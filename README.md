@@ -25,7 +25,7 @@ where `PATH_TO_KERRGEODESIC_GW` is the path to the directory `kerrgeodesic_gw` c
 
 You may then test the install by running all the doctests in the package source files via
 
-	sage -t PATH_TO_KERRGEODESIC_GW
+	sage -t PATH_TO_KERRGEODESIC_GW/kerrgeodesic_gw
 	
 You should then get the message `All tests passed!`
 
