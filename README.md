@@ -18,6 +18,11 @@ Run
 
 where `PATH_TO_KERRGEODESIC_GW` is the path to the directory `kerrgeodesic_gw` created by the `git clone` command.
 
+*NB:* on [CoCalc](https://cocalc.com), you need to add the option `--user`, i.e. open a terminal and run
+
+	git clone https://gitlab.obspm.fr/gourgoul/kerrgeodesic_gw.git
+	sage -pip install --user --upgrade --no-index -v -e kerrgeodesic_gw
+
 You may then test the install by running all the doctests in the package source files via
 
 	sage -t PATH_TO_KERRGEODESIC_GW
