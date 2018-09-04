@@ -51,6 +51,7 @@ extensions = [
     #'sage_package.sphinx',
     'sphinx.ext.doctest',
     'sphinx.ext.coverage',
+    'sphinx.ext.extlinks',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
