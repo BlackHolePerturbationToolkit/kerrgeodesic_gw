@@ -16,11 +16,11 @@ def strain_sensitivity(freq):
 
     INPUT:
 
-    - ``freq`` -- frequency `f` (in Hz)
+    - ``freq`` -- frequency `f` (in `\mathrm{Hz}`)
 
     OUTPUT:
 
-    - strain sensitivity `S(f)^{1/2}` (in Hz^{-1/2})
+    - strain sensitivity `S(f)^{1/2}` (in `\mathrm{Hz}^{-1/2}`)
 
     EXAMPLES::
 

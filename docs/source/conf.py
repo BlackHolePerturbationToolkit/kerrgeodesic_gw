@@ -12,24 +12,24 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# General information about the project.
-project = "kerrgeodesic_gw"
-copyright = "2018, Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton"
-package_name = "kerrgeodesic_gw"
-package_folder = "../../kerrgeodesic_gw"
-authors = "2018, Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton"
-
 import sys
 import os
 
 from sage.env import SAGE_DOC_SRC, SAGE_DOC, SAGE_SRC
 
+# General information about the project.
+project = "kerrgeodesic_gw"
+copyright = "2018, Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton"
+package_name = "kerrgeodesic_gw"
+package_name_latex = r"kerrgeodesic\_gw"
+package_folder = "../../kerrgeodesic_gw"
+authors = "2018, Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton"
+authors_latex = r"Eric Gourgoulhon, Alexandre Le Tiec,\\ Frederic Vincent, Niels Warburton"
+
 try:
     import sage.all
 except ImportError:
     raise RuntimeError("to build the documentation you need to be inside a Sage shell (run first the command 'sage -sh' in a shell")
-
-
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -163,7 +163,8 @@ html_theme_path = [os.path.join(SAGE_DOC_SRC, 'common', 'themes', 'sage')]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
+html_static_path = []
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -232,8 +233,9 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', package_name + '.tex', u'Documentation of ' + unicode(package_name),
-   authors, 'manual'),
+  ('index', package_name + '.tex',
+   u'Documentation of ' + unicode(package_name_latex),
+   authors_latex, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

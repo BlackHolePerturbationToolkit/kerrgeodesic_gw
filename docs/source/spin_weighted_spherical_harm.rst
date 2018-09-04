@@ -1,5 +1,3 @@
-.. nodoctest
-
 Spin-weighted spherical harmonics
 =================================
 

@@ -173,23 +173,33 @@ def spin_weighted_spherical_harmonic(s, l, m, theta, phi,
         sage: spin_weighted_spherical_harmonic(-2, 2, 1, R100(1.5), R100(2.0))  # tol 1.0e-28
         -0.14018136537676185317636108802 + 0.30630187143465275236861476906*I
 
-    Enforcing numerical evaluation with the argument ``numerical``::
+    Even when the entry is symbolic, numerical evaluation can be enforced via
+    the argument ``numerical``. For instance, setting ``numerical`` to ``RDF``
+    (SageMath's Real Double Field)::
 
-        sage: spin_weighted_spherical_harmonic(-2, 2, 1, pi/3, pi/4,
-        ....:                                  numerical=RDF)  # tol 1.0e-13 machine double prec
+        sage: spin_weighted_spherical_harmonic(-2, 2, 1, pi/3, pi/4, numerical=RDF)  # tol 1.0e-13
         0.2897056515173923 + 0.28970565151739225*I
         sage: parent(_)
         Complex Double Field
-        sage: spin_weighted_spherical_harmonic(-2, 2, 1, pi/3, pi/4,
-        ....:                                  numerical=RR)   # tol 1.0e-13 arbitrary prec set to 53 bits
+
+    One can also use ``numerical=RR`` (SageMath's Real Field with precision set
+    to 53 bits)::
+
+        sage: spin_weighted_spherical_harmonic(-2, 2, 1, pi/3, pi/4, numerical=RR)   # tol 1.0e-13
         0.289705651517392 + 0.289705651517392*I
         sage: parent(_)
         Complex Field with 53 bits of precision
-        sage: spin_weighted_spherical_harmonic(-2, 2, 1, pi/3, pi/4,
-        ....:                                  numerical=float)  # tol 1.0e-13 Python float
+
+    Another option is to use Python floats::
+
+        sage: spin_weighted_spherical_harmonic(-2, 2, 1, pi/3, pi/4, numerical=float)  # tol 1.0e-13
         (0.28970565151739225+0.2897056515173922j)
         sage: parent(_)
         <type 'complex'>
+
+    One can go beyond double precision, for instance using 100 bits of
+    precision::
+
         sage: spin_weighted_spherical_harmonic(-2, 2, 1, pi/3, pi/4,
         ....:                                  numerical=RealField(100))  # tol 1.0e-28
         0.28970565151739218525664455148 + 0.28970565151739218525664455148*I
