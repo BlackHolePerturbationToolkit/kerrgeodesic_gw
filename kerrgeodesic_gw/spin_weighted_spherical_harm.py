@@ -1,7 +1,16 @@
 r"""
-Spin-weighted spherical harmonics
+Spin-weighted spherical harmonics `{}_s Y_l^m(\theta,\phi)`
 
 """
+#******************************************************************************
+#       Copyright (C) 2018 Eric Gourgoulhon <eric.gourgoulhon@obspm.fr>
+#
+#  Distributed under the terms of the GNU General Public License (GPL)
+#  as published by the Free Software Foundation; either version 2 of
+#  the License, or (at your option) any later version.
+#                  http://www.gnu.org/licenses/
+#******************************************************************************
+
 from sage.rings.integer_ring import ZZ
 from sage.rings.real_double import RDF
 from sage.rings.real_mpfr import RealField_class
@@ -29,7 +38,7 @@ def _compute_sw_spherical_harm(s, l, m, theta, phi, condon_shortley=True,
     - ``theta`` -- colatitude angle
     - ``phi`` -- azimuthal angle
     - ``condon_shortley`` -- (default: ``True``) determines whether the
-      Condon-Shortley phase of `(-1)^m` is taken into account
+      Condon-Shortley phase of `(-1)^m` is taken into account (see below)
     - ``numerical`` -- (default: ``None``) determines whether a symbolic or
       a numerical computation of a given type is performed; allowed values are
 
@@ -54,10 +63,11 @@ def _compute_sw_spherical_harm(s, l, m, theta, phi, condon_shortley=True,
     ALGORITHM:
 
     The spin-weighted spherical harmonic is evaluated according to Eq. (3.1)
-    of J. N. Golberg et al., J. Math. Phys. **8**, 2155 (1967), with an
-    extra `(-1)^m` factor (the so-called *Condon-Shortley phase*) if
-    ``condon_shortley`` is ``True``, the actual formula being then the one
-    given in :wikipedia:`Spin-weighted_spherical_harmonics#Calculating`
+    of J. N. Golberg et al., J. Math. Phys. **8**, 2155 (1967)
+    [:doi:`10.1063/1.1705135`], with an extra `(-1)^m` factor (the so-called
+    *Condon-Shortley phase*) if ``condon_shortley`` is ``True``, the actual
+    formula being then the one given in
+    :wikipedia:`Spin-weighted_spherical_harmonics#Calculating`
 
     TESTS::
 
@@ -108,7 +118,7 @@ def spin_weighted_spherical_harmonic(s, l, m, theta, phi,
     - ``theta`` -- colatitude angle
     - ``phi`` -- azimuthal angle
     - ``condon_shortley`` -- (default: ``True``) determines whether the
-      Condon-Shortley phase of `(-1)^m` is taken into account
+      Condon-Shortley phase of `(-1)^m` is taken into account (see below)
     - ``cached`` -- (default: ``True``) determines whether the result shall be
       cached; setting ``cached`` to ``False`` forces a new computation, without
       caching the result
@@ -132,10 +142,11 @@ def spin_weighted_spherical_harmonic(s, l, m, theta, phi,
     ALGORITHM:
 
     The spin-weighted spherical harmonic is evaluated according to Eq. (3.1)
-    of J. N. Golberg et al., J. Math. Phys. **8**, 2155 (1967), with an
-    extra `(-1)^m` factor (the so-called *Condon-Shortley phase*) if
-    ``condon_shortley`` is ``True``, the actual formula being then the one
-    given in :wikipedia:`Spin-weighted_spherical_harmonics#Calculating`
+    of J. N. Golberg et al., J. Math. Phys. **8**, 2155 (1967)
+    [:doi:`10.1063/1.1705135`], with an extra `(-1)^m` factor (the so-called
+    *Condon-Shortley phase*) if ``condon_shortley`` is ``True``, the actual
+    formula being then the one given in
+    :wikipedia:`Spin-weighted_spherical_harmonics#Calculating`
 
     EXAMPLES::
 

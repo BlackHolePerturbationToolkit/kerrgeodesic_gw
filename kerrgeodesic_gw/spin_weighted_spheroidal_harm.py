@@ -2,6 +2,16 @@ r"""
 Spin-weighted spheroidal harmonics
 
 """
+#******************************************************************************
+#       Copyright (C) 2018 Eric Gourgoulhon <eric.gourgoulhon@obspm.fr>
+#       Copyright (C) 2018 Niels Warburton <niels.warburton@ucd.ie>
+#
+#  Distributed under the terms of the GNU General Public License (GPL)
+#  as published by the Free Software Foundation; either version 2 of
+#  the License, or (at your option) any later version.
+#                  http://www.gnu.org/licenses/
+#******************************************************************************
+
 from sage.functions.other import abs, ceil, sqrt
 from sage.functions.generalized import sgn
 from sage.matrix.constructor import matrix

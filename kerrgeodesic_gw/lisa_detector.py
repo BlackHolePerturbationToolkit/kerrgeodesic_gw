@@ -2,6 +2,15 @@ r"""
 Functions relative to the LISA detector.
 
 """
+#******************************************************************************
+#       Copyright (C) 2018 Eric Gourgoulhon <eric.gourgoulhon@obspm.fr>
+#
+#  Distributed under the terms of the GNU General Public License (GPL)
+#  as published by the Free Software Foundation; either version 2 of
+#  the License, or (at your option) any later version.
+#                  http://www.gnu.org/licenses/
+#******************************************************************************
+
 import os
 from sage.calculus.interpolation import spline
 from sage.functions.other import sqrt

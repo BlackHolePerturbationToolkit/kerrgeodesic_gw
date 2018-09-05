@@ -1,7 +1,28 @@
 r"""
-Functions `Z^\infty_{\ell m}(r)`
+Functions `Z^\infty_{\ell m}(r)` giving the amplitude of the gravitational
+radiation emitted by a particle on a circular orbit at radius `r` about
+a Kerr black hole.
+
+REFERENCES:
+
+- \S. A. Teukolsky, Astrophys. J. **185**, 635 (1973)
+- \S. Detweiler, Astrophys. J. **225**, 687 (1978)
+- \M. Shibata, Phys. Rev. D **50**, 6297 (1994)
+- \D. Kennefick, Phys. Rev. D **58**, 064012 (1998)
+- \S. A. Hughes, Phys. Rev. D **61**, 084004 (2000)
+- our paper
 
 """
+#******************************************************************************
+#       Copyright (C) 2018 Eric Gourgoulhon <eric.gourgoulhon@obspm.fr>
+#       Copyright (C) 2018 Niels Warburton <niels.warburton@ucd.ie>
+#
+#  Distributed under the terms of the GNU General Public License (GPL)
+#  as published by the Free Software Foundation; either version 2 of
+#  the License, or (at your option) any later version.
+#                  http://www.gnu.org/licenses/
+#******************************************************************************
+
 import os
 from sage.calculus.interpolation import spline
 from sage.functions.other import sqrt
@@ -13,17 +34,19 @@ from sage.symbolic.all import i as I
 
 _cached_splines = {}
 
-def Zinf_Schwarzchild_PN(l, m, r0):
+def Zinf_Schwarzchild_PN(l, m, r):
     r"""
-    Amplitude factor of the mode (l,m) for a Schwarzschild BH at the 1.5PN level.
+    Amplitude factor of the mode (l,m) for a Schwarzschild BH at the 1.5PN
+    level.
 
-    The 1.5PN formulas are taken from E. Poisson, Phys. Rev. D *47*, 1497 (1993).
+    The 1.5PN formulas are taken from E. Poisson, Phys. Rev. D **47**, 1497
+    (1993), :doi:`10.1103/PhysRevD.47.1497`.
 
     INPUT:
 
     - ``l`` -- integer >= 2; the harmonic degree
     - ``m`` -- integer within the range ``[-l, l]``; the azimuthal number
-    - ``r0`` -- areal radius of the orbit (in units of `M`, the BH mass)
+    - ``r`` -- areal radius of the orbit (in units of `M`, the BH mass)
 
     OUTPUT:
 
@@ -39,17 +62,17 @@ def Zinf_Schwarzchild_PN(l, m, r0):
 
     """
     if m < 0:
-        return (-1)**l * Zinf_Schwarzchild_PN(l, -m, r0).conjugate()
-    v = 1./sqrt(r0)
+        return (-1)**l * Zinf_Schwarzchild_PN(l, -m, r).conjugate()
+    v = 1./sqrt(r)
     if l == 2:
-        b = RDF(sqrt(pi/5.)/r0**4)
+        b = RDF(sqrt(pi/5.)/r**4)
         if m == 1:
             return CDF(4./3.*I*b*v*(1 - 17./28.*v**2))
         if m == 2:
             return CDF(-16*b*(1 - 107./42.*v**2
                         + (2*pi + 4*I*(3*ln(2*v) - 0.839451001765134))*v**3))
     if l == 3:
-        b = RDF(sqrt(pi/7.)/r0**(4.5))
+        b = RDF(sqrt(pi/7.)/r**(4.5))
         if m == 1:
             return CDF(I/3.*b/sqrt(10.)*(1 - 8./3.*v**2))
         if m == 2:
@@ -57,7 +80,7 @@ def Zinf_Schwarzchild_PN(l, m, r0):
         if m == 3:
             return CDF(-81*I*b/sqrt(8.)*(1 - 4*v**2))
     if l == 4:
-        b = RDF(sqrt(pi)/r0**5)
+        b = RDF(sqrt(pi)/r**5)
         if m == 1:
             return CDF(I/105.*b/sqrt(2)*v)
         if m == 2:
@@ -67,7 +90,7 @@ def Zinf_Schwarzchild_PN(l, m, r0):
         if m == 4:
             return CDF(512./9.*b/sqrt(7.))
     if l == 5:
-        b = RDF(sqrt(pi)/r0**(5.5))
+        b = RDF(sqrt(pi)/r**(5.5))
         if m == 1:
             return CDF(I/360.*b/sqrt(77.))
         if m == 2:
@@ -89,13 +112,14 @@ def Zinf(a, l, m, r, algorithm='spline'):
     - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
     - ``l`` -- integer >= 2; the harmonic degree
     - ``m`` -- integer within the range ``[-l, l]``; the azimuthal number
-    - ``r`` -- Boyer-Lindquist radial coordinate (in units of `M`)
+    - ``r`` -- areal radius of the orbit (in units of `M`)
     - ``algorithm`` -- (default: 'spline') string describing the computational
       method; allowed values are
 
       - ``'spline'``: spline interpolation of tabulated data
       - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
-        E. Poisson, Phys. Rev. D *47*, 1497 (1993), with a minus one factor
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`], with a minus one factor
         accounting for a different convention for the metric signature.
 
     OUTPUT:

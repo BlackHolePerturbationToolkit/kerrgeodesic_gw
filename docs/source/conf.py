@@ -124,7 +124,7 @@ extlinks = {
     'wikipedia': ('https://en.wikipedia.org/wiki/%s', 'Wikipedia article '),
     'arxiv': ('http://arxiv.org/abs/%s', 'Arxiv '),
     'oeis': ('https://oeis.org/%s', 'OEIS sequence '),
-    'doi': ('https://dx.doi.org/%s', 'doi:'),
+    'doi': ('https://doi.org/%s', 'doi:'),
     'mathscinet': ('http://www.ams.org/mathscinet-getitem?mr=%s', 'MathSciNet ')
     }
 
@@ -231,11 +231,11 @@ latex_elements = {
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
+#  author, documentclass [howto, manual, or own class], toctree_only).
 latex_documents = [
   ('index', package_name + '.tex',
-   u'Documentation of ' + unicode(package_name_latex),
-   authors_latex, 'manual'),
+   u'Documentation of ' + unicode(package_name_latex), authors_latex,
+   'manual', True),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

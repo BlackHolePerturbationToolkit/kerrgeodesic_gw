@@ -3,3 +3,4 @@ from .spin_weighted_spherical_harm import spin_weighted_spherical_harmonic
 from .spin_weighted_spheroidal_harm import (spin_weighted_spheroidal_harmonic,
                                             spin_weighted_spheroidal_eigenvalue)
 from .zinf import Zinf_Schwarzchild_PN, Zinf
+from .gw_particle import h_fourier_mode_plus, h_fourier_mode_cross
