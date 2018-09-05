@@ -234,7 +234,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class], toctree_only).
 latex_documents = [
   ('index', package_name + '.tex',
-   u'Documentation of ' + unicode(package_name_latex), authors_latex,
+   u'Reference manual of ' + unicode(package_name_latex), authors_latex,
    'manual', True),
 ]
 

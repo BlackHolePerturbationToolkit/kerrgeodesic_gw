@@ -131,7 +131,7 @@ def spin_weighted_spheroidal_eigenvalue(s, l, m, gamma, verbose=False,
     ALGORITHM:
 
     The method is adapted from that exposed in Appendix A of S.A. Hughes,
-    Phys. Rev. D **61**, 084004 (2000).
+    Phys. Rev. D **61**, 084004 (2000) [:doi:`10.1103/PhysRevD.61.084004`].
 
     EXAMPLES::
 
