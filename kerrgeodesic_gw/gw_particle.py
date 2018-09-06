@@ -2,6 +2,32 @@ r"""
 Gravitational radiation by a particle on a circular orbit around a Kerr
 black hole
 
+The gravitational wave emitted by a particle of mass `\mu` in a circular orbit
+around a Kerr black hole of mass `M` and angular momentum parameter `a`
+is given by the formula:
+
+.. MATH::
+
+    h_+ - i h_\times = \frac{2\mu}{r} \,
+    \sum_{\ell=2}^{\infty} \sum_{m=-\ell}^\ell
+    \frac{Z^\infty_{\ell m}(r_0)}{(m\omega_0)^2}
+    \, _{-2}S^{am\omega_0}_{\ell m}(\theta,\phi)
+    \, e^{-i m \phi_0} e^{- i m \omega_0 (t-r_*)}
+
+where
+
+- `h_+ = h_+(t,r,\theta,\phi)` and `h_\times = h_\times(t,r,\theta,\phi)`,
+  `(t,r,\theta,\phi)` being the Boyer-Lindquist coordinates of the observer
+- `r_*` is the tortoise coordinate corresponding to `r`
+- `r_0` is the Boyer-Lindquist radius of the particle's orbit
+- `\phi_0` is some constant phase factor
+- `\omega_0` is the orbital angular velocity
+- `Z^\infty_{\ell m}(r_0)` is numerically provided by the function
+  :func:`~kerrgeodesic_gw.zinf.Zinf`
+- `_{-2}S^{am\omega_0}_{\ell m}(\theta,\phi)` is the spin-weighted spheroidal
+  harmonic of weight `-2` (cf.
+  :func:`~kerrgeodesic_gw.spin_weighted_spheroidal_harm.spin_weighted_spheroidal_harmonic`)
+
 The Fourier-series expansion of the waveform `(h_+,h_\times)` received at the
 location `(t,r,\theta,\phi)` is
 
@@ -26,8 +52,17 @@ and `B_m^{+,\times}(r,\theta)` with respect to `r` is simply `\mu/r`, where
 complicated and involves both the radius `r_0` of the particle's orbit and the
 BH parameters `(M,a)`.
 
-The functions :func:`h_fourier_mode_plus` and :func:`h_fourier_mode_cross`
-defined below compute the rescaled Fourier coefficients
+The functions :func:`h_plus_particle` and :func:`h_cross_particle`
+defined below compute the rescaled waveforms
+
+.. MATH::
+
+    {\bar h}_+ := \frac{r}{\mu} \, h_+
+    \quad\mbox{and}\quad
+    {\bar h}_\times := \frac{r}{\mu} \, h_\times
+
+while the functions :func:`h_fourier_mode_plus` and
+:func:`h_fourier_mode_cross` compute the rescaled Fourier coefficients
 
 .. MATH::
 
@@ -55,6 +90,7 @@ REFERENCES:
 #******************************************************************************
 
 from sage.rings.real_double import RDF
+from sage.functions.trig import cos, sin
 from .spin_weighted_spherical_harm import spin_weighted_spherical_harmonic
 from .spin_weighted_spheroidal_harm import spin_weighted_spheroidal_harmonic
 from .zinf import Zinf
@@ -62,7 +98,8 @@ from .zinf import Zinf
 def h_fourier_mode_plus(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     r"""
     Return the Fourier mode of a given order ``m`` of the rescaled `h_+`-part
-    of the gravitational wave emitted by a particle orbiting a Kerr black hole.
+    of the gravitational wave emitted by a particle in circular orbit around
+    a Kerr black hole.
 
     The rescaled Fourier mode of order ``m`` received at the location
     `(t,r,\theta,\phi)` is
@@ -79,18 +116,18 @@ def h_fourier_mode_plus(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     INPUT:
 
     - ``m`` -- positive integer defining the Fourier mode
-    - ``a`` -- BH angular momentum parameter (in units of M, the BH mass)
-    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of M)
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
     - ``l_max`` -- (default: 5) upper bound in the summation over the harmonic
-      degree ``l``
-    - ``algorithm_Zinf`` -- (default: 'spline') string describing the
+      degree `\ell`
+    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
       computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
 
       - ``'spline'``: spline interpolation of tabulated data
       - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
-        E. Poisson, Phys. Rev. D **47**, 1497 (1993),
-        :doi:`10.1103/PhysRevD.47.1497`
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
 
     OUTPUT:
 
@@ -172,8 +209,8 @@ def h_fourier_mode_plus(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
 def h_fourier_mode_cross(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     r"""
     Return the Fourier mode of a given order ``m`` of the rescaled
-    `h_\times`-part of the gravitational wave emitted by a particle orbiting a
-    Kerr black hole.
+    `h_\times`-part of the gravitational wave emitted by a particle in
+    circular orbit around a Kerr black hole.
 
     The rescaled Fourier mode of order ``m`` received at the location
     `(t,r,\theta,\phi)` is
@@ -190,18 +227,18 @@ def h_fourier_mode_cross(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     INPUT:
 
     - ``m`` -- positive integer defining the Fourier mode
-    - ``a`` -- BH angular momentum parameter (in units of M, the BH mass)
-    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of M)
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
     - ``l_max`` -- (default: 5) upper bound in the summation over the harmonic
-      degree ``l``
-    - ``algorithm_Zinf`` -- (default: 'spline') string describing the
+      degree `\ell`
+    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
       computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
 
       - ``'spline'``: spline interpolation of tabulated data
       - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
-        E. Poisson, Phys. Rev. D **47**, 1497 (1993),
-        :doi:`10.1103/PhysRevD.47.1497`
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
 
     OUTPUT:
 
@@ -287,3 +324,200 @@ def h_fourier_mode_cross(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     Across *= pre
     Bcross *= pre
     return (Across, Bcross)
+
+def h_plus_particle(a, r0, phi0, u, theta, phi, l_max=10, m_min=1,
+                    algorithm_Zinf='spline'):
+    r"""
+    Return the rescaled `h_+`-part of the gravitational radiation emitted by
+    a particle in circular orbit around a Kerr black hole.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
+    - ``phi0`` -- phase factor
+    - ``u`` -- retarded time coordinate of the observer (in units of `M`):
+      `u = t - r_*`, where `t` is the Boyer-Lindquist time coordinate and `r_*`
+      is the tortoise coordinate
+    - ``theta`` -- Boyer-Lindquist colatitute  `\theta` of the observer
+    - ``phi`` -- Boyer-Lindquist azimuthal coordinate `\phi`  of the observer
+    - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
+      degree `\ell`
+    - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
+      mode `m`
+    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
+      computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
+
+      - ``'spline'``: spline interpolation of tabulated data
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
+
+    OUTPUT:
+
+    - the rescaled waveform  `(r / \mu) h_+`, where `\mu` is the particle's
+      mass and `r` is the Boyer-Lindquist radial coordinate of the observer
+
+    EXAMPLES:
+
+    Let us consider the case `a=0` (Schwarzschild black hole) and `r_0=6 M`
+    (emission from the ISCO)::
+
+        sage: from kerrgeodesic_gw import h_plus_particle
+        sage: a = 0
+        sage: h_plus_particle(a, 6., 0., 0., pi/2, 0.)  # tol 1.0e-13
+        0.1536656546005028
+        sage: h_plus_particle(a, 6., 0., 0., pi/2, 0., l_max=5)  # tol 1.0e-13
+        0.157759938177291
+        sage: h_plus_particle(a, 6., 0., 0., pi/2, 0., l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
+        0.22583887001798497
+
+    For an orbit of larger radius (`r_0=12 M`), the 1.5-post-Newtonian
+    approximation is in better agreement with the exact computation::
+
+        sage: h_plus_particle(a, 12., 0., 0., pi/2, 0.)  # tol 1.0e-13
+        0.11031251832047866
+        sage: h_plus_particle(a, 12., 0., 0., pi/2, 0., l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
+        0.12935832450325302
+
+    A plot of the waveform generated by a particle orbiting at the ISCO::
+
+        sage: hp = lambda u: h_plus_particle(a, 6., 0., u, pi/2, 0.)
+        sage: plot(hp, (0, 200.), axes_labels=[r'$(t-r_*)/M$', r'$r h_+/\mu$'],
+        ....:      gridlines=True, frame=True, axes=False)
+        Graphics object consisting of 1 graphics primitive
+
+    .. PLOT::
+
+        from kerrgeodesic_gw import h_plus_particle
+        hp = lambda u: h_plus_particle(0., 6., 0., u, pi/2, 0.)
+        g = plot(hp, (0, 200.), axes_labels=[r'$(t-r_*)/M$', r'$r h_+/\mu$'], \
+                 gridlines=True, frame=True, axes=False)
+        sphinx_plot(g)
+
+    Case `a/M=0.95` (rapidly rotating Kerr black hole)::
+
+        sage: a = 0.95
+        sage: h_plus_particle(a, 2., 0., 0., pi/2, 0.)  # tol 1.0e-13
+        0.20326150400852214
+
+    Assessing the importance of the mode `m=1`::
+
+        sage: h_plus_particle(a, 2., 0., 0., pi/2, 0., m_min=2)  # tol 1.0e-13
+        0.21845811047370495
+
+    """
+    # Orbital angular velocity:
+    omega0 = RDF(1. / (r0**1.5 + a))
+    # Phase angle:
+    psi = omega0*u - phi + phi0
+    # Sum over the Fourier modes:
+    hplus = 0
+    for m in range(m_min, l_max+1):
+        hm = h_fourier_mode_plus(m, a, r0, theta, l_max=l_max,
+                                 algorithm_Zinf=algorithm_Zinf)
+        mpsi = m*psi
+        hplus += hm[0]*cos(mpsi) + hm[1]*sin(mpsi)
+    return hplus
+
+def h_cross_particle(a, r0, phi0, u, theta, phi, l_max=10, m_min=1,
+                     algorithm_Zinf='spline'):
+    r"""
+    Return the rescaled `h_\times`-part of the gravitational radiation emitted
+    by a particle in circular orbit around a Kerr black hole.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
+    - ``phi0`` -- phase factor
+    - ``u`` -- retarded time coordinate of the observer (in units of `M`):
+      `u = t - r_*`, where `t` is the Boyer-Lindquist time coordinate and `r_*`
+      is the tortoise coordinate
+    - ``theta`` -- Boyer-Lindquist colatitute  `\theta` of the observer
+    - ``phi`` -- Boyer-Lindquist azimuthal coordinate `\phi`  of the observer
+    - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
+      degree `\ell`
+    - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
+      mode `m`
+    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
+      computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
+
+      - ``'spline'``: spline interpolation of tabulated data
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
+
+    OUTPUT:
+
+    - the rescaled waveform  `(r / \mu) h_\times`, where `\mu` is the
+      particle's mass and `r` is the Boyer-Lindquist radial coordinate of the
+      observer
+
+    EXAMPLES:
+
+    Let us consider the case `a=0` (Schwarzschild black hole) and `r_0=6 M`
+    (emission from the ISCO). For `\theta=\pi/2`, we have `h_\times=0`::
+
+        sage: from kerrgeodesic_gw import h_cross_particle
+        sage: a = 0
+        sage: h_cross_particle(a, 6., 0., 0., pi/2, 0.)  # tol 1.0e-13
+        1.0041370414185673e-16
+
+    while for `\theta=\pi/4`, we have::
+
+        sage: h_cross_particle(a, 6., 0., 0., pi/4, 0.)  # tol 1.0e-13
+        0.275027796440582
+        sage: h_cross_particle(a, 6., 0., 0., pi/4, 0., l_max=5)  # tol 1.0e-13
+        0.2706516303570341
+        sage: h_cross_particle(a, 6., 0., 0., pi/4, 0., l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
+        0.2625307460899205
+
+    For an orbit of larger radius (`r_0=12 M`), the 1.5-post-Newtonian
+    approximation is in better agreement with the exact computation::
+
+        sage: h_cross_particle(a, 12., 0., 0., pi/4, 0.)
+        0.1050751824554463
+        sage: h_cross_particle(a, 12., 0., 0., pi/4, 0., l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
+        0.10244926162224487
+
+    A plot of the waveform generated by a particle orbiting at the ISCO::
+
+        sage: hc = lambda u: h_cross_particle(a, 6., 0., u, pi/4, 0.)
+        sage: plot(hc, (0, 200.), axes_labels=[r'$(t-r_*)/M$', r'$r h_\times/\mu$'],
+        ....:      gridlines=True, frame=True, axes=False)
+        Graphics object consisting of 1 graphics primitive
+
+    .. PLOT::
+
+        from kerrgeodesic_gw import h_cross_particle
+        hc = lambda u: h_cross_particle(0, 6., 0., u, pi/4, 0.)
+        g = plot(hc, (0, 200.), axes_labels=[r'$(t-r_*)/M$', r'$r h_\times/\mu$'], \
+                 gridlines=True, frame=True, axes=False)
+        sphinx_plot(g)
+
+    Case `a/M=0.95` (rapidly rotating Kerr black hole)::
+
+        sage: a = 0.95
+        sage: h_cross_particle(a, 2., 0., 0., pi/4, 0.)  # tol 1.0e-13
+        -0.2681353673743396
+
+    Assessing the importance of the mode `m=1`::
+
+        sage: h_cross_particle(a, 2., 0., 0., pi/4, 0., m_min=2)  # tol 1.0e-13
+        -0.3010579420748449
+
+    """
+    # Orbital angular velocity:
+    omega0 = RDF(1. / (r0**1.5 + a))
+    # Phase angle:
+    psi = omega0*u - phi + phi0
+    # Sum over the Fourier modes:
+    hcross = 0
+    for m in range(m_min, l_max+1):
+        hm = h_fourier_mode_cross(m, a, r0, theta, l_max=l_max,
+                                  algorithm_Zinf=algorithm_Zinf)
+        mpsi = m*psi
+        hcross += hm[0]*cos(mpsi) + hm[1]*sin(mpsi)
+    return hcross
+

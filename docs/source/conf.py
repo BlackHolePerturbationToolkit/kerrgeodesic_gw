@@ -48,11 +48,41 @@ sys.path.append(os.path.join(SAGE_SRC, "sage_setup", "docbuild", "ext"))
 extensions = [
     #'sphinx.ext.autodoc',
     'sage_autodoc',
-    #'sage_package.sphinx',
     'sphinx.ext.doctest',
     'sphinx.ext.coverage',
     'sphinx.ext.extlinks',
+    'matplotlib.sphinxext.plot_directive'
 ]
+
+# This code is executed before each ".. PLOT::" directive in the Sphinx
+# documentation. It defines a 'sphinx_plot' function that displays a Sage object
+# through mathplotlib, so that it will be displayed in the HTML doc
+plot_html_show_source_link = False
+plot_pre_code = """
+def sphinx_plot(plot):
+    import matplotlib.image as mpimg
+    from sage.misc.temporary_file import tmp_filename
+    import matplotlib.pyplot as plt
+    if os.environ.get('SAGE_SKIP_PLOT_DIRECTIVE', 'no') != 'yes':
+        import matplotlib as mpl
+        mpl.rcParams['image.interpolation'] = 'bilinear'
+        mpl.rcParams['image.resample'] = False
+        mpl.rcParams['figure.figsize'] = [8.0, 6.0]
+        mpl.rcParams['figure.dpi'] = 80
+        mpl.rcParams['savefig.dpi'] = 100
+        fn = tmp_filename(ext=".png")
+        plot.plot().save(fn)
+        img = mpimg.imread(fn)
+        plt.imshow(img)
+        plt.margins(0)
+        plt.axis("off")
+        plt.tight_layout(pad=0)
+
+from sage.all_cmdline import *
+"""
+
+plot_html_show_formats = False
+
 
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ['_templates']

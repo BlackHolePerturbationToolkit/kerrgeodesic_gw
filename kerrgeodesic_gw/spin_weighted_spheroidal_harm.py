@@ -192,7 +192,8 @@ def spin_weighted_spheroidal_harmonic(s, l, m, gamma, theta, phi,
     The spin-weighted oblate spheroidal harmonics are computed by an expansion
     over spin-weighted *spherical* harmonics, the coefficients of the expansion
     being obtained by solving an eigenvalue problem, as exposed in Appendix A
-    of S.A. Hughes, Phys. Rev. D **61**, 084004 (2000).
+    of S.A. Hughes, Phys. Rev. D **61**, 084004 (2000)
+    [:doi:`10.1103/PhysRevD.61.084004`].
 
     EXAMPLES::
 
