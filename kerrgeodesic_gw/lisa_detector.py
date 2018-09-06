@@ -41,6 +41,25 @@ def strain_sensitivity(freq):
         sage: lisa_detector.strain_sensitivity(1.e-3)  # tol 1.0e-13
         1.8082609253700212e-19
 
+    ::
+
+        sage: plot_loglog(lisa_detector.strain_sensitivity, (1e-5, 1),
+        ....:             plot_points=2000, ymin=1e-20, ymax=1e-14,
+        ....:             axes_labels=[r"$f\ [\mathrm{Hz}]$",
+        ....:                          r"$S(f)^{1/2} \ \left[\mathrm{Hz}^{-1/2}\right]$"],
+        ....:             gridlines='minor', frame=True, axes=False)
+        Graphics object consisting of 1 graphics primitive
+
+    .. PLOT::
+
+        from kerrgeodesic_gw import lisa_detector
+        g = plot_loglog(lisa_detector.strain_sensitivity, (1e-5, 1), \
+                        plot_points=2000, ymin=1e-20, ymax=1e-14, \
+                        axes_labels=[r"$f\ [\mathrm{Hz}]$", \
+                                     r"$S(f)^{1/2} \ \left[\mathrm{Hz}^{-1/2}\right]$"], \
+                        gridlines='minor', frame=True, axes=False)
+        sphinx_plot(g)
+
     """
     global _sensitivity_spline
     if not _sensitivity_spline:

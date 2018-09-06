@@ -61,8 +61,8 @@ defined below compute the rescaled waveforms
     \quad\mbox{and}\quad
     {\bar h}_\times := \frac{r}{\mu} \, h_\times
 
-while the functions :func:`h_fourier_mode_plus` and
-:func:`h_fourier_mode_cross` compute the rescaled Fourier coefficients
+while the functions :func:`h_plus_particle_fourier` and
+:func:`h_cross_particle_fourier` compute the rescaled Fourier coefficients
 
 .. MATH::
 
@@ -91,17 +91,22 @@ REFERENCES:
 
 from sage.rings.real_double import RDF
 from sage.functions.trig import cos, sin
+from sage.functions.other import sqrt
+from sage.misc.latex import latex
+from sage.plot.graphics import Graphics
+from sage.plot.line import line
+from sage.symbolic.expression import Expression
 from .spin_weighted_spherical_harm import spin_weighted_spherical_harmonic
 from .spin_weighted_spheroidal_harm import spin_weighted_spheroidal_harmonic
 from .zinf import Zinf
 
-def h_fourier_mode_plus(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
+def h_plus_particle_fourier(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     r"""
-    Return the Fourier mode of a given order ``m`` of the rescaled `h_+`-part
+    Return the Fourier mode of a given order `m` of the rescaled `h_+`-part
     of the gravitational wave emitted by a particle in circular orbit around
     a Kerr black hole.
 
-    The rescaled Fourier mode of order ``m`` received at the location
+    The rescaled Fourier mode of order `m` received at the location
     `(t,r,\theta,\phi)` is
 
     .. MATH::
@@ -119,7 +124,7 @@ def h_fourier_mode_plus(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
     - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
-    - ``l_max`` -- (default: 5) upper bound in the summation over the harmonic
+    - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
       degree `\ell`
     - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
       computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
@@ -139,36 +144,36 @@ def h_fourier_mode_plus(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     Let us consider the case `a=0` first (Schwarzschild black hole), with
     `m=2`::
 
-        sage: from kerrgeodesic_gw import h_fourier_mode_plus
+        sage: from kerrgeodesic_gw import h_plus_particle_fourier
         sage: a = 0
-        sage: h_fourier_mode_plus(2, a, 8., pi/2)  # tol 1.0e-13
+        sage: h_plus_particle_fourier(2, a, 8., pi/2)  # tol 1.0e-13
         (0.2014580652208302, -0.06049343736886148)
-        sage: h_fourier_mode_plus(2, a, 8., pi/2, l_max=5)  # tol 1.0e-13
+        sage: h_plus_particle_fourier(2, a, 8., pi/2, l_max=5)  # tol 1.0e-13
         (0.20146097329552273, -0.060495372034569186)
-        sage: h_fourier_mode_plus(2, a, 8., pi/2, l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
+        sage: h_plus_particle_fourier(2, a, 8., pi/2, l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
         (0.2204617125753912, -0.0830484439639611)
 
     Values of `m` different from 2::
 
-        sage: h_fourier_mode_plus(3, a, 20., pi/2)  # tol 1.0e-13
+        sage: h_plus_particle_fourier(3, a, 20., pi/2)  # tol 1.0e-13
         (-0.005101595598729037, -0.021302121442654077)
-        sage: h_fourier_mode_plus(3, a, 20., pi/2, l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
+        sage: h_plus_particle_fourier(3, a, 20., pi/2, l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
         (0.0, -0.016720919174427588)
-        sage: h_fourier_mode_plus(1, a, 8., pi/2)  # tol 1.0e-13
+        sage: h_plus_particle_fourier(1, a, 8., pi/2)  # tol 1.0e-13
         (-0.014348477201223874, -0.05844679575244101)
-        sage: h_fourier_mode_plus(0, a, 8., pi/2)
+        sage: h_plus_particle_fourier(0, a, 8., pi/2)
         (0, 0)
 
     The case `a/M=0.95` (rapidly rotating Kerr black hole)::
 
         sage: a = 0.95
-        sage: h_fourier_mode_plus(2, a, 8., pi/2)  # tol 1.0e-13
+        sage: h_plus_particle_fourier(2, a, 8., pi/2)  # tol 1.0e-13
         (0.182748773431646, -0.05615306925896938)
-        sage: h_fourier_mode_plus(8, a, 8., pi/2)  # tol 1.0e-13
+        sage: h_plus_particle_fourier(8, a, 8., pi/2)  # tol 1.0e-13
         (-4.724709221209198e-05, 0.0006867183495228116)
-        sage: h_fourier_mode_plus(2, a, 2., pi/2)  # tol 1.0e-13
+        sage: h_plus_particle_fourier(2, a, 2., pi/2)  # tol 1.0e-13
         (0.1700402877617014, 0.33693580916655747)
-        sage: h_fourier_mode_plus(8, a, 2., pi/2)  # tol 1.0e-13
+        sage: h_plus_particle_fourier(8, a, 2., pi/2)  # tol 1.0e-13
         (-0.009367442995129153, -0.03555092085651877)
 
     """
@@ -206,13 +211,13 @@ def h_fourier_mode_plus(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     Bplus *= pre
     return (Aplus, Bplus)
 
-def h_fourier_mode_cross(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
+def h_cross_particle_fourier(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     r"""
-    Return the Fourier mode of a given order ``m`` of the rescaled
+    Return the Fourier mode of a given order `m` of the rescaled
     `h_\times`-part of the gravitational wave emitted by a particle in
     circular orbit around a Kerr black hole.
 
-    The rescaled Fourier mode of order ``m`` received at the location
+    The rescaled Fourier mode of order `m` received at the location
     `(t,r,\theta,\phi)` is
 
     .. MATH::
@@ -230,7 +235,7 @@ def h_fourier_mode_cross(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
     - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
-    - ``l_max`` -- (default: 5) upper bound in the summation over the harmonic
+    - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
       degree `\ell`
     - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
       computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
@@ -250,44 +255,44 @@ def h_fourier_mode_cross(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     Let us consider the case `a=0` first (Schwarzschild black hole), with
     `m=2`::
 
-        sage: from kerrgeodesic_gw import h_fourier_mode_cross
+        sage: from kerrgeodesic_gw import h_cross_particle_fourier
         sage: a = 0
 
     `h_m^\times` is always zero in the direction `\theta=\pi/2`::
 
-        sage: h_fourier_mode_cross(2, a, 8., pi/2)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(2, a, 8., pi/2)  # tol 1.0e-13
         (3.444996575846961e-17, 1.118234985040581e-16)
 
     Let us then evaluate `h_m^\times` in the direction `\theta=\pi/4`::
 
-        sage: h_fourier_mode_cross(2, a, 8., pi/4)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(2, a, 8., pi/4)  # tol 1.0e-13
         (0.09841144532628172, 0.31201728756415015)
-        sage: h_fourier_mode_cross(2, a, 8., pi/4, l_max=5)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(2, a, 8., pi/4, l_max=5)  # tol 1.0e-13
         (0.09841373523119075, 0.31202073689061305)
-        sage: h_fourier_mode_cross(2, a, 8., pi/4, l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
+        sage: h_cross_particle_fourier(2, a, 8., pi/4, l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
         (0.11744823578781578, 0.34124272645755677)
 
     Values of `m` different from 2::
 
-        sage: h_fourier_mode_cross(3, a, 20., pi/4)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(3, a, 20., pi/4)  # tol 1.0e-13
         (0.022251439699635174, -0.005354134279052387)
-        sage: h_fourier_mode_cross(3, a, 20., pi/4, l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
+        sage: h_cross_particle_fourier(3, a, 20., pi/4, l_max=5, algorithm_Zinf='1.5PN')  # tol 1.0e-13
         (0.017782177999686274, 0.0)
-        sage: h_fourier_mode_cross(1, a, 8., pi/4)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(1, a, 8., pi/4)  # tol 1.0e-13
         (0.03362589948237155, -0.008465651545641889)
-        sage: h_fourier_mode_cross(0, a, 8., pi/4)
+        sage: h_cross_particle_fourier(0, a, 8., pi/4)
         (0, 0)
 
     The case `a/M=0.95` (rapidly rotating Kerr black hole)::
 
         sage: a = 0.95
-        sage: h_fourier_mode_cross(2, a, 8., pi/4)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(2, a, 8., pi/4)  # tol 1.0e-13
         (0.08843838892991202, 0.28159329265206867)
-        sage: h_fourier_mode_cross(8, a, 8., pi/4)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(8, a, 8., pi/4)  # tol 1.0e-13
         (-0.00014588821622195107, -8.179557811364057e-06)
-        sage: h_fourier_mode_cross(2, a, 2., pi/4)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(2, a, 2., pi/4)  # tol 1.0e-13
         (-0.6021994882885746, 0.3789513303450391)
-        sage: h_fourier_mode_cross(8, a, 2., pi/4)  # tol 1.0e-13
+        sage: h_cross_particle_fourier(8, a, 2., pi/4)  # tol 1.0e-13
         (0.01045760329050054, -0.004986913120370192)
 
     """
@@ -324,6 +329,171 @@ def h_fourier_mode_cross(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     Across *= pre
     Bcross *= pre
     return (Across, Bcross)
+
+def h_amplitude_particle_fourier(m, a, r0, theta, l_max=10,
+                                 algorithm_Zinf='spline'):
+    r"""
+    Return the amplitude Fourier mode of a given order `m` of the rescaled
+    gravitational wave emitted by a particle in circular orbit around a Kerr
+    black hole.
+
+    The rescaled Fourier mode of order `m` received at the location
+    `(t,r,\theta,\phi)` is
+
+    .. MATH::
+
+        \frac{r}{\mu} h_m^{+,\times} = {\bar A}_m^{+,\times} \cos(m\psi)
+                                + {\bar B}_m^{+,\times} \sin(m\psi)
+
+    where `\mu` is the particle mass and `\psi := \omega_0 (t-r_*) - \phi`,
+    `\omega_0` being the orbital frequency of the particle and `r_*` the
+    tortoise coordinate corresponding to `r`.
+
+    The `+` and `\times` amplitudes of the Fourier mode `m` are defined
+    respectively by
+
+    .. MATH::
+
+        \frac{r}{\mu} |h_m^+| := \sqrt{({\bar A}_m^+)^2 + ({\bar B}_m^+)^2}
+        \quad\mbox{and}\quad
+        \frac{r}{\mu} |h_m^\times| := \sqrt{({\bar A}_m^\times)^2
+                                        + ({\bar B}_m^\times)^2}
+
+    INPUT:
+
+    - ``m`` -- positive integer defining the Fourier mode
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
+    - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
+    - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
+      degree `\ell`
+    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
+      computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
+
+      - ``'spline'``: spline interpolation of tabulated data
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
+
+    OUTPUT:
+
+    - tuple `((r/\mu)|h_m^+|,\ (r/\mu)|h_m^\times|)` (cf. the above expression)
+
+    EXAMPLE:
+
+    For a Schwarzschild black hole (`a=0`)::
+
+        sage: from kerrgeodesic_gw import h_amplitude_particle_fourier
+        sage: a = 0
+        sage: h_amplitude_particle_fourier(2, a, 6., pi/2)  # tol 1.0e-13
+        (0.27875846152963557, 1.5860176188287866e-16)
+        sage: h_amplitude_particle_fourier(2, a, 6., pi/4)  # tol 1.0e-13
+        (0.47180033963220214, 0.45008696580919527)
+        sage: h_amplitude_particle_fourier(2, a, 6., 1e-12)  # tol 1.0e-13
+        (0.6724377101572424, 0.6724377101572424)
+        sage: h_amplitude_particle_fourier(2, a, 6., pi/4, l_max=5)  # tol 1.0e-13
+        (0.47179830286565255, 0.4500948389153302)
+        sage: h_amplitude_particle_fourier(2, a, 6., pi/4, l_max=5,  # tol 1.0e-13
+        ....:                              algorithm_Zinf='1.5PN')
+        (0.5381495951380861, 0.5114366815383188)
+
+    For a rapidly rotating Kerr black hole (`a=0.95 M`)::
+
+        sage: a = 0.95
+        sage: h_amplitude_particle_fourier(2, a, 6., pi/4)  # tol 1.0e-13
+        (0.39402068296301823, 0.37534143024659444)
+        sage: h_amplitude_particle_fourier(2, a, 2., pi/4)  # tol 1.0e-13
+        (0.7358730645589858, 0.7115113031184368)
+
+    """
+    ap, bp = h_plus_particle_fourier(m, a, r0, theta, l_max=l_max,
+                                     algorithm_Zinf=algorithm_Zinf)
+    ac, bc = h_cross_particle_fourier(m, a, r0, theta, l_max=l_max,
+                                      algorithm_Zinf=algorithm_Zinf)
+    return (sqrt(ap**2 + bp**2), sqrt(ac**2 + bc**2))
+
+def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
+                           algorithm_Zinf='spline', color='blue',
+                           linestyle='-',  thickness=2, legend_label=None,
+                           offset=0, xlabel=None, ylabel=None):
+    r"""
+    Plot the spectrum of the gravitational radiation emitted by a particle in
+    circular orbit around a Kerr black hole.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
+    - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
+    - ``mode`` -- (default: ``'+'``) either ``'+'`` or ``'x'``: determine which
+      polarization mode is plotted
+    - ``m_max`` -- (default: 10) maximal value of `m`
+    - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
+      degree `\ell`
+    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
+      computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
+
+      - ``'spline'``: spline interpolation of tabulated data
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
+
+    - ``color`` -- (default: ``'blue'``) color of vertical lines
+    - ``linestyle`` -- (default: ``'-'``) style of vertical lines
+    - ``legend_label`` -- (default: ``None``) legend label for this spectrum
+    - ``offset`` -- (default: `0``) horizontal offset for the position of the
+      vertical lines
+    - ``xlabel`` -- (default: ``None``) label of the x-axis; if none is
+      provided, the label is set to `f/f_0`
+    - ``ylabel`` -- (default: ``None``) label of the y-axis; if none is
+      provided, the label is set to `r h_m / \mu`
+
+    OUTPUT:
+
+    - a graphics object
+
+    EXAMPLES:
+
+    Spectrum of gravitational radiation generated by a particle orbiting at
+    the ISCO of a Schwarzschild black hole (`a=0`, `r_0=6M`)::
+
+        sage: from kerrgeodesic_gw import plot_spectrum_particle
+        sage: plot_spectrum_particle(0, 6., pi/2)
+        Graphics object consisting of 10 graphics primitives
+
+    .. PLOT::
+
+        from kerrgeodesic_gw import plot_spectrum_particle
+        sphinx_plot(plot_spectrum_particle(0, 6., pi/2))
+
+    """
+    if not xlabel:
+        xlabel = r"$f/f_0$"
+    if not ylabel:
+        ylabel = r"$r h_m / \mu$"
+    indexh = {'+': 0, 'x': 1}
+    if isinstance(theta, Expression):
+        ltheta = latex(theta)
+    elif abs(theta) < 1e-4:
+        ltheta = 0
+    else:
+        ltheta = float(theta)
+    graph = Graphics()
+    for m in range(1, m_max+1):
+        if m > 1:
+            legend_label=None
+        hm = h_amplitude_particle_fourier(m, a, r0, theta, l_max=l_max,
+                                          algorithm_Zinf=algorithm_Zinf)[indexh[mode]]
+        graph += line([(m+offset, 0), (m+offset, hm)],
+                      color=color, linestyle=linestyle, thickness=thickness,
+                      legend_label=legend_label,
+                      axes_labels=(xlabel, ylabel),
+                      gridlines=True, frame=True, axes=False,
+                      xmin=0,
+                      title=r"$a={:.2f}M,\quad r_0={:.3f}M,\quad \theta={}$".format(
+                          float(a), float(r0), ltheta))
+    return graph
+
 
 def h_plus_particle(a, r0, phi0, u, theta, phi, l_max=10, m_min=1,
                     algorithm_Zinf='spline'):
@@ -414,7 +584,7 @@ def h_plus_particle(a, r0, phi0, u, theta, phi, l_max=10, m_min=1,
     # Sum over the Fourier modes:
     hplus = 0
     for m in range(m_min, l_max+1):
-        hm = h_fourier_mode_plus(m, a, r0, theta, l_max=l_max,
+        hm = h_plus_particle_fourier(m, a, r0, theta, l_max=l_max,
                                  algorithm_Zinf=algorithm_Zinf)
         mpsi = m*psi
         hplus += hm[0]*cos(mpsi) + hm[1]*sin(mpsi)
@@ -515,7 +685,7 @@ def h_cross_particle(a, r0, phi0, u, theta, phi, l_max=10, m_min=1,
     # Sum over the Fourier modes:
     hcross = 0
     for m in range(m_min, l_max+1):
-        hm = h_fourier_mode_cross(m, a, r0, theta, l_max=l_max,
+        hm = h_cross_particle_fourier(m, a, r0, theta, l_max=l_max,
                                   algorithm_Zinf=algorithm_Zinf)
         mpsi = m*psi
         hcross += hm[0]*cos(mpsi) + hm[1]*sin(mpsi)
