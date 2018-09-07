@@ -36,7 +36,7 @@ _cached_splines = {}
 
 def Zinf_Schwarzchild_PN(l, m, r):
     r"""
-    Amplitude factor of the mode (l,m) for a Schwarzschild BH at the 1.5PN
+    Amplitude factor of the mode `(\ell,m)` for a Schwarzschild BH at the 1.5PN
     level.
 
     The 1.5PN formulas are taken from E. Poisson, Phys. Rev. D **47**, 1497
@@ -44,13 +44,13 @@ def Zinf_Schwarzchild_PN(l, m, r):
 
     INPUT:
 
-    - ``l`` -- integer >= 2; the harmonic degree
-    - ``m`` -- integer within the range ``[-l, l]``; the azimuthal number
+    - ``l`` -- integer >= 2; the harmonic degree `\ell`
+    - ``m`` -- integer within the range ``[-l, l]``; the azimuthal number `m`
     - ``r`` -- areal radius of the orbit (in units of `M`, the BH mass)
 
     OUTPUT:
 
-    - coefficient `Z^H_{\ell m}(r)` (in units of `M^{-2}`)
+    - coefficient `Z^\infty_{\ell m}(r)` (in units of `M^{-2}`)
 
     EXAMPLES::
 
@@ -105,16 +105,20 @@ def Zinf_Schwarzchild_PN(l, m, r):
 
 def Zinf(a, l, m, r, algorithm='spline'):
     r"""
-    Amplitude factor of the mode (l,m).
+    Amplitude factor of the mode `(\ell,m)`.
+
+    The factor `Z^\infty_{\ell m}(r)` is obtained by spline interpolation
+    of tabulated numerical solutions of the radial component of the
+    Teukolsky equation.
 
     INPUT:
 
     - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
-    - ``l`` -- integer >= 2; the harmonic degree
-    - ``m`` -- integer within the range ``[-l, l]``; the azimuthal number
+    - ``l`` -- integer >= 2; the harmonic degree `\ell`
+    - ``m`` -- integer within the range ``[-l, l]``; the azimuthal number `m`
     - ``r`` -- areal radius of the orbit (in units of `M`)
-    - ``algorithm`` -- (default: 'spline') string describing the computational
-      method; allowed values are
+    - ``algorithm`` -- (default: ``'spline'``) string describing the
+      computational method; allowed values are
 
       - ``'spline'``: spline interpolation of tabulated data
       - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
