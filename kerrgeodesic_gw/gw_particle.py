@@ -717,8 +717,8 @@ def h_particle_signal(a, r0, theta, phi, u_min, u_max, nb_points=100, mode='+',
     - ``u_min`` -- lower bound of the retarded time coordinate of the observer
       (in units of the black hole mass `M`):  `u = t - r_*`,  where `t` is the
       Boyer-Lindquist time coordinate and `r_*` is the tortoise coordinate
-    - ``u_max`` -- upper bound of the retarded time coordinate of the observer (in units
-      of the black hole mass `M`)
+    - ``u_max`` -- upper bound of the retarded time coordinate of the observer
+      (in units of the black hole mass `M`)
     - ``nb_points`` -- (default: 100) number of points in the interval
       ``(u_min, u_max)``
     - ``mode`` -- (default: ``'+'``) string determining which GW polarization
@@ -820,8 +820,43 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                     legend_label=(r'$h_+$', r'$h_\times$'),
                     xlabel=r'$(t - r_*)/M$', ylabel=None):
     r"""
-    Plot the waveform from a particle in circular orbit around a Kerr
-    black hole.
+    Plot the gravitational waveform emitted by a particle in circular orbit
+    around a Kerr black hole.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
+    - ``theta`` -- Boyer-Lindquist colatitute  `\theta` of the observer
+    - ``phi`` -- Boyer-Lindquist azimuthal coordinate `\phi`  of the observer
+    - ``u_min`` -- lower bound of the retarded time coordinate of the observer
+      (in units of the black hole mass `M`):  `u = t - r_*`,  where `t` is the
+      Boyer-Lindquist time coordinate and `r_*` is the tortoise coordinate
+    - ``u_max`` -- upper bound of the retarded time coordinate of the observer
+      (in units of the black hole mass `M`)
+    - ``plot_points`` -- (default: 200) number of points involved in the
+      sampling of the interval ``(u_min, u_max)``
+    - ``phi0`` -- (default: 0) phase factor
+    - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
+      degree `\ell`
+    - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
+      mode `m`
+    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
+      computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
+
+      - ``'spline'``: spline interpolation of tabulated data
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
+
+    - ``mode`` -- (default: ``('+', 'x')``) string determining the plotted
+      quantities: allowed values are ``'+'`` and ``'x'``, for
+      respectively `h_+` and `h_\times`, as well as ``('+', 'x')`` for plotting
+      both polarization modes
+
+    OUTPUT:
+
+
 
     """
     if mode not in ['+', 'x', ('+', 'x')]:
