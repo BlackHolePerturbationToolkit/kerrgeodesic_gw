@@ -415,7 +415,7 @@ def h_amplitude_particle_fourier(m, a, r0, theta, l_max=10,
 def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
                            algorithm_Zinf='spline', color='blue',
                            linestyle='-',  thickness=2, legend_label=None,
-                           offset=0, xlabel=None, ylabel=None):
+                           offset=0, xlabel=None, ylabel=None, title=None):
     r"""
     Plot the spectrum of the gravitational radiation emitted by a particle in
     circular orbit around a Kerr black hole.
@@ -442,12 +442,14 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
     - ``color`` -- (default: ``'blue'``) color of vertical lines
     - ``linestyle`` -- (default: ``'-'``) style of vertical lines
     - ``legend_label`` -- (default: ``None``) legend label for this spectrum
-    - ``offset`` -- (default: `0``) horizontal offset for the position of the
+    - ``offset`` -- (default: 0) horizontal offset for the position of the
       vertical lines
     - ``xlabel`` -- (default: ``None``) label of the x-axis; if none is
       provided, the label is set to `f/f_0`
     - ``ylabel`` -- (default: ``None``) label of the y-axis; if none is
       provided, the label is set to `r h_m / \mu`
+    - ``title`` -- (default: ``None``) plot title; if ``None``, the title is
+      generated from ``a``, ``r0`` and ``theta``
 
     OUTPUT:
 
@@ -472,27 +474,27 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
         xlabel = r"$f/f_0$"
     if not ylabel:
         ylabel = r"$r h_m / \mu$"
+    if not title:
+        if isinstance(theta, Expression):
+            ltheta = latex(theta)
+        elif abs(theta) < 1e-4:
+            ltheta = 0
+        else:
+            ltheta = float(theta)
+        title=r"$a={:.2f}M,\quad r_0={:.3f}M,\quad \theta={}$".format(float(a),
+                                                             float(r0), ltheta)
     indexh = {'+': 0, 'x': 1}
-    if isinstance(theta, Expression):
-        ltheta = latex(theta)
-    elif abs(theta) < 1e-4:
-        ltheta = 0
-    else:
-        ltheta = float(theta)
     graph = Graphics()
     for m in range(1, m_max+1):
         if m > 1:
             legend_label=None
         hm = h_amplitude_particle_fourier(m, a, r0, theta, l_max=l_max,
                                           algorithm_Zinf=algorithm_Zinf)[indexh[mode]]
-        graph += line([(m+offset, 0), (m+offset, hm)],
-                      color=color, linestyle=linestyle, thickness=thickness,
-                      legend_label=legend_label,
-                      axes_labels=(xlabel, ylabel),
-                      gridlines=True, frame=True, axes=False,
-                      xmin=0,
-                      title=r"$a={:.2f}M,\quad r_0={:.3f}M,\quad \theta={}$".format(
-                          float(a), float(r0), ltheta))
+        graph += line([(m+offset, 0), (m+offset, hm)], color=color,
+                      linestyle=linestyle, thickness=thickness,
+                      legend_label=legend_label, axes_labels=(xlabel, ylabel),
+                      gridlines=True, frame=True, axes=False, xmin=0,
+                      title=title)
     return graph
 
 
@@ -818,22 +820,23 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                     phi0=0, l_max=10, m_min=1, algorithm_Zinf='spline',
                     mode=('+', 'x'), color=None, linestyle=None,
                     legend_label=(r'$h_+$', r'$h_\times$'),
-                    xlabel=r'$(t - r_*)/M$', ylabel=None):
+                    xlabel=r'$(t - r_*)/M$', ylabel=None, title=None):
     r"""
     Plot the gravitational waveform emitted by a particle in circular orbit
     around a Kerr black hole.
 
     INPUT:
 
-    - ``a`` -- BH angular momentum parameter (in units of `M`)
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the black hole
+      mass)
     - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``theta`` -- Boyer-Lindquist colatitute  `\theta` of the observer
     - ``phi`` -- Boyer-Lindquist azimuthal coordinate `\phi`  of the observer
     - ``u_min`` -- lower bound of the retarded time coordinate of the observer
-      (in units of the black hole mass `M`):  `u = t - r_*`,  where `t` is the
+      (in units of `M`):  `u = t - r_*`,  where `t` is the
       Boyer-Lindquist time coordinate and `r_*` is the tortoise coordinate
     - ``u_max`` -- upper bound of the retarded time coordinate of the observer
-      (in units of the black hole mass `M`)
+      (in units of `M`)
     - ``plot_points`` -- (default: 200) number of points involved in the
       sampling of the interval ``(u_min, u_max)``
     - ``phi0`` -- (default: 0) phase factor
@@ -853,20 +856,70 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
       quantities: allowed values are ``'+'`` and ``'x'``, for
       respectively `h_+` and `h_\times`, as well as ``('+', 'x')`` for plotting
       both polarization modes
+    - ``color`` -- (default: ``None``) a color (if ``mode`` = ``'+'`` or
+      ``'x'``) or a pair of colors (if ``mode`` = ``('+', 'x')``) for the
+      plot(s); if ``None``, the default colors are ``'blue'`` for `h_+` and
+      ``'red'`` for `h_\times`
+    - ``linestyle`` -- (default: ``None``) a line style (if ``mode`` = ``'+'``
+      or ``'x'``) or a pair of line styles (if ``mode`` = ``('+', 'x')``) for
+      the plot(s); if ``None``, the default style is a solid line
+    - ``legend_label`` -- (default: ``(r'$h_+$', r'$h_\times$')``) labels for
+      the plots of `h_+` and  `h_\times`; used only if ``mode`` is
+      ``('+', 'x')``
+    - ``xlabel`` -- (default: ``r'$(t - r_*)/M$'``) label of the `x`-axis
+    - ``ylabel`` -- (default: ``None``) label of the `y`-axis; if ``None``,
+      ``r'$r h_+/\mu$'`` is used for ``mode`` = ``'+'``,
+      ``r'$r h_\times/\mu$'`` for ``mode`` = ``'x'`` and
+      ``r'$r h/\mu$'`` for ``mode`` = ``('+', 'x')``
+    - ``title`` -- (default: ``None``) plot title; if ``None``, the title is
+      generated from ``a``, ``r0`` and ``theta`` (see the example below)
 
     OUTPUT:
 
+    - a graphics object
 
+    EXAMPLES:
+
+    Plot of the gravitational waveform generated by a particle orbiting at the
+    ISCO of a Kerr black hole with `a=0.9 M`::
+
+        sage: from kerrgeodesic_gw import plot_h_particle
+        sage: plot_h_particle(0.9, 2.321, pi/4, 0., 0., 70.)
+        Graphics object consisting of 2 graphics primitives
+
+    .. PLOT::
+
+        from kerrgeodesic_gw import plot_h_particle
+        g = plot_h_particle(0.9, 2.321, pi/4, 0., 0., 70.)
+        sphinx_plot(g)
+
+    Plot of `h_+` only, with some non-default options::
+
+        sage: plot_h_particle(0.9, 2.321, pi/4, 0., 0., 70., mode='+',
+        ....:                 color='green', xlabel=r'$u/M$',
+        ....:                 title='GW from ISCO, $a=0.9M$')
+        Graphics object consisting of 1 graphics primitive
+
+    .. PLOT::
+
+        from kerrgeodesic_gw import plot_h_particle
+        g = plot_h_particle(0.9, 2.321, pi/4, 0., 0., 70., mode='+', \
+                            color='green', xlabel=r'$u/M$', \
+                            title='GW from ISCO, $a=0.9M$')
+        sphinx_plot(g)
 
     """
     if mode not in ['+', 'x', ('+', 'x')]:
         raise ValueError("mode must be '+', 'x' or ('+', 'x')")
-    if isinstance(theta, Expression):
-        ltheta = latex(theta)
-    elif abs(theta) < 1e-4:
-        ltheta = 0
-    else:
-        ltheta = float(theta)
+    if not title:
+        if isinstance(theta, Expression):
+            ltheta = latex(theta)
+        elif abs(theta) < 1e-4:
+            ltheta = 0
+        else:
+            ltheta = float(theta)
+        title=r"$a={:.2f}M,\quad r_0={:.3f}M,\quad \theta={}$".format(float(a),
+                                                             float(r0), ltheta)
     graph = Graphics()
     if mode == '+' or mode == ('+', 'x'):
         hsig = h_particle_signal(a, r0, theta, phi, u_min, u_max,
@@ -884,7 +937,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 lstl = '-'
             lglab = None
             if not ylabel:
-                ylabel = r'$r h_+ / \mu$'
+                ylabel = r'$r h_+/\mu$'
         else:
             if color:
                 col = color[0]
@@ -896,12 +949,10 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 lstl = '-'
             lglab = legend_label[0]
             if not ylabel:
-                ylabel = r'$r h / \mu$'
+                ylabel = r'$r h/\mu$'
         graph += line(hsig, thickness=1.5, color=col, linestyle=lstl,
                       legend_label=lglab, axes_labels=[xlabel, ylabel],
-                      gridlines=True, frame=True, axes=False,
-                      title=r"$a={:.1f}M,\quad r_0={:.3f}M,\quad \theta={}$".format(
-                            float(a), float(r0), ltheta))
+                      gridlines=True, frame=True, axes=False, title=title)
     if mode == 'x' or mode == ('+', 'x'):
         hsig = h_particle_signal(a, r0, theta, phi, u_min, u_max,
                                  nb_points=plot_points, mode='x',
@@ -918,7 +969,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 lstl = '-'
             lglab = None
             if not ylabel:
-                ylabel = r'$r h_\times / \mu$'
+                ylabel = r'$r h_\times/\mu$'
         else:
             if color:
                 col = color[1]
@@ -930,11 +981,9 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 lstl = '-'
             lglab = legend_label[1]
             if not ylabel:
-                ylabel = r'$r h / \mu$'
+                ylabel = r'$r h/\mu$'
         graph += line(hsig, thickness=1.5, color=col, linestyle=lstl,
                       legend_label=lglab, axes_labels=[xlabel, ylabel],
-                      gridlines=True, frame=True, axes=False,
-                      title=r"$a={:.1f}M,\quad r_0={:.3f}M,\quad \theta={}$".format(
-                            float(a), float(r0), ltheta))
+                      gridlines=True, frame=True, axes=False, title=title)
     return graph
 
