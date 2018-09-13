@@ -7,6 +7,7 @@ around a Kerr black hole of mass `M` and angular momentum parameter `a`
 is given by the formula:
 
 .. MATH::
+   :label: gw_single_part
 
     h_+ - i h_\times = \frac{2\mu}{r} \,
     \sum_{\ell=2}^{\infty} \sum_{m=-\ell}^\ell
@@ -28,10 +29,11 @@ where
   harmonic of weight `-2` (cf.
   :func:`~kerrgeodesic_gw.spin_weighted_spheroidal_harm.spin_weighted_spheroidal_harmonic`)
 
-The Fourier-series expansion of the waveform `(h_+,h_\times)` received at the
-location `(t,r,\theta,\phi)` is
+According to Eq. (1), the Fourier-series expansion of the waveform
+`(h_+,h_\times)` received at the location `(t,r,\theta,\phi)` is
 
 .. MATH::
+   :label: gw_single_part_Fourier
 
     h_{+,\times}(t, r, \theta, \phi) = \sum_{m=1}^{+\infty}
     \left[ A_m^{+,\times}(r,\theta) \cos(m\psi)
@@ -48,27 +50,35 @@ coordinate corresponding to `r`.
 
 Note that the dependence of the Fourier coefficients `A_m^{+,\times}(r,\theta)`
 and `B_m^{+,\times}(r,\theta)` with respect to `r` is simply `\mu/r`, where
-`\mu` is the particle's mass. The dependence with respect to `\theta` is more
-complicated and involves both the radius `r_0` of the particle's orbit and the
-BH parameters `(M,a)`.
-
-The functions :func:`h_plus_particle` and :func:`h_cross_particle`
-defined below compute the rescaled waveforms
-
-.. MATH::
-
-    {\bar h}_+ := \frac{r}{\mu} \, h_+
-    \quad\mbox{and}\quad
-    {\bar h}_\times := \frac{r}{\mu} \, h_\times
-
-while the functions :func:`h_plus_particle_fourier` and
-:func:`h_cross_particle_fourier` compute the rescaled Fourier coefficients
+`\mu` is the particle's mass, i.e. we may consider the following rescaled
+Fourier coefficients, which depend on `\theta` only:
 
 .. MATH::
 
     {\bar A}_m^{+,\times}(\theta) := \frac{r}{\mu} A_m^{+,\times}(r,\theta)
     \quad\mbox{and}\quad
     {\bar B}_m^{+,\times}(\theta) := \frac{r}{\mu} B_m^{+,\times}(r,\theta)
+
+According to Eqs. (1) and (2), we have TBC (Eq. (3))
+
+
+
+This module implements the following functions:
+
+- :func:`h_plus_particle`: evaluates `r h_+/\mu` via Eq. (2)
+- :func:`h_cross_particle`: evaluates `r h_\times/\mu` via Eq. (2)
+- :func:`h_plus_particle_fourier`: evaluates `r A_m^+/\mu` and
+  `r B_m^+/\mu` via Eq. (3)
+- :func:`h_cross_particle_fourier`: evaluates `r A_m^\times/\mu` and
+  `r B_m^\times/\mu` via Eq. (3)
+- :func:`h_amplitude_particle_fourier`: evaluates
+  `(r/\mu)\sqrt{(A_m^+)^2 + (B_m^+)^2}` and
+  `(r/\mu)\sqrt{(A_m^\times)^2 + (B_m^\times)^2}`
+- :func:`h_particle_signal`: time sequence of `r h_+/\mu` or `r h_\times/\mu`
+- :func:`plot_h_particle`: plot `r h_+/\mu` and/or `r h_\times/\mu` in terms of
+  the retarded time
+- :func:`plot_spectrum_particle`: plot
+  `(r/\mu)\sqrt{(A_m^{+,\times})^2 + (B_m^{+,\times})^2}` in terms of `m`
 
 REFERENCES:
 
