@@ -23,14 +23,14 @@ where
 - `r_0` is the Boyer-Lindquist radius of the particle's orbit
 - `\phi_0` is some constant phase factor
 - `\omega_0` is the orbital angular velocity
-- `Z^\infty_{\ell m}(r_0)` is numerically provided by the function
-  :func:`~kerrgeodesic_gw.zinf.Zinf`
+- `Z^\infty_{\ell m}(r_0)` is a solution of the radial component of the
+  Teukolsky equation (cf. :func:`~kerrgeodesic_gw.zinf.Zinf`)
 - `_{-2}S^{am\omega_0}_{\ell m}(\theta,\phi)` is the spin-weighted spheroidal
   harmonic of weight `-2` (cf.
   :func:`~kerrgeodesic_gw.spin_weighted_spheroidal_harm.spin_weighted_spheroidal_harmonic`)
 
-According to Eq. (1), the Fourier-series expansion of the waveform
-`(h_+,h_\times)` received at the location `(t,r,\theta,\phi)` is
+According to Eq. :eq:`gw_single_part`, the Fourier-series expansion of the
+waveform `(h_+,h_\times)` received at the location `(t,r,\theta,\phi)` is
 
 .. MATH::
    :label: gw_single_part_Fourier
@@ -59,18 +59,55 @@ Fourier coefficients, which depend on `\theta` only:
     \quad\mbox{and}\quad
     {\bar B}_m^{+,\times}(\theta) := \frac{r}{\mu} B_m^{+,\times}(r,\theta)
 
-According to Eqs. (1) and (2), we have TBC (Eq. (3))
+According to Eqs. :eq:`gw_single_part` and :eq:`gw_single_part_Fourier`,
+we have
 
+.. MATH::
+   :label: Amplus
 
+    {\bar A}_m^+(\theta) = \frac{2}{(m\omega_0)^2}
+    \sum_{\ell=2}^{\infty}
+    \mathrm{Re}\left( Z^\infty_{\ell m}(r_0) \right)
+    \left[ (-1)^\ell\,  {}_{-2}S^{-am\omega_0}_{\ell,- m}(\theta,0)
+     + {}_{-2}S^{am\omega_0}_{\ell m}(\theta,0) \right]
+
+.. MATH::
+   :label: Bmplus
+
+    {\bar B}_m^+(\theta) = \frac{2}{(m\omega_0)^2}
+    \sum_{\ell=2}^{\infty}
+    \mathrm{Im}\left( Z^\infty_{\ell m}(r_0) \right)
+    \left[ (-1)^\ell\,  {}_{-2}S^{-am\omega_0}_{\ell,- m}(\theta,0)
+     + {}_{-2}S^{am\omega_0}_{\ell m}(\theta,0) \right]
+
+.. MATH::
+   :label: Amcross
+
+    {\bar A}_m^\times(\theta) = \frac{2}{(m\omega_0)^2}
+    \sum_{\ell=2}^{\infty}
+    \mathrm{Im}\left( Z^\infty_{\ell m}(r_0) \right)
+    \left[ (-1)^\ell\,  {}_{-2}S^{-am\omega_0}_{\ell,- m}(\theta,0)
+     - {}_{-2}S^{am\omega_0}_{\ell m}(\theta,0) \right]
+
+.. MATH::
+   :label: Bmcross
+
+    {\bar B}_m^\times(\theta) = \frac{2}{(m\omega_0)^2}
+    \sum_{\ell=2}^{\infty}
+    \mathrm{Re}\left( Z^\infty_{\ell m}(r_0) \right)
+    \left[ (-1)^{\ell+1}\,  {}_{-2}S^{-am\omega_0}_{\ell,- m}(\theta,0)
+     + {}_{-2}S^{am\omega_0}_{\ell m}(\theta,0) \right]
 
 This module implements the following functions:
 
-- :func:`h_plus_particle`: evaluates `r h_+/\mu` via Eq. (2)
-- :func:`h_cross_particle`: evaluates `r h_\times/\mu` via Eq. (2)
+- :func:`h_plus_particle`: evaluates `r h_+/\mu` via
+  Eq. :eq:`gw_single_part_Fourier`
+- :func:`h_cross_particle`: evaluates `r h_\times/\mu` via
+  Eq. :eq:`gw_single_part_Fourier`
 - :func:`h_plus_particle_fourier`: evaluates `r A_m^+/\mu` and
-  `r B_m^+/\mu` via Eq. (3)
+  `r B_m^+/\mu` via Eqs. :eq:`Amplus`-:eq:`Bmplus`
 - :func:`h_cross_particle_fourier`: evaluates `r A_m^\times/\mu` and
-  `r B_m^\times/\mu` via Eq. (3)
+  `r B_m^\times/\mu` via Eqs. :eq:`Amcross`-:eq:`Bmcross`
 - :func:`h_amplitude_particle_fourier`: evaluates
   `(r/\mu)\sqrt{(A_m^+)^2 + (B_m^+)^2}` and
   `(r/\mu)\sqrt{(A_m^\times)^2 + (B_m^\times)^2}`
@@ -126,7 +163,8 @@ def h_plus_particle_fourier(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
 
     where `\mu` is the particle mass and `\psi := \omega_0 (t-r_*) - \phi`,
     `\omega_0` being the orbital frequency of the particle and `r_*` the
-    tortoise coordinate corresponding to `r`.
+    tortoise coordinate corresponding to `r` and `{\bar A}_m^+` and
+    `{\bar B}_m^+` are given by Eqs. :eq:`Amplus`-:eq:`Bmplus` above.
 
     INPUT:
 
@@ -135,7 +173,7 @@ def h_plus_particle_fourier(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
     - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
     - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
-      degree `\ell`
+      degree `\ell` in Eqs. :eq:`Amplus`-:eq:`Bmplus`
     - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
       computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
 
@@ -146,8 +184,7 @@ def h_plus_particle_fourier(m, a, r0, theta, l_max=10, algorithm_Zinf='spline'):
 
     OUTPUT:
 
-    - tuple `({\bar A}_m^+, {\bar B}_m^+)` (cf. the above expression
-      for `(r/\mu) h_m^+`)
+    - tuple `({\bar A}_m^+, {\bar B}_m^+)`
 
     EXAMPLES:
 
@@ -237,7 +274,8 @@ def h_cross_particle_fourier(m, a, r0, theta, l_max=10, algorithm_Zinf='spline')
 
     where `\mu` is the particle mass and `\psi := \omega_0 (t-r_*) - \phi`,
     `\omega_0` being the orbital frequency of the particle and `r_*` the
-    tortoise coordinate corresponding to `r`.
+    tortoise coordinate corresponding to `r` and `{\bar A}_m^\times` and
+    `{\bar B}_m^\times` are given by Eqs. :eq:`Amcross`-:eq:`Bmcross` above.
 
     INPUT:
 
@@ -246,7 +284,7 @@ def h_cross_particle_fourier(m, a, r0, theta, l_max=10, algorithm_Zinf='spline')
     - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
     - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
-      degree `\ell`
+      degree `\ell` in Eqs. :eq:`Amcross`-:eq:`Bmcross`
     - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
       computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
 
@@ -257,8 +295,7 @@ def h_cross_particle_fourier(m, a, r0, theta, l_max=10, algorithm_Zinf='spline')
 
     OUTPUT:
 
-    - tuple `({\bar A}_m^\times, {\bar B}_m^\times)` (cf. the above expression
-      for `(r/\mu) h_m^\times`)
+    - tuple `({\bar A}_m^\times, {\bar B}_m^\times)`
 
     EXAMPLES:
 
@@ -357,7 +394,9 @@ def h_amplitude_particle_fourier(m, a, r0, theta, l_max=10,
 
     where `\mu` is the particle mass and `\psi := \omega_0 (t-r_*) - \phi`,
     `\omega_0` being the orbital frequency of the particle and `r_*` the
-    tortoise coordinate corresponding to `r`.
+    tortoise coordinate corresponding to `r` and `{\bar A}_m^{+,\times}` and
+    `{\bar B}_m^{+,\times}` are given by
+    Eqs. :eq:`Amplus`-:eq:`Bmcross` above.
 
     The `+` and `\times` amplitudes of the Fourier mode `m` are defined
     respectively by
@@ -376,7 +415,7 @@ def h_amplitude_particle_fourier(m, a, r0, theta, l_max=10,
     - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
     - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
-      degree `\ell`
+      degree `\ell` in Eqs. :eq:`Amplus`-:eq:`Bmcross`
     - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
       computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
 
@@ -514,6 +553,8 @@ def h_plus_particle(a, r0, u, theta, phi, phi0=0, l_max=10, m_min=1,
     Return the rescaled `h_+`-part of the gravitational radiation emitted by
     a particle in circular orbit around a Kerr black hole.
 
+    The computation is based on Eq. :eq:`gw_single_part_Fourier` above.
+
     INPUT:
 
     - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
@@ -608,6 +649,8 @@ def h_cross_particle(a, r0, u, theta, phi, phi0=0, l_max=10, m_min=1,
     r"""
     Return the rescaled `h_\times`-part of the gravitational radiation emitted
     by a particle in circular orbit around a Kerr black hole.
+
+    The computation is based on Eq. :eq:`gw_single_part_Fourier` above.
 
     INPUT:
 
