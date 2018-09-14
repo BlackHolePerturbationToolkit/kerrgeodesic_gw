@@ -14,6 +14,7 @@ Contents
    spher_harm
    zinf
    gw_particle
+   gw_blob
    lisa_detector
 
 
