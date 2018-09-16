@@ -747,9 +747,9 @@ def h_cross_particle(a, r0, u, theta, phi, phi0=0, l_max=10, m_min=1,
         hcross += hm[0]*cos(mpsi) + hm[1]*sin(mpsi)
     return hcross
 
-def h_particle_signal(a, r0, theta, phi, u_min, u_max, nb_points=100, mode='+',
-                      phi0=0, l_max=10, m_min=1, algorithm_Zinf='spline',
-                      store=None):
+def h_particle_signal(a, r0, theta, phi, u_min, u_max,  mode='+',
+                      nb_points=100, phi0=0, l_max=10, m_min=1,
+                      algorithm_Zinf='spline', store=None):
     r"""
     Return a time sequence of the `h_+` or the `h_\times` part of the
     gravitational radiation from a particle in circular orbit around a Kerr
@@ -774,11 +774,11 @@ def h_particle_signal(a, r0, theta, phi, u_min, u_max, nb_points=100, mode='+',
       Boyer-Lindquist time coordinate and `r_*` is the tortoise coordinate
     - ``u_max`` -- upper bound of the retarded time coordinate of the observer
       (in units of the black hole mass `M`)
-    - ``nb_points`` -- (default: 100) number of points in the interval
-      ``(u_min, u_max)``
     - ``mode`` -- (default: ``'+'``) string determining which GW polarization
       mode is considered; allowed values are ``'+'`` and ``'x'``, for
       respectively `h_+` and `h_\times`
+    - ``nb_points`` -- (default: 100) number of points in the interval
+      ``(u_min, u_max)``
     - ``phi0`` -- (default: 0) phase factor
     - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
       degree `\ell`
