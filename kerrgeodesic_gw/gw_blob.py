@@ -7,6 +7,8 @@ This module implements the following functions:
 
 - :func:`h_blob`: evaluates `r h_+` or `r h_\times`
 - :func:`h_blob_signal`: time sequence of `r h_+/\mu` or `r h_\times/\mu`
+- :func:`h_toy_model_semi_analytic`: `r h_+/\mu` and `r h_\times/\mu` from a
+  semi-analytic approximation based on a constant density blob
 - :func:`surface_density_toy_model`: `\Sigma(\bar{r},\bar{\phi})` as an
   indicator function
 - :func:`surface_density_gaussian`: `\Sigma(\bar{r},\bar{\phi})` as a Gaussian
@@ -23,6 +25,7 @@ This module implements the following functions:
 #  the License, or (at your option) any later version.
 #                  http://www.gnu.org/licenses/
 #******************************************************************************
+from __future__ import print_function
 from sage.functions.trig import cos, sin
 from sage.functions.log import exp
 from sage.functions.other import sqrt
@@ -185,6 +188,35 @@ def h_blob_signal(u_min, u_max, theta, phi, a, surf_dens, param_surf_dens,
       (depending on ``mode``),  where `\mu` is the blob's mass and
       `r` is the Boyer-Lindquist radial coordinate of the observer
 
+    EXAMPLES:
+
+    `h_+` sequence for a Gaussian-density matter blob around a Schwarzschild
+    black hole::
+
+        sage: from kerrgeodesic_gw import h_blob_signal, surface_density_gaussian
+        sage: param_surf_dens = [6.5, 0., 0.3]
+        sage: integ_range = [6, 7, -0.1, 0.1]
+        sage: a = 0
+        sage: h_blob_signal(0., 100., pi/4, 0., a, surface_density_gaussian,  # tol 1.0e-13
+        ....:               param_surf_dens, integ_range, nb_points=5,
+        ....:               epsrel=1e-4, verbose=False)
+        [(0.000000000000000, 0.2988585811681569),
+         (25.0000000000000, -0.3902717353505495),
+         (50.0000000000000, 0.4196374371978159),
+         (75.0000000000000, -0.4729306367862637),
+         (100.000000000000, 0.3464193312741741)]
+
+    The corresponding `h_\times` sequence::
+
+        sage: h_blob_signal(0., 100., pi/4, 0., a, surface_density_gaussian,  # tol 1.0e-13
+        ....:               param_surf_dens, integ_range, mode='x',
+        ....:               nb_points=5, epsrel=1e-4, verbose=False)
+        [(0.000000000000000, 0.24810446643240472),
+         (25.0000000000000, -0.060862007486422516),
+         (50.0000000000000, -0.12309577666126706),
+         (75.0000000000000, -0.0017707729883368948),
+         (100.000000000000, 0.08100026787377135)]
+
     """
     mu_mass = blob_mass(a, surf_dens, param_surf_dens, integ_range,
                         epsabs=epsabs, epsrel=epsrel)[0]
@@ -198,8 +230,8 @@ def h_blob_signal(u_min, u_max, theta, phi, a, surf_dens, param_surf_dens,
         h = h / mu_mass
         signal.append((u, h))
         if verbose:
-            #!# print("i={}  u={}  h={}  error={}".format(i, u, h, err), end="\r")
-            print("i={}  u={}  h={}  error={}".format(i, u, h, err))
+            print("i={}  u={}  h={}  error={}".format(i, u, h, err), end="\r")
+            # Python 2: print("i={}  u={}  h={}  error={}".format(i, u, h, err))
     if verbose:
         print("")
     if store:
@@ -208,6 +240,114 @@ def h_blob_signal(u_min, u_max, theta, phi, a, surf_dens, param_surf_dens,
                 output_file.write("{}\t{}\n".format(u, h))
     return signal
 
+def h_toy_model_semi_analytic(u, theta, phi, a, r0, phi0, lam, Dphi, l_max=10):
+    r"""
+    Return the gravitational wave emitted by a matter blob orbiting a Kerr
+    black hole (semi-analytic computation based on a toy model surface density).
+
+    The surface density of the matter blob is that given by
+    :func:`surface_density_toy_model`.
+
+    The gravitational wave is computed according to the formula
+
+    .. MATH::
+
+        h = \frac{2\mu}{r} \, \sum_{\ell=2}^{\infty} \sum_{m=-\ell}^\ell
+        \frac{Z^\infty_{\ell m}(r_0)}{(m\omega_0)^2} \;
+        \text{sinc}\left( \frac{m}{2} \Delta\varphi \right) \,
+        \text{sinc}\left( \frac{3}{4} \varepsilon \, m \omega_0
+        (1-a\omega_0)u \right)
+        e^{- i m (\omega_0 u + \phi_0)} \,
+        _{-2}S_{\ell m}^{a m \omega_0}(\theta,\varphi)
+
+    INPUT:
+
+    - ``u`` -- retarded time coordinate of the observer (in units of `M`, the
+      BH mass): `u = t - r_*`, where `t` is the Boyer-Lindquist time coordinate
+      and `r_*` is the tortoise coordinate
+    - ``theta`` -- Boyer-Lindquist colatitute  `\theta` of the observer
+    - ``phi`` -- Boyer-Lindquist azimuthal coordinate `\phi`  of the observer
+    - ``a`` -- BH angular momentum parameter (in units of `M`)
+    - ``r0`` -- mean radius `r_0` of the matter blob (Boyer-Lindquist
+      coordinate)
+    - ``phi0`` -- mean azimuthal angle `\phi_0` of the matter blob
+      (Boyer-Lindquist coordinate)
+    - ``lam`` -- radial extent `\lambda` of the matter blob
+    - ``Dphi``-- opening angle `\Delta\phi` of the matter blob
+    - ``l_max`` -- (default: 10) upper bound in the summation over the harmonic
+      degree `\ell`
+
+    OUTPUT:
+
+    - a pair ``(hp, hc)``, where ``hp`` (resp. ``hc``) is `(r / \mu) h_+`
+      (resp. `(r / \mu) h_\times`), `\mu` being the blob's mass and
+      `r` is the Boyer-Lindquist radial coordinate of the observer
+
+    EXAMPLES:
+
+    Schwarzschild black hole::
+
+        sage: from kerrgeodesic_gw import h_toy_model_semi_analytic
+        sage: a = 0
+        sage: r0, phi0, lam, Dphi = 6.5, 0, 0.6, 0.1
+        sage: u = 60.
+        sage: h_toy_model_semi_analytic(u, pi/4, 0., a, r0, phi0, lam, Dphi)  # tol 1.0e-13
+        (0.2999183296797872, 0.36916647790743246)
+        sage: hp, hc = _
+
+    Comparison with the exact value::
+
+        sage: from kerrgeodesic_gw import (h_blob, blob_mass,
+        ....:                              surface_density_toy_model)
+        sage: param_surf_dens = [r0, phi0, lam, Dphi]
+        sage: integ_range = [6.2, 6.8, -0.05, 0.05]
+        sage: mu = blob_mass(a, surface_density_toy_model, param_surf_dens,
+        ....:                integ_range)[0]
+        sage: hp0 = h_blob(u, pi/4, 0., a, surface_density_toy_model,
+        ....:              param_surf_dens, integ_range)[0] / mu
+        sage: hc0 = h_blob(u, pi/4, 0., a, surface_density_toy_model,
+        ....:              param_surf_dens, integ_range, mode='x')[0] / mu
+        sage: hp0, hc0  # tol 1.0e-13
+        (0.2951163078053617, 0.3743683023327848)
+        sage: (hp - hp0) / hp0  # tol 1.0e-13
+        0.01627162494047128
+        sage: (hc - hc0) / hc0  # tol 1.0e-13
+        -0.013894938201066784
+
+    """
+    import numpy
+    from sage.rings.real_double import RDF
+    from sage.rings.complex_double import CDF
+    from sage.symbolic.all import i as I
+    from .spin_weighted_spherical_harm import spin_weighted_spherical_harmonic
+    from .spin_weighted_spheroidal_harm import spin_weighted_spheroidal_harmonic
+    from .zinf import Zinf
+    u = RDF(u)
+    theta = RDF(theta)
+    phi = RDF(phi)
+    a = RDF(a)
+    omega0 = RDF(1. / (r0**1.5 + a))
+    eps = lam/r0
+    resu = CDF(0)
+    for l in range(2, l_max+1):
+        for m in range(-l, l+1):
+            if m == 0:    # m=0 is skipped
+                continue  #
+            m_omega0 = RDF(m*omega0)
+            if a == 0:
+                Slm = spin_weighted_spherical_harmonic(-2, l, m, theta, phi,
+                                                       numerical=RDF)
+            else:
+                a = RDF(a)
+                Slm = spin_weighted_spheroidal_harmonic(-2, l, m, a*m_omega0,
+                                                        theta, phi)
+            # Division by pi in the Sinc function due to the defintion used by numpy
+            resu += Zinf(a, l, m, r0) / m_omega0**2 \
+                    * numpy.sinc(m*Dphi/2./numpy.pi) \
+                    * numpy.sinc(0.75*eps*m_omega0*(1-a*omega0)*u/numpy.pi) \
+                    * CDF(exp(-I*(m_omega0*u + m*phi0))) * Slm
+    resu *= 2
+    return (resu.real(), -resu.imag())
 
 def surface_density_toy_model(r, phi, param):
     r"""
