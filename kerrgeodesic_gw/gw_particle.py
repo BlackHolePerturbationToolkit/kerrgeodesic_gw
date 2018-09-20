@@ -494,7 +494,7 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
     - ``offset`` -- (default: 0) horizontal offset for the position of the
       vertical lines
     - ``xlabel`` -- (default: ``None``) label of the x-axis; if none is
-      provided, the label is set to `f/f_0`
+      provided, the label is set to `m`
     - ``ylabel`` -- (default: ``None``) label of the y-axis; if none is
       provided, the label is set to `r h_m / \mu`
     - ``title`` -- (default: ``None``) plot title; if ``None``, the title is
@@ -520,7 +520,7 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
 
     """
     if not xlabel:
-        xlabel = r"$f/f_0$"
+        xlabel = r"$m$"
     if not ylabel:
         ylabel = r"$r h_m / \mu$"
     if not title:
