@@ -16,6 +16,7 @@ Contents
    gw_particle
    gw_blob
    lisa_detector
+   signal_processing
 
 
 Indices and Tables
