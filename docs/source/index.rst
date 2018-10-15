@@ -17,7 +17,7 @@ Contents
    gw_blob
    lisa_detector
    signal_processing
-
+   astro_data
 
 Indices and Tables
 ==================
