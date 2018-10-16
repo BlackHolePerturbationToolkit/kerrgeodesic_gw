@@ -9,9 +9,18 @@ Mass of Sgr A* in kg::
 
 Mass of Sgr A* in millions of solar masses::
 
-    sage: astro_data.MSgrA / (1.e6*astro_data.Msol) # tol 1.0e-13
+    sage: astro_data.MSgrA / (1.e6*astro_data.Msol)  # tol 1.0e-13
     4.30000000000000
 
+Mass of Sgr A* in meters (geometrized units)::
+
+    sage: astro_data.MSgrA_m  # tol 1.0e-13
+    6349502303.099471
+
+Mass of Sgr A* in seconds (geometrized units)::
+
+    sage: astro_data.MSgrA_s  # tol 1.0e-13
+    21.179659906919575
 
 """
 #******************************************************************************
