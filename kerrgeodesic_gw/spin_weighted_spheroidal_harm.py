@@ -14,13 +14,10 @@ Spin-weighted spheroidal harmonics
 
 from sage.functions.other import abs, ceil, sqrt
 from sage.functions.generalized import sgn
-from sage.functions.log import exp
 from sage.matrix.constructor import matrix
 from sage.rings.integer_ring import ZZ
 from sage.rings.real_double import RDF
-from sage.rings.complex_double import CDF
 from sage.symbolic.constants import pi
-from sage.symbolic.all import i as I
 from sage.symbolic.expression import Expression
 from .spin_weighted_spherical_harm import spin_weighted_spherical_harmonic
 
@@ -214,7 +211,7 @@ def spin_weighted_spheroidal_harmonic(s, l, m, gamma, theta, phi,
         0.11612826056899399 - 0.20114004750009495*I
 
     Test that the relation
-    `{}_s S_{lm}^\gamma(\theta,0) = (-1)^{l+s}\, {}_s S_{l,-m}^{-\gamma}(\pi-\theta,0)`
+    `{}_s S_{lm}^\gamma(\theta,\phi) = (-1)^{l+s}\, {}_s S_{l,-m}^{-\gamma}(\pi-\theta,-\phi)`
     [cf. Eq. (2.3) of :arxiv:`1810.00432`], which is used to evaluate
     `{}_s S_{lm}^\gamma(\theta,\phi)` when `m<0` and ``cached`` is ``True``,
     is correctly implemented::
@@ -232,23 +229,18 @@ def spin_weighted_spheroidal_harmonic(s, l, m, gamma, theta, phi,
 
     """
     global _eigenvectors
+    if m<0 and cached:
+        # We use the symmetry formula
+        #  {}_s S_{lm}^\gamma(\theta,\phi) =
+        #                  (-1)^{l+s} {}_s S_{l,-m}^{-\gamma}(\pi-\theta,-\phi)
+        # cf. Eq. (2.3) of  https://arxiv.org/abs/1810.00432
+        return (-1)**(l+s)*spin_weighted_spheroidal_harmonic(s, l, -m, -gamma,
+                                pi-theta, -phi, verbose=verbose, cached=cached,
+                                min_nmax=min_nmax)
     s = ZZ(s)  # ensure that we are dealing with Sage integers
     l = ZZ(l)
     m = ZZ(m)
     gamma = RDF(gamma)  # all computations are performed with RDF
-    symbolic_theta_phi = ((isinstance(theta, Expression) and theta.variables())
-                          or (isinstance(phi, Expression) and phi.variables()))
-    if m<0 and cached:
-        # We use the symmetry formula
-        #  {}_s S_{lm}^\gamma(\theta,0) =
-        #                     (-1)^{l+s} {}_s S_{l,-m}^{-\gamma}(\pi-\theta,0)
-        # cf. Eq. (2.3) of  https://arxiv.org/abs/1810.00432
-        eimphi = exp(I*m*phi)
-        if not symbolic_theta_phi:
-            eimphi = CDF(eimphi)
-        return (-1)**(l+s)*spin_weighted_spheroidal_harmonic(s, l, -m, -gamma,
-                                   pi-theta, 0, verbose=verbose, cached=cached,
-                                   min_nmax=min_nmax)*eimphi
     param = (s, l, m, gamma)
     if cached:
         if param not in _eigenvectors:
@@ -262,7 +254,8 @@ def spin_weighted_spheroidal_harmonic(s, l, m, gamma, theta, phi,
     nmax = data[3]
     lmin = data[4]
     # If neither theta nor phi is symbolic, we convert both of them to RDF:
-    if not symbolic_theta_phi:
+    if not ((isinstance(theta, Expression) and theta.variables())
+            or (isinstance(phi, Expression) and phi.variables())):
         theta = RDF(theta)
         phi = RDF(phi)
     resu = RDF(0)
