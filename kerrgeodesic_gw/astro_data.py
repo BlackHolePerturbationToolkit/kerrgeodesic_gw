@@ -5,22 +5,22 @@ Mass of Sgr A* in kg::
 
     sage: from kerrgeodesic_gw import astro_data
     sage: astro_data.MSgrA  # tol 1.0e-13
-    8.550464e+36
+    8.152768e+36
 
 Mass of Sgr A* in millions of solar masses::
 
     sage: astro_data.MSgrA / (1.e6*astro_data.Msol)  # tol 1.0e-13
-    4.30000000000000
+    4.10000000000000
 
 Mass of Sgr A* in meters (geometrized units)::
 
     sage: astro_data.MSgrA_m  # tol 1.0e-13
-    6349502303.099471
+    6054176614.583217
 
 Mass of Sgr A* in seconds (geometrized units)::
 
     sage: astro_data.MSgrA_s  # tol 1.0e-13
-    21.179659906919575
+    20.19455944613262
 
 """
 #******************************************************************************
