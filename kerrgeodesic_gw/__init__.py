@@ -10,4 +10,5 @@ from .gw_particle import (h_plus_particle, h_cross_particle, h_particle_signal,
 from .gw_blob import (h_blob, h_blob_signal, h_toy_model_semi_analytic,
                       blob_mass, surface_density_toy_model,
                       surface_density_gaussian)
-from .signal_processing import fourier, read_signal, save_signal
+from .signal_processing import (fourier, read_signal, save_signal,
+                                signal_to_noise)
