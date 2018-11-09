@@ -50,11 +50,11 @@ Msol_m = G*Msol/c**2
 Msol_s = G*Msol/c**3
 
 # Sgr A* mass in SI units (kg)
-MSgrA = 4.3e6*Msol
+MSgrA = 4.1e6*Msol
 # Sgr A* mass in meters
 MSgrA_m = G*MSgrA/c**2
 # Sgr A* mass in seconds
 MSgrA_s = G*MSgrA/c**3
 
 # Distance to Sgr A* in SI units (m)
-dSgrA = 8.1*pc
+dSgrA = 8.1e3*pc
