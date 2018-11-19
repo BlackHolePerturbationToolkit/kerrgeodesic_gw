@@ -57,4 +57,4 @@ MSgrA_m = G*MSgrA/c**2
 MSgrA_s = G*MSgrA/c**3
 
 # Distance to Sgr A* in SI units (m)
-dSgrA = 8.1e3*pc
+dSgrA = 8.12e3*pc

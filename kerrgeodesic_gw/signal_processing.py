@@ -250,7 +250,7 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
         sage: snr = signal_to_noise(h, time_scale, psd, fmin, fmax,
         ....:                       scale=mu_ov_r)
         sage: snr  # tol 1.0e-13
-        5395.478476734978
+        5382.189120880952
 
     """
     sig = [(t*time_scale, h) for (t, h) in signal]
