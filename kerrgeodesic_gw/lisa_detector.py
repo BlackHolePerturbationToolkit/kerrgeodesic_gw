@@ -15,7 +15,9 @@ import os
 from sage.calculus.interpolation import spline
 from sage.functions.other import sqrt
 from sage.functions.log import log
+from sage.functions.trig import cos
 from sage.rings.real_double import RDF
+from sage.symbolic.constants import pi
 
 _sensitivity_spline = None
 _psd_spline = None
@@ -119,3 +121,36 @@ def power_spectral_density(freq):
         raise ValueError("frequency {} Hz is out of range".format(freq))
     freq = RDF(freq)
     return RDF(10)**(_psd_spline(log(freq, 10)))
+
+def power_spectral_density_RCLfit(freq):
+    r"""
+    Return the effective power spectral density (PSD) of the detector noise
+    at a given frequency, according to the analytical fit by Robson, Cornish
+    and Liu, :arxiv:`1803.01944`
+
+    INPUT:
+
+    - ``freq`` -- frequency `f` (in `\mathrm{Hz}`)
+
+    OUTPUT:
+
+    - effective power spectral density `S(f)` (in `\mathrm{Hz}^{-1}`)
+
+    EXAMPLES::
+
+        sage: from kerrgeodesic_gw import lisa_detector
+        sage: Sn = lisa_detector.power_spectral_density_RCLfit
+        sage: Sn(1.e-1)  # tol 1.0e-13
+        2.12858262120861e-39
+        sage: Sn(1.e-2)  # tol 1.0e-13
+        1.44307343517977e-40
+        sage: Sn(1.e-3)  # tol 1.0e-13
+        1.63410027259543e-38
+
+    """
+    p_oms = 2.25e-22 * (1 + (2.e-3/freq)**4)
+    p_acc = 9.e-30 * (1 +(4.e-4/freq)**2) * (1 + (freq/8.e-3)**4)
+    L = 2.5e9
+    f_star = 1.909e-2
+    p_n = (p_oms + 2*(1 + cos(freq/f_star)**2)*p_acc/(2*RDF(pi)*freq)**4)/L**2
+    return 10./3.*p_n*(1 + 0.6*(freq/f_star)**2)
