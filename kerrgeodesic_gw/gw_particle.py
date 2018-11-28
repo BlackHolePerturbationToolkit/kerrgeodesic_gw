@@ -104,6 +104,8 @@ This module implements the following functions:
   Eq. :eq:`gw_single_part_Fourier`
 - :func:`h_cross_particle`: evaluates `r h_\times/\mu` via
   Eq. :eq:`gw_single_part_Fourier`
+- :func:`h_particle_quadrupole`: evaluates `r h_+/\mu` or `r h_\times/\mu` at
+  the quadrupole approximation
 - :func:`h_plus_particle_fourier`: evaluates `r A_m^+/\mu` and
   `r B_m^+/\mu` via Eqs. :eq:`Amplus`-:eq:`Bmplus`
 - :func:`h_cross_particle_fourier`: evaluates `r A_m^\times/\mu` and
@@ -747,9 +749,143 @@ def h_cross_particle(a, r0, u, theta, phi, phi0=0, l_max=10, m_min=1,
         hcross += hm[0]*cos(mpsi) + hm[1]*sin(mpsi)
     return hcross
 
+def h_particle_quadrupole(r0, u, theta, phi, phi0=0, mode='+'):
+    r"""
+    Return the rescaled `h_+` or `h_\times` part of the gravitational radiation
+    emitted by a particle in quasi-Newtonian circular orbit around a massive
+    body, computed at the quadrupole approximation.
+
+    The computation is performed according to the following formulas:
+
+    .. MATH::
+
+        \begin{array}{l}
+        \displaystyle h_+ = 2\,  \frac{\mu}{r} \frac{M}{r_0} (1+\cos^2\theta)
+        \cos\left[2\omega_0 (t - r) + 2(\phi_0-\phi)\right] \\
+         \displaystyle h_\times = 4\, \frac{\mu}{r} \frac{M}{r_0} \cos\theta
+        \sin\left[2\omega_0 (t - r) + 2(\phi_0-\phi)\right]
+        \end{array}
+
+    where `M` is the mass of the central body, `\mu\ll M` the mass of the
+    orbiting particle, `r_0` the orbital radius, `\omega_0 = \sqrt{M/r_0^3}`
+    the corresponding orbital angular velocity and `(t, r, \theta,\phi)`
+    the coordinates of the observer.
+
+    INPUT:
+
+    - ``r0`` -- radius of the orbit (in units of `M`, the mass of the central
+      body)
+    - ``u`` -- retarded time coordinate `u = t - r` of the observer (in units
+      of `M`)
+    - ``theta`` -- colatitute  `\theta` of the observer
+    - ``phi`` -- azimuthal coordinate `\phi`  of the observer
+    - ``phi0`` -- (default: 0) phase factor
+    - ``mode`` -- (default: ``'+'``) string determining which GW polarization
+      mode is considered; allowed values are ``'+'`` and ``'x'``, for
+      respectively `h_+` and `h_\times`
+
+    OUTPUT:
+
+    - the rescaled waveform  `(r / \mu) h`, where `\mu` is the particle's
+      mass, `r` is the radial coordinate of the observer and `h` is either
+      `h_+` or `h_\times` (depending on the value of ``mode``)
+
+    EXAMPLES:
+
+    Values of `h_+` for `r_0 = 12 M`::
+
+        sage: from kerrgeodesic_gw import (h_particle_quadrupole,
+        ....:                              h_plus_particle, h_cross_particle)
+        sage: theta, phi = pi/3, 0
+        sage: r0 = 12.
+        sage: porb = n(2*pi*r0^1.5)  # orbital period
+        sage: u = porb/16
+        sage: h_particle_quadrupole(r0, u, theta, phi)  # tol 1.0e-13
+        0.1473139127471974
+        sage: h_plus_particle(0., r0, u, theta, phi)  # exact value, tol 1.0e-13
+        0.041745779012809306
+        sage: h_plus_particle(0., r0, u, theta, phi, l_max=5,
+        ....:                 algorithm_Zinf='1.5PN')  # 1.5 PN approx, tol 1.0e-13
+        0.06396788402755646
+
+    Values of `h_\times` for `r_0 = 12 M`::
+
+        sage: h_particle_quadrupole(r0, u, theta, phi, mode='x')  # tol 1.0e-13
+        0.1178511301977579
+        sage: h_cross_particle(0., r0, u, theta, phi)  # exact value, tol 1.0e-13
+        0.1351232731503482
+        sage: h_cross_particle(0., r0, u, theta, phi, l_max=5,
+        ....:                  algorithm_Zinf='1.5PN')  # 1.5 PN approx, tol 1.0e-13
+        0.14924631043762673
+
+    Values of `h_+` for `r_0 = 50 M`::
+
+        sage: r0 = 50.
+        sage: porb = n(2*pi*r0^1.5)  # orbital period
+        sage: u = porb/16
+        sage: h_particle_quadrupole(r0, u, theta, phi)  # tol 1.0e-13
+        0.03535533905932738
+        sage: h_plus_particle(0., r0, u, theta, phi, l_max=5)  # exact value, tol 1.0e-13
+        0.024850367000986223
+        sage: h_plus_particle(0., r0, u, theta, phi, l_max=5,
+        ....:                 algorithm_Zinf='1.5PN')  # 1.5 PN approx, tol 1.0e-13
+        0.026007035506911764
+
+    The difference between the exact value and the one resulting from the
+    quadrupole approximation looks large, but actually this results mostly from
+    some dephasing, as one can see on a plot::
+
+        sage: hp_quad = lambda t: h_particle_quadrupole(r0, t, theta, phi)
+        sage: hc_quad = lambda t: h_particle_quadrupole(r0, t, theta, phi, mode='x')
+        sage: hp = lambda t: h_plus_particle(0., r0, t, theta, phi, l_max=5)
+        sage: hc = lambda t: h_cross_particle(0., r0, t, theta, phi, l_max=5)
+        sage: umax = 2*porb
+        sage: plot(hp_quad, (0, umax), legend_label=r'$h_+$ quadrupole',
+        ....:      axes_labels=[r'$(t-r_*)/M$', r'$r h/\mu$'],
+        ....:      title=r'$r_0=50 M$, $\theta=\pi/3$',
+        ....:      gridlines=True, frame=True, axes=False) + \
+        ....: plot(hp, (0, umax), color='red', legend_label=r'$h_+$ exact') + \
+        ....: plot(hc_quad, (0, umax), linestyle='--',
+        ....:      legend_label=r'$h_\times$ quadrupole') + \
+        ....: plot(hc, (0, umax), color='red', linestyle='--',
+        ....:      legend_label=r'$h_\times$ exact')
+        Graphics object consisting of 4 graphics primitives
+
+    .. PLOT::
+
+        from kerrgeodesic_gw import (h_particle_quadrupole, h_plus_particle, \
+                                     h_cross_particle)
+        r0, theta, phi = 50., pi/3, 0
+        hp_quad = lambda t: h_particle_quadrupole(r0, t, theta, phi)
+        hc_quad = lambda t: h_particle_quadrupole(r0, t, theta, phi, mode='x')
+        hp = lambda t: h_plus_particle(0., r0, t, theta, phi, l_max=5)
+        hc = lambda t: h_cross_particle(0., r0, t, theta, phi, l_max=5)
+        umax = 2*n(2*pi*r0**1.5)
+        g = plot(hp_quad, (0, umax), legend_label=r'$h_+$ quadrupole', \
+                 axes_labels=[r'$(t-r_*)/M$', r'$r h/\mu$'], \
+                 title=r'$r_0=50 M$, $\theta=\pi/3$', \
+                 gridlines=True, frame=True, axes=False)
+        g += plot(hp, (0, umax), color='red', legend_label=r'$h_+$ exact')
+        g += plot(hc_quad, (0, umax), linestyle='--', \
+                  legend_label=r'$h_\times$ quadrupole')
+        g += plot(hc, (0, umax), color='red', linestyle='--', \
+                  legend_label=r'$h_\times$ exact')
+        sphinx_plot(g)
+
+    """
+    # Orbital angular velocity:
+    omega0 = RDF(1./r0**1.5)
+    # Phase angle:
+    psi = omega0*u - phi + phi0
+    if mode == '+':
+        return RDF(2./r0*(1+cos(theta)**2)*cos(2*psi))
+    if mode == 'x':
+        return RDF(4./r0*cos(theta)*sin(2*psi))
+    raise ValueError("mode must be either '+' or 'x'")
+
 def h_particle_signal(a, r0, theta, phi, u_min, u_max,  mode='+',
                       nb_points=100, phi0=0, l_max=10, m_min=1,
-                      algorithm_Zinf='spline', store=None):
+                      approximation=None, store=None):
     r"""
     Return a time sequence of the `h_+` or the `h_\times` part of the
     gravitational radiation from a particle in circular orbit around a Kerr
@@ -784,13 +920,15 @@ def h_particle_signal(a, r0, theta, phi, u_min, u_max,  mode='+',
       degree `\ell`
     - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
       mode `m`
-    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
-      computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
+    - ``approximation`` -- (default: ``None``) string describing the
+      computational method; allowed values are
 
-      - ``'spline'``: spline interpolation of tabulated data
+      - ``None``: exact computation
       - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
         E. Poisson, Phys. Rev. D **47**, 1497 (1993)
         [:doi:`10.1103/PhysRevD.47.1497`]
+      - ``'quadrupole'`` (only for ``a=0``): quadrupole approximation
+        (0-post-Newtonian); see :func:`h_particle_quadrupole`
 
     - ``store`` -- (default: ``None``) string containing a file name for
       storing the time sequence; if ``None``, no storage is attempted
@@ -838,31 +976,44 @@ def h_particle_signal(a, r0, theta, phi, u_min, u_max,  mode='+',
          (200.000000000000, 0.22869838143661578)]
 
     """
-    # Fourier modes
-    if mode == '+':
-        hfr = h_plus_particle_fourier
-    else:
-        if mode != 'x':
-            raise ValueError("mode must be either '+' or 'x'")
-        hfr = h_cross_particle_fourier
-    h_fourier = [hfr(m, a, r0, theta, l_max=l_max,
-                     algorithm_Zinf=algorithm_Zinf)
-                 for m in range(m_min, l_max+1)]
-    # Orbital angular velocity
-    omega0 = RDF(1. / (r0**1.5 + a))
     # Time sequence
     signal = []
     du = (u_max - u_min)/float(nb_points-1)
-    for i in range(nb_points):
-        u = u_min + du*i
-        psi = omega0*u - phi + phi0
-        # Sum over the Fourier modes:
-        h = 0
-        for m in range(m_min, l_max+1):
-            hm = h_fourier[m-m_min]
-            mpsi = m*psi
-            h += hm[0]*cos(mpsi) + hm[1]*sin(mpsi)
-        signal.append((u, h))
+    # Case of quadrupole approximation:
+    if approximation == 'quadrupole':
+        for i in range(nb_points):
+            u = u_min + du*i
+            h = h_particle_quadrupole(r0, u, theta, phi, phi0=phi0, mode=mode)
+            signal.append((u, h))
+    else:
+        if approximation is None:
+            algorithm_Zinf = 'spline'
+        elif approximation == '1.5PN':
+            algorithm_Zinf = '1.5PN'
+        else:
+            raise ValueError("unknown type of approximation")
+        # Fourier modes
+        if mode == '+':
+            hfr = h_plus_particle_fourier
+        else:
+            if mode != 'x':
+                raise ValueError("mode must be either '+' or 'x'")
+            hfr = h_cross_particle_fourier
+        h_fourier = [hfr(m, a, r0, theta, l_max=l_max,
+                         algorithm_Zinf=algorithm_Zinf)
+                     for m in range(m_min, l_max+1)]
+        # Orbital angular velocity
+        omega0 = RDF(1. / (r0**1.5 + a))
+        for i in range(nb_points):
+            u = u_min + du*i
+            psi = omega0*u - phi + phi0
+            # Sum over the Fourier modes:
+            h = 0
+            for m in range(m_min, l_max+1):
+                hm = h_fourier[m-m_min]
+                mpsi = m*psi
+                h += hm[0]*cos(mpsi) + hm[1]*sin(mpsi)
+            signal.append((u, h))
     if store:
         with open(store, "w") as output_file:
             for u, h in signal:
@@ -870,7 +1021,7 @@ def h_particle_signal(a, r0, theta, phi, u_min, u_max,  mode='+',
     return signal
 
 def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
-                    phi0=0, l_max=10, m_min=1, algorithm_Zinf='spline',
+                    phi0=0, l_max=10, m_min=1, approximation=None,
                     mode=('+', 'x'), color=None, linestyle=None,
                     legend_label=(r'$h_+$', r'$h_\times$'),
                     xlabel=r'$(t - r_*)/M$', ylabel=None, title=None):
@@ -897,13 +1048,15 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
       degree `\ell`
     - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
       mode `m`
-    - ``algorithm_Zinf`` -- (default: ``'spline'``) string describing the
-      computational method for `Z^\infty_{\ell m}(r_0)`; allowed values are
+    - ``approximation`` -- (default: ``None``) string describing the
+      computational method; allowed values are
 
-      - ``'spline'``: spline interpolation of tabulated data
+      - ``None``: exact computation
       - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
         E. Poisson, Phys. Rev. D **47**, 1497 (1993)
         [:doi:`10.1103/PhysRevD.47.1497`]
+      - ``'quadrupole'`` (only for ``a=0``): quadrupole approximation
+        (0-post-Newtonian); see :func:`h_particle_quadrupole`
 
     - ``mode`` -- (default: ``('+', 'x')``) string determining the plotted
       quantities: allowed values are ``'+'`` and ``'x'``, for
@@ -978,7 +1131,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
         hsig = h_particle_signal(a, r0, theta, phi, u_min, u_max,
                                  nb_points=plot_points, mode='+',
                                  phi0=phi0, l_max=l_max, m_min=m_min,
-                                 algorithm_Zinf=algorithm_Zinf)
+                                 approximation=approximation)
         if mode == '+':
             if color:
                 col = color
@@ -1010,7 +1163,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
         hsig = h_particle_signal(a, r0, theta, phi, u_min, u_max,
                                  nb_points=plot_points, mode='x',
                                  phi0=phi0, l_max=l_max, m_min=m_min,
-                                 algorithm_Zinf=algorithm_Zinf)
+                                 approximation=approximation)
         if mode == 'x':
             if color:
                 col = color
