@@ -17,6 +17,7 @@ from scipy.integrate import quad
 from sage.calculus.interpolation import spline
 from sage.functions.other import sqrt
 from sage.rings.real_double import RDF
+from sage.symbolic.constants import pi
 
 def fourier(signal):
     r"""
@@ -207,10 +208,10 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
     - ``signal`` -- list of pairs `(t, h(t))`, where `t` is the time and `h(t)`
       is the signal at `t`. *NB*: the sampling in `t` must be uniform
     - ``time_scale`` -- value of `t` unit in terms of `S_n(f)` unit; if `S_n(f)`
-      is provided in `\mathrm{Hz}^{-1}`, then `time_scale` must be the unit of
+      is provided in `\mathrm{Hz}^{-1}`, then ``time_scale`` must be the unit of
       `t` in ``signal`` expressed in seconds.
     - ``psd`` -- function with a single argument (`f`) representing the
-      detector's one-sided noise power spectral density `S_n`
+      detector's one-sided noise power spectral density `S_n(f)`
     - ``fmin`` -- lower bound used instead of `0` in the integral :eq:`rho_snr`
     - ``fmax`` -- upper bound used instead of `+\infty` in the integral
       :eq:`rho_snr`
@@ -262,3 +263,39 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
         return hf2_func(f) / psd(f)
     integ = quad(hf2_ov_Sn, fmin, fmax, epsrel=quad_epsrel, limit=quad_limit)
     return 2*sqrt(integ[0])*scale
+
+def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
+                             m_min=1, m_max=10, scale=1):
+    r"""
+    Evaluate the signal-to-noise ratio of gravitational radiation emitted
+    by a single orbiting particle observed in a detector of a given power
+    spectral density.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
+    - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
+    - ``psd`` -- function with a single argument (`f`) representing the
+      detector's one-sided noise power spectral density `S_n(f)` (see e.g. :func:`.lisa_detector.power_spectral_density`)
+    - ``t_obs`` -- observation period, in the same time unit as `S_n(f)`
+    - ``BH_time_scale`` -- value of `M` in the same time unit as `S_n(f)`; if
+      `S_n(f)` is provided in `\mathrm{Hz}^{-1}`, then ``BH_time_scale`` must
+      be `M` expressed in seconds.
+    - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
+      mode `m`
+    - ``m_max`` -- (default: 10) upper bound in the summation over the Fourier
+      mode `m`
+    - ``scale`` -- (default: ``1``) scale factor by which `h(t)` must be
+      multiplied to get the actual signal; this should by `\mu/r`, where `\mu`
+
+    """
+    from .gw_particle import h_amplitude_particle_fourier
+    # Orbital frequency in the same time units as S_n(f) (generally seconds):
+    f0 = RDF(1. /(2*pi*(r0**1.5 + a))/BH_time_scale)
+    rho2 = 0
+    for m in range(m_min, m_max+1):
+        hmp, hmc = h_amplitude_particle_fourier(m, a, r0, theta, l_max=m_max)
+        rho2 += (hmp**2 + hmc**2) / psd(m*f0)
+    return sqrt(rho2*t_obs)*scale
+
