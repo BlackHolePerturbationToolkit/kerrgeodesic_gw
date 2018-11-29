@@ -185,7 +185,7 @@ def save_signal(sig, filename, dirname=None):
             output_file.write("{}\t{}\n".format(t, h))
 
 def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
-                    quad_epsrel=1.e-6, quad_limit=500):
+                    interpolation='linear', quad_epsrel=1.e-5, quad_limit=500):
     r"""
     Evaluate the signal-to-noise ratio of a signal observed in a
     detector of a given power spectral density.
@@ -217,12 +217,25 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
       :eq:`rho_snr`
     - ``scale`` -- (default: ``1``) scale factor by which `h(t)` must be
       multiplied to get the actual signal
+    - ``interpolation`` -- (default: ``'linear'``) string describing the type
+      of interpolation used to evaluate `|h(f)|^2` from the list resulting from
+      the FFT of ``signal``; allowed values are
+
+      - ``'linear'``: linear interpolation between two data points
+      - ``'spline'``: cubic spline interpolation
+
     - ``quad_epsrel`` -- (default: ``1.e-6``) relative error tolerance in the
       computation of the integral :eq:`rho_snr`
     - ``quad_limit`` -- (default: ``500``) upper bound on the number of
       subintervals used in the adaptive algorithm to compute the integral
       (this corresponds to the argument ``limit`` of SciPy's function
       `quad <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quad.html#scipy.integrate.quad/>`_)
+
+    OUTPUT:
+
+    - the signal-to-noise ratio `\rho` computed via the integral :eq:`rho_snr`,
+      with the boundaries `0` and `+\infty` replaced by respectively ``fmin``
+      and ``fmax``.
 
     EXAMPLES:
 
@@ -245,27 +258,48 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
     The signal-to-noise ratio is then computed as::
 
         sage: time_scale = astro_data.MSgrA_s  # Sgr A* mass in seconds
-        sage: psd = lisa_detector.power_spectral_density
-        sage: fmin, fmax = 1e-5, 2e-2
+        sage: psd = lisa_detector.power_spectral_density_RCLfit
+        sage: fmin, fmax = 1e-5, 5e-3
         sage: mu_ov_r = astro_data.Msol_m / astro_data.dSgrA  # mu/r
-        sage: snr = signal_to_noise(h, time_scale, psd, fmin, fmax,
-        ....:                       scale=mu_ov_r)
-        sage: snr  # tol 1.0e-13
-        5382.189120880952
+        sage: signal_to_noise(h, time_scale, psd, fmin, fmax,
+        ....:                 interpolation='spline', scale=mu_ov_r)  # tol 1.0e-13
+        7582.5363375174875
+
+    Signal-to-noise for a signal computed at the quadrupole approximation::
+
+        sage: h = h_particle_signal(a, r0, theta, phi, 0., tmax, mode='+',
+        ....:                       nb_points=4000, approximation='quadrupole')
+        sage: signal_to_noise(h, time_scale, psd, fmin, fmax,
+        ....:                 interpolation='spline', scale=mu_ov_r)  # tol 1.0e-13
+        5380.74197174931
 
     """
     sig = [(t*time_scale, h) for (t, h) in signal]
     hf = fourier(sig)
-    hf2 = [(f, abs(h)**2) for (f, h) in hf]
-    hf2_pos = [(f, h) for (f, h) in hf2 if f >=0]
-    hf2_func = spline(hf2_pos)
+    hf2 = [(f, abs(h)**2) for (f, h) in hf if f >=0]
+    if interpolation == 'linear':
+        def hf2_func(f):
+            for i, (fc, hc) in enumerate(hf2):
+                if fc > f:
+                    fc1, hc1 = fc, hc
+                    fc0, hc0 = hf2[i-1]
+                    break
+            else:
+                raise ValueError("frequency out of range")
+            return hc0 + (hc1-hc0)*(f-fc0)/(fc1-fc0)
+    elif interpolation == 'spline':
+        hf2_func = spline(hf2)
+    else:
+        raise ValueError("{} is not a valid ".format(interpolation)
+                         + " interpolation method")
     def hf2_ov_Sn(f):
         return hf2_func(f) / psd(f)
     integ = quad(hf2_ov_Sn, fmin, fmax, epsrel=quad_epsrel, limit=quad_limit)
+    # print("integ: {}".format(integ))
     return 2*sqrt(integ[0])*scale
 
 def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
-                             m_min=1, m_max=10, scale=1):
+                             m_min=1, m_max=None, scale=1):
     r"""
     Evaluate the signal-to-noise ratio of gravitational radiation emitted
     by a single orbiting particle observed in a detector of a given power
@@ -284,13 +318,37 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
       be `M` expressed in seconds.
     - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
       mode `m`
-    - ``m_max`` -- (default: 10) upper bound in the summation over the Fourier
-      mode `m`
+    - ``m_max`` -- (default: ``None``) upper bound in the summation over the
+      Fourier mode `m`; if ``None``, ``m_max`` is set to 10 for `r_0 \leq 20 M`
+      and to 5 for `r_0 > 20 M`
     - ``scale`` -- (default: ``1``) scale factor by which `h(t)` must be
       multiplied to get the actual signal; this should by `\mu/r`, where `\mu`
 
+    OUTPUT:
+
+    - the signal-to-noise ratio `\rho`
+
+    EXAMPLES:
+
+    Let us evaluate the SNR of the gravitational signal generated by a 1-solar
+    mass object orbiting at the ISCO of Sgr A* observed by LISA during 1 day::
+
+        sage: from kerrgeodesic_gw import (signal_to_noise_particle,
+        ....:                              lisa_detector, astro_data)
+        sage: a, r0 = 0., 6.
+        sage: theta, phi = pi/2, 0
+        sage: t_obs = 24*3600  # 1 day in seconds
+        sage: BH_time_scale = astro_data.MSgrA_s  # Sgr A* mass in seconds
+        sage: psd = lisa_detector.power_spectral_density_RCLfit
+        sage: mu_ov_r = astro_data.Msol_m / astro_data.dSgrA  # mu/r
+        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
+        ....:                          scale=mu_ov_r)  # tol 1.0e-13
+        7565.6612762972445
+
     """
     from .gw_particle import h_amplitude_particle_fourier
+    if m_max is None:
+        m_max = 10 if r0 <= 20. else 5
     # Orbital frequency in the same time units as S_n(f) (generally seconds):
     f0 = RDF(1. /(2*pi*(r0**1.5 + a))/BH_time_scale)
     rho2 = 0
