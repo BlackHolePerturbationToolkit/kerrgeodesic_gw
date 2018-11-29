@@ -192,3 +192,34 @@ def Zinf(a, l, m, r, algorithm='spline'):
     # The factor (-1)**(l+m) below accounts for a difference of convention
     # in the C++ code used to produce the data files
     return (-1)**(l+m)*CDF(splines[0](r), splines[1](r))
+
+def _lmax(a, r):
+    r"""
+    Utility function giving the maximal value of the harmonic index `\ell`
+    for tabulated values of `Z^\infty_{\ell m}(r)`.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r`` -- areal radius of the orbit (in units of `M`)
+
+    OUTPUT:
+
+    - maximal value of `\ell` for which `Z^\infty_{\ell m}(r)` is tabulated
+
+    EXAMPLES::
+
+        sage: from kerrgeodesic_gw.zinf import _lmax
+        sage: _lmax(0, 6.)
+        10
+        sage: _lmax(0, 40.)
+        5
+        sage: _lmax(0.9, 12.)
+        10
+        sage: _lmax(0.95, 12.)
+        5
+
+    """
+    r_high_l = 20. if a <= 0.9 else 10.
+    l_max = 10 if r <= r_high_l else 5
+    return l_max

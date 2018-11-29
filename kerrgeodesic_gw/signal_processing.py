@@ -347,8 +347,9 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
 
     """
     from .gw_particle import h_amplitude_particle_fourier
+    from .zinf import _lmax
     if m_max is None:
-        m_max = 10 if r0 <= 20. else 5
+        m_max = _lmax(a, r0)
     # Orbital frequency in the same time units as S_n(f) (generally seconds):
     f0 = RDF(1. /(2*pi*(r0**1.5 + a))/BH_time_scale)
     rho2 = 0
