@@ -1193,3 +1193,57 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                       gridlines=True, frame=True, axes=False, title=title)
     return graph
 
+def gw_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
+    r"""
+    Return the total power in the gravitational radiation emitted by
+    a particle in circular orbit around a Kerr black hole.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
+    - ``l_max`` -- (default: ``None``) upper bound in the summation over the
+      harmonic degree `\ell`; if ``None``, ``l_max`` is determined automatically
+      from tabulated data
+    - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
+      mode `m`
+    - ``approximation`` -- (default: ``None``) string describing the
+      computational method; allowed values are
+
+      - ``None``: exact computation
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
+      - ``'quadrupole'`` (only for ``a=0``): quadrupole approximation
+        (0-post-Newtonian); see :func:`h_particle_quadrupole`
+
+    OUTPUT:
+
+    - total power rescaled by the factor `(M/\mu)^2`, where `M` is the BH mass
+      and `\mu` the mass of the particle.
+
+    """
+    from sage.symbolic.constants import pi
+    from .zinf import _lmax
+    a = RDF(a)  # RDF = Real Double Field
+    r0 = RDF(r0)
+    if approximation == 'quadrupole':
+        return 32./5./r0**5
+    else:
+        if approximation is None:
+            algorithm_Zinf = 'spline'
+        elif approximation == '1.5PN':
+            algorithm_Zinf = '1.5PN'
+        else:
+            raise ValueError("unknown type of approximation")
+    if l_max is None:
+        l_max = _lmax(a, r0)
+    # m times the orbital angular velocity
+    omega0_2 = 1./(r0**1.5 + a)**2
+    res = 0
+    for l in range(2, l_max+1):
+        for m in range(m_min, l+1):
+            Zlm = Zinf(a, l, m, r0, algorithm=algorithm_Zinf)
+            res += abs(Zlm)**2 / (m*m*omega0_2)
+    # To take into account the negative m's, we divide by 2*pi instead of 4*pi:
+    return res/RDF(2*pi)
