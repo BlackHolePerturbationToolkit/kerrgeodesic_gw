@@ -1193,18 +1193,19 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                       gridlines=True, frame=True, axes=False, title=title)
     return graph
 
-def gw_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
+def radiated_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
     r"""
-    Return the total power in the gravitational radiation emitted by
-    a particle in circular orbit around a Kerr black hole.
+    Return the total (i.e. summed over all directions) power of the
+    gravitational radiation emitted by a particle in circular orbit around a
+    Kerr black hole.
 
     INPUT:
 
     - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
     - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
     - ``l_max`` -- (default: ``None``) upper bound in the summation over the
-      harmonic degree `\ell`; if ``None``, ``l_max`` is determined automatically
-      from tabulated data
+      harmonic degree `\ell`; if ``None``, ``l_max`` is determined
+      automatically from the available tabulated data
     - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
       mode `m`
     - ``approximation`` -- (default: ``None``) string describing the
@@ -1219,8 +1220,39 @@ def gw_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
 
     OUTPUT:
 
-    - total power rescaled by the factor `(M/\mu)^2`, where `M` is the BH mass
-      and `\mu` the mass of the particle.
+    - rescaled radiated power `dE/dt (M/\mu)^2`, where `M` is the BH mass and
+      `\mu` the mass of the orbiting particle.
+
+    EXAMPLES:
+
+    Power radiated by a particle at the ISCO of a Schwarzschild BH::
+
+        sage: from kerrgeodesic_gw import radiated_power_particle
+        sage: radiated_power_particle(0, 6.)
+        0.000937262782177525
+
+    Power radiated by a particle at the ISCO of a rapidly rotating Kerr BH
+    (`a=0.98 M`)::
+
+        sage: radiated_power_particle(0.98, 1.61403)  # tol 1.0e-13
+        0.08629927053494096
+
+    Power computed according to various approximations::
+
+        sage: radiated_power_particle(0, 6., approximation='1.5PN')  # tol 1.0e-13
+        0.0010435864384751143
+        sage: radiated_power_particle(0, 6., approximation='quadrupole')  # tol 1.0e-13
+        0.000823045267489712
+
+    Let us check that at large radius, these approximations get closer to the
+    actual result::
+
+        sage: radiated_power_particle(0, 50.)  # tol 1.0e-13
+        1.9624555021692417e-08
+        sage: radiated_power_particle(0, 50., approximation='1.5PN')  # tol 1.0e-13
+        1.958318200436188e-08
+        sage: radiated_power_particle(0, 50., approximation='quadrupole')  # tol 1.0e-13
+        2.0480000000000002e-08
 
     """
     from sage.symbolic.constants import pi
@@ -1229,15 +1261,16 @@ def gw_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
     r0 = RDF(r0)
     if approximation == 'quadrupole':
         return 32./5./r0**5
+    if approximation is None:
+        algorithm_Zinf = 'spline'
+        if l_max is None:
+            l_max = _lmax(a, r0)
+    elif approximation == '1.5PN':
+        algorithm_Zinf = '1.5PN'
+        if l_max is None:
+            l_max = 5
     else:
-        if approximation is None:
-            algorithm_Zinf = 'spline'
-        elif approximation == '1.5PN':
-            algorithm_Zinf = '1.5PN'
-        else:
-            raise ValueError("unknown type of approximation")
-    if l_max is None:
-        l_max = _lmax(a, r0)
+        raise ValueError("unknown type of approximation")
     # m times the orbital angular velocity
     omega0_2 = 1./(r0**1.5 + a)**2
     res = 0
