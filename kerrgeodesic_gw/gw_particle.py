@@ -10,7 +10,8 @@ is given by the formula:
    :label: gw_single_part
 
     h_+ - i h_\times = \frac{2\mu}{r} \,
-    \sum_{\ell=2}^{\infty} \sum_{m=-\ell}^\ell
+    \sum_{\ell=2}^{\infty}
+    \sum_{{\scriptstyle m=-\ell\atop \scriptstyle m\not=0}}^\ell
     \frac{Z^\infty_{\ell m}(r_0)}{(m\omega_0)^2}
     \, _{-2}S^{am\omega_0}_{\ell m}(\theta,\phi)
     \, e^{-i m \phi_0} e^{- i m \omega_0 (t-r_*)}
@@ -118,6 +119,7 @@ This module implements the following functions:
   the retarded time
 - :func:`plot_spectrum_particle`: plot
   `(r/\mu)\sqrt{(A_m^{+,\times})^2 + (B_m^{+,\times})^2}` in terms of `m`
+- :func:`radiated_power_particle`: total radiated power (gravitational luminosity)
 
 REFERENCES:
 
@@ -1199,6 +1201,16 @@ def radiated_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
     gravitational radiation emitted by a particle in circular orbit around a
     Kerr black hole.
 
+    The total radiated power (or *luminosity*) `L` is computed according to
+    the formula:
+
+    .. MATH::
+
+        L = \frac{\mu^2}{4\pi}
+        \sum_{\ell=2}^{\infty}
+        \sum_{{\scriptstyle m=-\ell\atop \scriptstyle m\not=0}}^\ell
+        \frac{\left| Z^\infty_{\ell m}(r_0) \right| ^2}{(m\omega_0)^2}
+
     INPUT:
 
     - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
@@ -1220,7 +1232,7 @@ def radiated_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
 
     OUTPUT:
 
-    - rescaled radiated power `dE/dt (M/\mu)^2`, where `M` is the BH mass and
+    - rescaled radiated power `L\, (M/\mu)^2`, where `M` is the BH mass and
       `\mu` the mass of the orbiting particle.
 
     EXAMPLES:
