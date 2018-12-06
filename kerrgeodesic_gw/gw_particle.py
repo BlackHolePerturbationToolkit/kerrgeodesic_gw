@@ -1338,9 +1338,31 @@ def secular_frequency_change(a, r0, l_max=None, m_min=1, approximation=None):
     else:
         x = 1./r0
     ax32 = a*x**1.5
-    num = (1 - 3*x + 2*ax32)**1.5
-    den = (1 - 6*x + 8*ax32 - 3*(a*x)**2)
     res = 3*L*r0/(1 + ax32)*((1 - 3*x + 2*ax32)**1.5 /
                              (1 - 6*x + 8*ax32 - 3*(a*x)**2))
     return res
 
+def decay_time(a, r_init, r_final, l_max=None, m_min=1, approximation=None,
+               quad_epsrel=1.e-5, quad_limit=500):
+    r"""
+    Return the time spent in the migration from a circular orbit of
+    radius ``r_init`` to that of radius ``r_final``, via gravitational
+    radiation reaction.
+    """
+    from scipy.integrate import quad
+    a = float(a)
+    r_init = float(r_init)
+    r_final = float(r_final)
+    def dtdr(r0):
+        L = radiated_power_particle(a, r0, l_max=l_max, m_min=m_min,
+                                    approximation=approximation)
+        if approximation == 'quadrupole':
+            x = 0
+        else:
+            x = 1./r0
+        ax32 = a*x**1.5
+        res = - ((1 - 6*x + 8*ax32 - 3*(a*x)**2) / (1 - 3*x + 2*ax32)**1.5
+                 / (2*r0**2*float(L)))
+        return res
+    integ = quad(dtdr, r_init, r_final, epsrel=quad_epsrel, limit=quad_limit)
+    return integ[0]
