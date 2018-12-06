@@ -7,7 +7,7 @@ from .gw_particle import (h_plus_particle, h_cross_particle, h_particle_signal,
                           h_particle_quadrupole, radiated_power_particle,
                           h_plus_particle_fourier, h_cross_particle_fourier,
                           h_amplitude_particle_fourier, plot_spectrum_particle,
-                          plot_h_particle)
+                          plot_h_particle, secular_frequency_change)
 from .gw_blob import (h_blob, h_blob_signal, h_toy_model_semi_analytic,
                       blob_mass, surface_density_toy_model,
                       surface_density_gaussian)

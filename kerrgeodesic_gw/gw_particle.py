@@ -46,7 +46,7 @@ where
 
     \psi := \omega_0 (t - r_*) - \phi + \phi_0 ,
 
-`\omega_0` being the orbital frequency of the particle and `r_*` the tortoise
+`\omega_0` being the orbital angular velocity of the particle and `r_*` the tortoise
 coordinate corresponding to `r`.
 
 Note that the dependence of the Fourier coefficients `A_m^{+,\times}(r,\theta)`
@@ -120,6 +120,8 @@ This module implements the following functions:
 - :func:`plot_spectrum_particle`: plot
   `(r/\mu)\sqrt{(A_m^{+,\times})^2 + (B_m^{+,\times})^2}` in terms of `m`
 - :func:`radiated_power_particle`: total radiated power (gravitational luminosity)
+- :func:`secular_frequency_change`: change in orbital frequency
+  `\dot{\omega_0}/\omega_0` due to the gravitational radiation reaction
 
 REFERENCES:
 
@@ -1292,3 +1294,53 @@ def radiated_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
             res += abs(Zlm)**2 / (m*m*omega0_2)
     # To take into account the negative m's, we divide by 2*pi instead of 4*pi:
     return res/RDF(2*pi)
+
+def secular_frequency_change(a, r0, l_max=None, m_min=1, approximation=None):
+    r"""
+    Return the gravitational-radiation induced change of the orbital frequency
+    of a particle in circular orbit around a Kerr black hole.
+
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r0`` -- Boyer-Lindquist radius of the orbit (in units of `M`)
+    - ``l_max`` -- (default: ``None``) upper bound in the summation over the
+      harmonic degree `\ell`; if ``None``, ``l_max`` is determined
+      automatically from the available tabulated data
+    - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
+      mode `m`
+    - ``approximation`` -- (default: ``None``) string describing the
+      computational method; allowed values are
+
+      - ``None``: exact computation
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
+      - ``'quadrupole'`` (only for ``a=0``): quadrupole approximation
+        (0-post-Newtonian); see :func:`h_particle_quadrupole`
+
+    OUTPUT:
+
+    - rescaled fractional change in orbital frequency
+      `M/f_0 \, df_0/dt\, (M/\mu)`, where `M` is the BH mass and
+      `\mu` the mass of the orbiting particle.
+
+    EXAMPLES:
+
+    """
+    a = RDF(a)
+    r0 = RDF(r0)
+    L = radiated_power_particle(a, r0, l_max=l_max, m_min=m_min,
+                                approximation=approximation)
+    if approximation == 'quadrupole':
+        x = 0
+    else:
+        x = 1./r0
+    ax32 = a*x**1.5
+    num = (1 - 3*x + 2*ax32)**1.5
+    den = (1 - 6*x + 8*ax32 - 3*(a*x)**2)
+    res = 3*L*r0/(1 + ax32)*((1 - 3*x + 2*ax32)**1.5 /
+                             (1 - 6*x + 8*ax32 - 3*(a*x)**2))
+    return res
+
