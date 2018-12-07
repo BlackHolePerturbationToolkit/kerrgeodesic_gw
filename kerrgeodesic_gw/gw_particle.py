@@ -1343,7 +1343,7 @@ def secular_frequency_change(a, r0, l_max=None, m_min=1, approximation=None):
     return res
 
 def decay_time(a, r_init, r_final, l_max=None, m_min=1, approximation=None,
-               quad_epsrel=1.e-5, quad_limit=500):
+               quad_epsrel=1.e-6, quad_limit=500):
     r"""
     Return the time spent in the migration from a circular orbit of
     radius ``r_init`` to that of radius ``r_final``, via gravitational
