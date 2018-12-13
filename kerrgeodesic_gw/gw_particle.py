@@ -122,6 +122,7 @@ This module implements the following functions:
 - :func:`radiated_power_particle`: total radiated power (gravitational luminosity)
 - :func:`secular_frequency_change`: change in orbital frequency
   `\dot{\omega_0}/\omega_0` due to the gravitational radiation reaction
+- :func:`decay_time`: time for the orbit to shrink to an orbit of given radius
 
 REFERENCES:
 
@@ -1300,7 +1301,6 @@ def secular_frequency_change(a, r0, l_max=None, m_min=1, approximation=None):
     Return the gravitational-radiation induced change of the orbital frequency
     of a particle in circular orbit around a Kerr black hole.
 
-
     INPUT:
 
     - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
@@ -1323,10 +1323,41 @@ def secular_frequency_change(a, r0, l_max=None, m_min=1, approximation=None):
     OUTPUT:
 
     - rescaled fractional change in orbital frequency
-      `M/f_0 \, df_0/dt\, (M/\mu)`, where `M` is the BH mass and
+      `\dot{\omega}_0/\omega_0 \, (M^2/\mu)`, where `M` is the BH mass and
       `\mu` the mass of the orbiting particle.
 
     EXAMPLES:
+
+    Relative change in orbital frequency change at `r_0 = 10 M` around a
+    Schwarzschild black hole::
+
+        sage: from kerrgeodesic_gw import secular_frequency_change
+        sage: secular_frequency_change(0, 10)  # tol 1.0e-13
+        0.002701529506901975
+        sage: secular_frequency_change(0, 10, approximation='quadrupole')  # tol 1.0e-13
+        0.00192
+
+    At larger distance, the quadrupole approximation works better::
+
+        sage: secular_frequency_change(0, 50)  # tol 1.0e-13
+        3.048598175592674e-06
+        sage: secular_frequency_change(0, 50, approximation='quadrupole')  # tol 1.0e-13
+        3.072e-06
+
+    At the ISCO, `\dot{\omega}_0` diverges::
+
+        sage: secular_frequency_change(0, 6)
+        +infinity
+
+    while the quadrupole approximation would have predict a finite value there::
+
+        sage: secular_frequency_change(0, 6, approximation='quadrupole')  # tol 1.0e-13
+        0.014814814814814817
+
+    Case of a Kerr black hole::
+
+        sage: secular_frequency_change(0.5, 6)  # tol 1.0e-13
+        0.020393023677356764
 
     """
     a = RDF(a)
@@ -1346,8 +1377,57 @@ def decay_time(a, r_init, r_final, l_max=None, m_min=1, approximation=None,
                quad_epsrel=1.e-6, quad_limit=500):
     r"""
     Return the time spent in the migration from a circular orbit of
-    radius ``r_init`` to that of radius ``r_final``, via gravitational
+    radius ``r_init`` to that of radius ``r_final``, induced by gravitational
     radiation reaction.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``r_init`` -- Boyer-Lindquist radius of the initial orbit (in units of `M`)
+    - ``r_final`` -- Boyer-Lindquist radius of the final orbit (in units of `M`)
+    - ``l_max`` -- (default: ``None``) upper bound in the summation over the
+      harmonic degree `\ell`; if ``None``, ``l_max`` is determined
+      automatically from the available tabulated data
+    - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
+      mode `m`
+    - ``approximation`` -- (default: ``None``) string describing the
+      computational method; allowed values are
+
+      - ``None``: exact computation
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
+      - ``'quadrupole'`` (only for ``a=0``): quadrupole approximation
+        (0-post-Newtonian); see :func:`h_particle_quadrupole`
+    - ``quad_epsrel`` -- (default: ``1.e-6``) relative error tolerance in the
+      computation of the integral giving the decay time
+    - ``quad_limit`` -- (default: ``500``) upper bound on the number of
+      subintervals used in the adaptive algorithm to compute the integral
+      (this corresponds to the argument ``limit`` of SciPy's function
+      `quad <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quad.html#scipy.integrate.quad/>`_)
+
+    OUTPUT:
+
+    - rescaled decay time `T (\mu/M^2)`, where `M` is the BH mass and
+      `\mu` the mass of the orbiting particle.
+
+    EXAMPLES:
+
+    Time to migrate from `r_0=10 M` to `r_0=6 M` around a Schwarzschild black
+    hole::
+
+        sage: from kerrgeodesic_gw import decay_time
+        sage: decay_time(0, 10, 6)  # tol 1.0e-13
+        90.80876605028857
+
+    Let us check that at large radius, there is a good agreement with the
+    quadrupole formula::
+
+        sage: decay_time(0, 50, 6)  # tol 1.0e-13
+        121893.29664651724
+        sage: decay_time(0, 50, 6, approximation='quadrupole')  # tol 1.0e-13
+        122045.0
+
     """
     from scipy.integrate import quad
     a = float(a)
