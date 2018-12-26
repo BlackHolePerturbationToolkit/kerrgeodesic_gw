@@ -11,6 +11,7 @@ Contents
 .. toctree::
    :maxdepth: 3
 
+   kerr_spacetime
    spher_harm
    zinf
    gw_particle
