@@ -16,8 +16,9 @@ REFERENCES:
 #                  http://www.gnu.org/licenses/
 #******************************************************************************
 
-from sage.functions.trig import cos, sin
+from sage.functions.trig import cos, sin, acos
 from sage.functions.other import sqrt
+from sage.rings.rational_field import QQ
 from sage.misc.cachefunc import cached_method
 from sage.manifolds.differentiable.pseudo_riemannian import PseudoRiemannianManifold
 
@@ -238,6 +239,28 @@ class KerrBH(PseudoRiemannianManifold):
     def metric(self):
         r"""
         Return the metric tensor.
+
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: a, m = var('a m')
+            sage: BH = KerrBH(a, m)
+            sage: BH.metric()
+            Lorentzian metric g on the 4-dimensional Lorentzian manifold M
+            sage: BH.metric().display()
+            g = -(a^2*cos(th)^2 - 2*m*r + r^2)/(a^2*cos(th)^2 + r^2) dt*dt
+             - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dt*dph
+             + (a^2*cos(th)^2 + r^2)/(a^2 - 2*m*r + r^2) dr*dr
+             + (a^2*cos(th)^2 + r^2) dth*dth
+             - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dph*dt
+             + (2*a^2*m*r*sin(th)^4 + (a^2*r^2 + r^4 + (a^4 + a^2*r^2)*cos(th)^2)*sin(th)^2)/(a^2*cos(th)^2 + r^2) dph*dph
+
+        The Schwarzschild metric::
+
+            sage: KerrBH(0, m).metric().display()
+            g = (2*m - r)/r dt*dt - r/(2*m - r) dr*dr + r^2 dth*dth
+             + r^2*sin(th)^2 dph*dph
+
         """
         if self._metric is None:
             # Initialization of the metric tensor in Boyer-Lindquist coordinates
@@ -324,3 +347,157 @@ class KerrBH(PseudoRiemannianManifold):
         return m - sqrt(m**2 - a**2)
 
     Cauchy_horizon_radius = inner_horizon_radius
+
+    @cached_method
+    def photon_orbit_radius(self, retrograde=False):
+        r"""
+        Return the Boyer-Lindquist radial coordinate of the circular orbit
+        of photons in the equatorial plane.
+
+        INPUT:
+
+        - ``retrograde`` -- (default: ``False``) boolean determining whether
+          retrograde or prograde (direct) orbits are considered
+
+        OUTPUT:
+
+        - Boyer-Lindquist radial coordinate `r` of the circular orbit of
+          photons in the equatorial plane
+
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: a, m = var('a m')
+            sage: BH = KerrBH(a, m)
+            sage: BH.photon_orbit_radius()
+            2*m*(cos(2/3*arccos(-a/m)) + 1)
+            sage: BH.photon_orbit_radius(retrograde=True)
+            2*m*(cos(2/3*arccos(a/m)) + 1)
+
+        Photon orbit in Schwarzschild spacetime::
+
+            sage: KerrBH(0, m).photon_orbit_radius()
+            3*m
+
+        Photon orbits in extreme Kerr spacetime (`a=m`)::
+
+            sage: KerrBH(m, m).photon_orbit_radius()
+            m
+            sage: KerrBH(m, m).photon_orbit_radius(retrograde=True)
+            4*m
+
+        """
+        m = self._m
+        a = self._a
+        eps = -1 if not retrograde else 1
+        # Eq. (2.18) in Bardeen, Press & Teukolsky, ApJ 178, 347 (1972)
+        return 2*m*(1 + cos(2*acos(eps*a/m)/3))
+
+    @cached_method
+    def marginally_bound_orbit_radius(self, retrograde=False):
+        r"""
+        Return the Boyer-Lindquist radial coordinate of the marginally bound
+        circular orbit in the equatorial plane.
+
+        INPUT:
+
+        - ``retrograde`` -- (default: ``False``) boolean determining whether
+          retrograde or prograde (direct) orbits are considered
+
+        OUTPUT:
+
+        - Boyer-Lindquist radial coordinate `r` of the marginally bound
+          circular orbit in the equatorial plane
+
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: a, m = var('a m')
+            sage: BH = KerrBH(a, m)
+            sage: BH.marginally_bound_orbit_radius()
+            -a + 2*sqrt(-a + m)*sqrt(m) + 2*m
+            sage: BH.marginally_bound_orbit_radius(retrograde=True)
+            a + 2*sqrt(a + m)*sqrt(m) + 2*m
+
+        Marginally bound orbit in Schwarzschild spacetime::
+
+            sage: KerrBH(0, m).marginally_bound_orbit_radius()
+            4*m
+
+        Marginally bound orbits in extreme Kerr spacetime (`a=m`)::
+
+            sage: KerrBH(m, m).marginally_bound_orbit_radius()
+            m
+            sage: KerrBH(m, m).marginally_bound_orbit_radius(retrograde=True)
+            2*sqrt(2)*m + 3*m
+
+        """
+        m = self._m
+        a = self._a
+        eps = -1 if not retrograde else 1
+        # Eq. (2.19) in Bardeen, Press & Teukolsky, ApJ 178, 347 (1972)
+        return 2*m + eps*a +2*sqrt(m)*sqrt(m + eps*a)
+
+
+    @cached_method
+    def isco_radius(self, retrograde=False):
+        r"""
+        Return the Boyer-Lindquist radial coordinate of the innermost stable
+        circular orbit (ISCO) in the equatorial plane.
+
+        INPUT:
+
+        - ``retrograde`` -- (default: ``False``) boolean determining whether
+          retrograde or prograde (direct) orbits are considered
+
+        OUTPUT:
+
+        - Boyer-Lindquist radial coordinate `r` of the innermost stable
+          circular orbit in the equatorial plane
+
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: a, m = var('a m')
+            sage: BH = KerrBH(a, m)
+            sage: BH.isco_radius()
+            m*(sqrt((((a/m + 1)^(1/3) + (-a/m + 1)^(1/3))*(-a^2/m^2 + 1)^(1/3) + 1)^2
+             + 3*a^2/m^2) - sqrt(-(((a/m + 1)^(1/3) + (-a/m + 1)^(1/3))*(-a^2/m^2 + 1)^(1/3)
+             + 2*sqrt((((a/m + 1)^(1/3) + (-a/m + 1)^(1/3))*(-a^2/m^2 + 1)^(1/3) + 1)^2
+             + 3*a^2/m^2) + 4)*(((a/m + 1)^(1/3) + (-a/m + 1)^(1/3))*(-a^2/m^2 + 1)^(1/3) - 2)) + 3)
+            sage: BH.isco_radius(retrograde=True)
+            m*(sqrt((((a/m + 1)^(1/3) + (-a/m + 1)^(1/3))*(-a^2/m^2 + 1)^(1/3) + 1)^2
+             + 3*a^2/m^2) + sqrt(-(((a/m + 1)^(1/3) + (-a/m + 1)^(1/3))*(-a^2/m^2 + 1)^(1/3)
+             + 2*sqrt((((a/m + 1)^(1/3) + (-a/m + 1)^(1/3))*(-a^2/m^2 + 1)^(1/3) + 1)^2
+             + 3*a^2/m^2) + 4)*(((a/m + 1)^(1/3) + (-a/m + 1)^(1/3))*(-a^2/m^2 + 1)^(1/3) - 2)) + 3)
+            sage: KerrBH(0.5).isco_radius()  # tol 1.0e-13
+            4.23300252953083
+            sage: KerrBH(0.9).isco_radius()  # tol 1.0e-13
+            2.32088304176189
+            sage: KerrBH(0.98).isco_radius()  # tol 1.0e-13
+            1.61402966763547
+
+        ISCO in Schwarzschild spacetime::
+
+            sage: KerrBH(0, m).isco_radius()
+            6*m
+
+        ISCO in extreme Kerr spacetime (`a=m`)::
+
+            sage: KerrBH(m, m).isco_radius()
+            m
+            sage: KerrBH(m, m).isco_radius(retrograde=True)
+            9*m
+
+        """
+        m = self._m
+        a = self._a
+        eps = -1 if not retrograde else 1
+        # Eq. (2.21) in Bardeen, Press & Teukolsky, ApJ 178, 347 (1972)
+        asm = a/m
+        asm2 = asm**2
+        one_third = QQ(1)/QQ(3)
+        z1 = 1 + (1 - asm2)**one_third * ((1 + asm)**one_third
+                                          + (1 - asm)**one_third)
+        z2 = sqrt(3*asm2 + z1**2)
+        return m*(3 + z2 + eps*sqrt((3 - z1)*(3 + z1 + 2*z2)))
