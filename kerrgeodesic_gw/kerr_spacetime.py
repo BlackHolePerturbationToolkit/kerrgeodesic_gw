@@ -173,6 +173,48 @@ class KerrBH(PseudoRiemannianManifold):
         - the chart of Boyer-Lindquist coordinates, as an instance of
           :class:`~sage.manifolds.differentiable.chart.RealDiffChart`
 
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: a, m = var('a m')
+            sage: BH = KerrBH(a, m)
+            sage: BH.BoyerLindquist_coordinates()
+            Chart (M, (t, r, th, ph))
+            sage: latex(BH.BoyerLindquist_coordinates())
+            \left(M,(t, r, {\theta}, {\phi})\right)
+
+        The coordinate variables are returned by the square bracket operator::
+
+            sage: BH.BoyerLindquist_coordinates()[0]
+            t
+            sage: BH.BoyerLindquist_coordinates()[1]
+            r
+            sage: BH.BoyerLindquist_coordinates()[:]
+            (t, r, th, ph)
+
+        They can also be obtained via the operator ``<,>`` at the same
+        time as the chart itself::
+
+            sage: BLchart.<t, r, th, ph> = BH.BoyerLindquist_coordinates()
+            sage: BLchart
+            Chart (M, (t, r, th, ph))
+            sage: type(ph)
+            <type 'sage.symbolic.expression.Expression'>
+
+        Actually, ``BLchart.<t, r, th, ph> = BH.BoyerLindquist_coordinates()``
+        is a shortcut for::
+
+            sage: BLchart = BH.BoyerLindquist_coordinates()
+            sage: t, r, th, ph = BLchart[:]
+
+        The coordinate symbols can be customized::
+
+            sage: BH = KerrBH(a)
+            sage: BH.BoyerLindquist_coordinates(symbols=r"T R Th:\Theta Ph:\Phi")
+            Chart (M, (T, R, Th, Ph))
+            sage: latex(BH.BoyerLindquist_coordinates())
+            \left(M,(T, R, {\Theta}, {\Phi})\right)
+
         """
         if self._BLcoord is None:
             if symbols is None:
