@@ -54,11 +54,11 @@ class KerrBH(PseudoRiemannianManifold):
         sage: dim(BH)
         4
 
-    The default chart on the spacetime manifold is the Boyer-Lindquist one::
+    The Boyer-Lindquist chart::
 
-        sage: BH.default_chart()
+        sage: BH.BoyerLindquist_coordinates()
         Chart (M, (t, r, th, ph))
-        sage: latex(BH.default_chart())
+        sage: latex(_)
         \left(M,(t, r, {\theta}, {\phi})\right)
 
     The Kerr metric::
@@ -109,23 +109,8 @@ class KerrBH(PseudoRiemannianManifold):
                                           metric_name=metric_name, signature=2,
                                           latex_name=manifold_latex_name,
                                           metric_latex_name=metric_latex_name)
-        # Boyer-Lindquist coordinates:
-        BLcoord = self.chart(coordinates=r"t r:(0,+oo) th:(0,pi):\theta ph:(0,2*pi):\phi")
-        t, r, th, ph = BLcoord[:]
-        # Initialization of the metric tensor in Boyer-Lindquist coordinates
-        g = self.metric()
-        r2 = r**2
-        a2 = a**2
-        rho2 = r2 + (a*cos(th))**2
-        Delta = r2 - 2*m*r + a2
-        g[0,0] = -1 + 2*m*r/rho2
-        g[0,3] = -2*a*m*r*sin(th)**2/rho2
-        g[1,1] = rho2/Delta
-        g[2,2] = rho2
-        g[3,3] = (r2 + a2 + 2*m*r*(a*sin(th))**2/rho2)*sin(th)**2
-        for i in self.irange():
-            g[i,i].simplify()
-        g[0,3].simplify()
+        # Coordinate charts (not initialized yet)
+        self._BLcoord = None # Boyer-Lindquist
 
     def mass(self):
         r"""
@@ -165,6 +150,75 @@ class KerrBH(PseudoRiemannianManifold):
         return self._a
 
     angular_momentum = spin
+
+    def BoyerLindquist_coordinates(self, symbols=None, names=None):
+        r"""
+        Return the chart of Boyer-Lindquist coordinates
+
+        INPUT:
+
+        - ``symbols`` -- (default: ``None``) string defining the coordinate
+          text symbols and LaTeX symbols, with the same conventions as the
+          argument ``coordinates`` in
+          :class:`~sage.manifolds.differentiable.chart.RealDiffChart`; this is
+          used only if the Boyer-Lindquist chart has not been already defined;
+          if ``None`` the symbols are generated as `(t,r,\theta,\phi)`.
+        - ``names`` -- (default: ``None``) unused argument, except if
+          ``symbols`` is not provided; it must be a tuple containing
+          the coordinate symbols (this is guaranteed if the shortcut operator
+          ``<,>`` is used)
+
+        OUTPUT:
+
+        - the chart of Boyer-Lindquist coordinates, as an instance of
+          :class:`~sage.manifolds.differentiable.chart.RealDiffChart`
+
+        """
+        if self._BLcoord is None:
+            if symbols is None:
+                if names is None:
+                    symbols = 't r th:\\theta ph:\\phi'
+                else:
+                    names = list(names)
+                    if names[2] in ['th', 'theta']:
+                        names[2] = names[2] + ':\\theta'
+                    if names[3] in ['p', 'ph', 'phi']:
+                        names[3] = names[3] + ':\\phi'
+                    symbols = (names[0] + ' ' + names[1] + ' ' + names[2] + ' '
+                               + names[3])
+            coords = symbols.split()  # list of strings, one per coordinate
+            # Adding the coordinate ranges:
+            coordinates = (coords[0] + ' ' + coords[1] + ' ' + coords[2]
+                           + ':(0,pi) ' + coords[3] + ':(0,2*pi)')
+            self._BLcoord = self.chart(coordinates=coordinates)
+        return self._BLcoord
+
+    def metric(self):
+        r"""
+        Return the metric tensor.
+        """
+        if self._metric is None:
+            # Initialization of the metric tensor in Boyer-Lindquist coordinates
+            cBL = self.BoyerLindquist_coordinates()
+            t, r, th, ph = cBL[:]
+            g = super(KerrBH, self).metric() # the initialized metric object
+            m = self._m
+            a = self._a
+            r2 = r**2
+            a2 = a**2
+            rho2 = r2 + (a*cos(th))**2
+            Delta = r2 - 2*m*r + a2
+            fBL = cBL.frame()  # vector frame associated to BL coordinates
+            g[fBL,0,0,cBL] = -1 + 2*m*r/rho2
+            g[fBL,0,3,cBL] = -2*a*m*r*sin(th)**2/rho2
+            g[fBL,1,1,cBL] = rho2/Delta
+            g[fBL,2,2,cBL] = rho2
+            g[fBL,3,3,cBL] = (r2 + a2 + 2*m*r*(a*sin(th))**2/rho2)*sin(th)**2
+            for i in self.irange():
+                g[fBL,i,i,cBL].simplify()
+            g[fBL,0,3,cBL].simplify()
+        return self._metric
+
 
     @cached_method
     def outer_horizon_radius(self):
