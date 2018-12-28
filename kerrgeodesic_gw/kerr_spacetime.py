@@ -19,6 +19,7 @@ REFERENCES:
 from sage.functions.trig import cos, sin, acos
 from sage.functions.other import sqrt
 from sage.rings.rational_field import QQ
+from sage.symbolic.constants import pi
 from sage.misc.cachefunc import cached_method
 from sage.manifolds.differentiable.pseudo_riemannian import PseudoRiemannianManifold
 
@@ -501,3 +502,118 @@ class KerrBH(PseudoRiemannianManifold):
                                           + (1 - asm)**one_third)
         z2 = sqrt(3*asm2 + z1**2)
         return m*(3 + z2 + eps*sqrt((3 - z1)*(3 + z1 + 2*z2)))
+
+    def orbital_angular_velocity(self, r, retrograde=False):
+        r"""
+        Return the angular velocity on a circular orbit.
+
+        The angular velocity `\Omega` on a circular orbit of Boyer-Lindquist
+        radial coordinate `r` around a Kerr black hole of parameters `(m, a)`
+        is given by the formula
+
+        .. MATH::
+           :label: Omega
+
+            \Omega := \frac{\mathrm{d}\phi}{\mathrm{d}t}
+                    = \pm \frac{m^{1/2}}{r^{3/2} \pm a m^{1/2}}
+
+        where `(t,\phi)` are the Boyer-Lindquist time and azimuthal coordinates
+        and `\pm` is `+` (resp. `-`) for a prograde (resp. retrograde) orbit.
+
+        INPUT:
+
+        - ``r`` -- Boyer-Lindquist radial coordinate `r` of the circular orbit
+        - ``retrograde`` -- (default: ``False``) boolean determining whether
+          the orbit is retrograde or prograde
+
+        OUTPUT:
+
+        - Angular velocity `\Omega` computed according to Eq. :eq:`Omega`
+
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: a, m, r = var('a m r')
+            sage: BH = KerrBH(a, m)
+            sage: BH.orbital_angular_velocity(r)
+            sqrt(m)/(a*sqrt(m) + r^(3/2))
+            sage: BH.orbital_angular_velocity(r, retrograde=True)
+            sqrt(m)/(a*sqrt(m) - r^(3/2))
+            sage: KerrBH(0.9).orbital_angular_velocity(4.)
+            0.112359550561798
+
+        Orbital angular velocity around a Schwarzschild black hole::
+
+            sage: KerrBH(0, m).orbital_angular_velocity(r)
+            sqrt(m)/r^(3/2)
+
+        Orbital angular velocity on the prograde ISCO of an extreme Kerr
+        black hole (`a=m`)::
+
+            sage: EKBH = KerrBH(m, m)
+            sage: EKBH.orbital_angular_velocity(EKBH.isco_radius())
+            1/2/m
+
+        """
+        m = self._m
+        a = self._a
+        # Eq. (2.16) in Bardeen, Press & Teukolsky, ApJ 178, 347 (1972)
+        three_halves = QQ(3)/QQ(2)
+        sm = sqrt(m)
+        if retrograde:
+            return - sm / (r**three_halves - a * sm)
+        return sm / (r**three_halves + a * sm)
+
+    def orbital_frequency(self, r, retrograde=False):
+        r"""
+        Return the orbital frequency of a circular orbit.
+
+        The frequency `f` of a circular orbit of Boyer-Lindquist
+        radial coordinate `r` around a Kerr black hole of parameters `(m, a)`
+        is `f := \Omega/(2\pi)`, where `\Omega` is given by Eq. :eq:`Omega`.
+
+        INPUT:
+
+        - ``r`` -- Boyer-Lindquist radial coordinate `r` of the circular orbit
+        - ``retrograde`` -- (default: ``False``) boolean determining whether
+          the orbit is retrograde or prograde
+
+        OUTPUT:
+
+        - orbital frequency `f`
+
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: a, m, r = var('a m r')
+            sage: BH = KerrBH(a, m)
+            sage: BH.orbital_frequency(r)
+            1/2*sqrt(m)/(pi*(a*sqrt(m) + r^(3/2)))
+            sage: BH.orbital_frequency(r, retrograde=True)
+            1/2*sqrt(m)/(pi*(a*sqrt(m) - r^(3/2)))
+            sage: KerrBH(0.9).orbital_frequency(4.)
+            0.0178825778754939
+            sage: KerrBH(0.9).orbital_frequency(float(4))
+            0.0178825778754939
+
+        Orbital angular velocity around a Schwarzschild black hole::
+
+            sage: KerrBH(0, m).orbital_frequency(r)
+            1/2*sqrt(m)/(pi*r^(3/2))
+
+
+        Orbital angular velocity on the prograde ISCO of an extreme Kerr
+        black hole (`a=m`)::
+
+            sage: EKBH = KerrBH(m, m)
+            sage: EKBH.orbital_frequency(EKBH.isco_radius())
+            1/4/(pi*m)
+
+        """
+        tpi = 2*pi
+        try:
+            par = r.parent()
+            tpi = par(tpi)
+        except AttributeError:
+            tpi = type(r)(tpi)
+        return self.orbital_angular_velocity(r, retrograde=retrograde) / tpi
