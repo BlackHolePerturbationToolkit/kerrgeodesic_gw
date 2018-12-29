@@ -94,11 +94,122 @@ class KerrBH(PseudoRiemannianManifold):
         sage: g[0,3]
         -1.8*r*sin(th)^2/(r^2 + 0.81*cos(th)^2)
 
-    The Schwarrzschild metric as the special case `a=0` of Kerr metric::
+    The Schwarrzschild spacetime as the special case `a=0` of Kerr
+    spacetime::
 
         sage: BH = KerrBH(0, m)
-        sage: BH.metric().display()
+        sage: g = BH.metric()
+        sage: g.display()
         g = (2*m - r)/r dt*dt - r/(2*m - r) dr*dr + r^2 dth*dth + r^2*sin(th)^2 dph*dph
+
+    The object returned by :meth:`metric` belongs to the SageMath class
+    `PseudoRiemannianMetric <http://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/metric.html>`_,
+    for which many methods are available, like ``christoffel_symbols_display()``
+    to get the Christoffel symbols with respect to the Boyer-Lindquist
+    coordinates (by default, only nonzero and non-redundant symbols are
+    displayed)::
+
+        sage: g.christoffel_symbols_display()
+        Gam^t_t,r = -m/(2*m*r - r^2)
+        Gam^r_t,t = -(2*m^2 - m*r)/r^3
+        Gam^r_r,r = m/(2*m*r - r^2)
+        Gam^r_th,th = 2*m - r
+        Gam^r_ph,ph = (2*m - r)*sin(th)^2
+        Gam^th_r,th = 1/r
+        Gam^th_ph,ph = -cos(th)*sin(th)
+        Gam^ph_r,ph = 1/r
+        Gam^ph_th,ph = cos(th)/sin(th)
+
+    or ``ricci()`` to compute the Ricci tensor (identically zero here since we
+    are dealing with a solution of Einstein equation in vacuum)::
+
+        sage: g.ricci()
+        Field of symmetric bilinear forms Ric(g) on the 4-dimensional
+         Lorentzian manifold M
+        sage: g.ricci().display()
+        Ric(g) = 0
+
+    Various methods of ``KerrBH`` class implement the computations of
+    remarkable radii in the Kerr spacetime. Let us use them to reproduce Fig. 1
+    of the seminal article by Bardeen, Press and Teukolsky, ApJ **178**, 347
+    (1972), :doi:`10.1086/151796`, which displays these radii as functions of
+    the black hole spin paramater `a`. The radii of event horizon and inner
+    (Cauchy) horizon are obtained by the methods :meth:`event_horizon_radius`
+    and :meth:`Cauchy_horizon_radius` respectively::
+
+        sage: graph = plot(lambda a: KerrBH(a).event_horizon_radius(),
+        ....:              (0., 1.), color='black', thickness=1.5,
+        ....:              legend_label=r"$r_{\rm H}$ (event horizon)",
+        ....:              axes_labels=[r"$a/M$", r"$r/M$"],
+        ....:              gridlines=True, frame=True, axes=False)
+        sage: graph += plot(lambda a: KerrBH(a).Cauchy_horizon_radius(),
+        ....:               (0., 1.), color='black', linestyle=':', thickness=1.5,
+        ....:               legend_label=r"$r_{\rm C}$ (Cauchy horizon)")
+
+    The ISCO radius is computed by the method :meth:`isco_radius`::
+
+        sage: graph += plot(lambda a: KerrBH(a).isco_radius(),
+        ....:               (0., 1.), thickness=1.5,
+        ....:               legend_label=r"$r_{\rm ISCO}$ (prograde)")
+        sage: graph += plot(lambda a: KerrBH(a).isco_radius(retrograde=True),
+        ....:               (0., 1.), linestyle='--', thickness=1.5,
+        ....:               legend_label=r"$r_{\rm ISCO}$ (retrograde)")
+
+    The radius of the marginally bound circular orbit is computed by the method
+    :meth:`marginally_bound_orbit_radius`::
+
+        sage: graph += plot(lambda a: KerrBH(a).marginally_bound_orbit_radius(),
+        ....:               (0., 1.), color='purple', linestyle='-', thickness=1.5,
+        ....:               legend_label=r"$r_{\rm mb}$ (prograde)")
+        sage: graph += plot(lambda a: KerrBH(a).marginally_bound_orbit_radius(retrograde=True),
+        ....:               (0., 1.), color='purple', linestyle='--', thickness=1.5,
+        ....:               legend_label=r"$r_{\rm mb}$ (retrograde)")
+
+    The radius of the photon circular orbit is computed by the method
+    :meth:`photon_orbit_radius`::
+
+        sage: graph += plot(lambda a: KerrBH(a).photon_orbit_radius(),
+        ....:               (0., 1.), color='gold', linestyle='-', thickness=1.5,
+        ....:               legend_label=r"$r_{\rm ph}$ (prograde)")
+        sage: graph += plot(lambda a: KerrBH(a).photon_orbit_radius(retrograde=True),
+        ....:               (0., 1.), color='gold', linestyle='--', thickness=1.5,
+        ....:               legend_label=r"$r_{\rm ph}$ (retrograde)")
+
+    The final plot::
+
+        sage: graph
+        Graphics object consisting of 8 graphics primitives
+
+    .. PLOT::
+
+        from kerrgeodesic_gw import KerrBH
+        graph = plot(lambda a: KerrBH(a).event_horizon_radius(), \
+                     (0., 1.), color='black', thickness=1.5, \
+                     legend_label=r"$r_{\rm H}$ (event horizon)", \
+                     axes_labels=[r"$a/M$", r"$r/M$"], \
+                     gridlines=True, frame=True, axes=False, ymax=10)
+        graph += plot(lambda a: KerrBH(a).Cauchy_horizon_radius(), \
+                      (0., 1.), color='black', linestyle=':', thickness=1.5, \
+                      legend_label=r"$r_{\rm C}$ (Cauchy horizon)")
+        graph += plot(lambda a: KerrBH(a).isco_radius(), \
+                      (0., 1.), thickness=1.5, \
+                      legend_label=r"$r_{\rm ISCO}$ (prograde)")
+        graph += plot(lambda a: KerrBH(a).isco_radius(retrograde=True), \
+                      (0., 1.), linestyle='--', thickness=1.5, \
+                      legend_label=r"$r_{\rm ISCO}$ (retrograde)")
+        graph += plot(lambda a: KerrBH(a).marginally_bound_orbit_radius(), \
+                      (0., 1.), color='purple', linestyle='-', thickness=1.5, \
+                      legend_label=r"$r_{\rm mb}$ (prograde)")
+        graph += plot(lambda a: KerrBH(a).marginally_bound_orbit_radius(retrograde=True), \
+                      (0., 1.), color='purple', linestyle='--', thickness=1.5, \
+                      legend_label=r"$r_{\rm mb}$ (retrograde)")
+        graph += plot(lambda a: KerrBH(a).photon_orbit_radius(), \
+                      (0., 1.), color='gold', linestyle='-', thickness=1.5, \
+                      legend_label=r"$r_{\rm ph}$ (prograde)")
+        graph += plot(lambda a: KerrBH(a).photon_orbit_radius(retrograde=True), \
+                      (0., 1.), color='gold', linestyle='--', thickness=1.5, \
+                      legend_label=r"$r_{\rm ph}$ (retrograde)")
+        sphinx_plot(graph)
 
     """
     def __init__(self, a, m=1, manifold_name='M', manifold_latex_name=None,
@@ -300,20 +411,20 @@ class KerrBH(PseudoRiemannianManifold):
             sage: BH.outer_horizon_radius()
             m + sqrt(-a^2 + m^2)
 
-        An alias is ``horizon_radius()``::
+        An alias is ``event_horizon_radius()``::
 
-            sage: BH.horizon_radius()
+            sage: BH.event_horizon_radius()
             m + sqrt(-a^2 + m^2)
 
         The horizon radius of the Schwarzschild black hole::
 
             sage: assume(m>0)
-            sage: KerrBH(0, m).horizon_radius()
+            sage: KerrBH(0, m).event_horizon_radius()
             2*m
 
         The horizon radius of the extreme Kerr black hole (`a=m`)::
 
-            sage: KerrBH(m, m).horizon_radius()
+            sage: KerrBH(m, m).event_horizon_radius()
             m
 
         """
@@ -321,7 +432,7 @@ class KerrBH(PseudoRiemannianManifold):
         a = self._a
         return m + sqrt(m**2 - a**2)
 
-    horizon_radius = outer_horizon_radius
+    event_horizon_radius = outer_horizon_radius
 
     @cached_method
     def inner_horizon_radius(self):
