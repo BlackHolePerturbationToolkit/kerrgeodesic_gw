@@ -5,6 +5,8 @@ REFERENCES:
 
 - \J. M. Bardeen, W. H. Press and S. A. Teukolsky, Astrophys. J. **178**,
   347 (1972), :doi:`10.1086/151796`
+- \L. Dai and R. Blandford, Mon. Not. Roy. Astron. Soc. **434**, 2948 (2013),
+  :doi:`10.1093/mnras/stt1209`
 
 """
 #******************************************************************************
@@ -135,14 +137,14 @@ class KerrBH(PseudoRiemannianManifold):
     (1972), :doi:`10.1086/151796`, which displays these radii as functions of
     the black hole spin paramater `a`. The radii of event horizon and inner
     (Cauchy) horizon are obtained by the methods :meth:`event_horizon_radius`
-    and :meth:`Cauchy_horizon_radius` respectively::
+    and :meth:`cauchy_horizon_radius` respectively::
 
         sage: graph = plot(lambda a: KerrBH(a).event_horizon_radius(),
         ....:              (0., 1.), color='black', thickness=1.5,
         ....:              legend_label=r"$r_{\rm H}$ (event horizon)",
         ....:              axes_labels=[r"$a/M$", r"$r/M$"],
         ....:              gridlines=True, frame=True, axes=False)
-        sage: graph += plot(lambda a: KerrBH(a).Cauchy_horizon_radius(),
+        sage: graph += plot(lambda a: KerrBH(a).cauchy_horizon_radius(),
         ....:               (0., 1.), color='black', linestyle=':', thickness=1.5,
         ....:               legend_label=r"$r_{\rm C}$ (Cauchy horizon)")
 
@@ -188,7 +190,7 @@ class KerrBH(PseudoRiemannianManifold):
                      legend_label=r"$r_{\rm H}$ (event horizon)", \
                      axes_labels=[r"$a/M$", r"$r/M$"], \
                      gridlines=True, frame=True, axes=False, ymax=10)
-        graph += plot(lambda a: KerrBH(a).Cauchy_horizon_radius(), \
+        graph += plot(lambda a: KerrBH(a).cauchy_horizon_radius(), \
                       (0., 1.), color='black', linestyle=':', thickness=1.5, \
                       legend_label=r"$r_{\rm C}$ (Cauchy horizon)")
         graph += plot(lambda a: KerrBH(a).isco_radius(), \
@@ -448,9 +450,9 @@ class KerrBH(PseudoRiemannianManifold):
             sage: BH.inner_horizon_radius()
             m - sqrt(-a^2 + m^2)
 
-        An alias is ``Cauchy_horizon_radius()``::
+        An alias is ``cauchy_horizon_radius()``::
 
-            sage: BH.Cauchy_horizon_radius()
+            sage: BH.cauchy_horizon_radius()
             m - sqrt(-a^2 + m^2)
 
         """
@@ -458,7 +460,7 @@ class KerrBH(PseudoRiemannianManifold):
         a = self._a
         return m - sqrt(m**2 - a**2)
 
-    Cauchy_horizon_radius = inner_horizon_radius
+    cauchy_horizon_radius = inner_horizon_radius
 
     @cached_method
     def photon_orbit_radius(self, retrograde=False):
@@ -650,7 +652,7 @@ class KerrBH(PseudoRiemannianManifold):
             sqrt(m)/(a*sqrt(m) + r^(3/2))
             sage: BH.orbital_angular_velocity(r, retrograde=True)
             sqrt(m)/(a*sqrt(m) - r^(3/2))
-            sage: KerrBH(0.9).orbital_angular_velocity(4.)
+            sage: KerrBH(0.9).orbital_angular_velocity(4.)  # tol 1.0e-13
             0.112359550561798
 
         Orbital angular velocity around a Schwarzschild black hole::
@@ -702,9 +704,9 @@ class KerrBH(PseudoRiemannianManifold):
             1/2*sqrt(m)/(pi*(a*sqrt(m) + r^(3/2)))
             sage: BH.orbital_frequency(r, retrograde=True)
             1/2*sqrt(m)/(pi*(a*sqrt(m) - r^(3/2)))
-            sage: KerrBH(0.9).orbital_frequency(4.)
+            sage: KerrBH(0.9).orbital_frequency(4.)  # tol 1.0e-13
             0.0178825778754939
-            sage: KerrBH(0.9).orbital_frequency(float(4))
+            sage: KerrBH(0.9).orbital_frequency(float(4))  # tol 1.0e-13
             0.0178825778754939
 
         Orbital angular velocity around a Schwarzschild black hole::
@@ -728,3 +730,114 @@ class KerrBH(PseudoRiemannianManifold):
         except AttributeError:
             tpi = type(r)(tpi)
         return self.orbital_angular_velocity(r, retrograde=retrograde) / tpi
+
+    def roche_volume(self, r0, k_rot):
+        r"""
+        Roche volume of a star on a given circular orbit.
+
+        The Roche volume depends on the rotational parameter
+
+        .. MATH::
+
+            k_\omega := \frac{\omega}{\Omega}
+
+        where `\omega` is the angular velocity of the star (assumed to be a
+        rigid rotator) with respect to some inertial frame and `\Omega` is
+        the orbital angular velocity (cf. :meth:`orbital_angular_velocity`).
+        The Roche volume is computed according to formulas provided by Dai
+        & Blandford, Mon. Not. Roy. Astron. Soc. **434**, 2948 (2013),
+        :doi:`10.1093/mnras/stt1209`.
+
+        INPUT:
+
+        - ``r0`` -- Boyer-Lindquist radial coordinate `r` of the circular orbit
+        - ``k_rot`` -- rotational parameter `k_\omega` defined above
+
+        OUPUT:
+
+        - the dimensionless quantity `V_R / (\mu M^2)`, where `V_R` is the
+          Roche volume, `\mu` the mass of the star and `M` the mass of the
+          central black hole
+
+        EXAMPLES:
+
+        Roche volume around a Schwarzschild black hole::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: BH = KerrBH(0)
+            sage: BH.roche_volume(6, 0)  # tol 1.0e-13
+            98.49600000000001
+
+        Comparison with  Eq. (26) of Dai & Blandford (2013)
+        :doi:`10.1093/mnras/stt1209`::
+
+            sage: _ - 0.456*6^3  # tol 1.0e-13
+            0.000000000000000
+
+        Case `k_\omega=1`::
+
+            sage: BH.roche_volume(6, 1)  # tol 1.0e-13
+            79.145115913556
+
+        Comparison with  Eq. (26) of Dai & Blandford (2013)::
+
+            sage: _ - 0.456/(1+1/4.09)*6^3  # tol 1.0e-13
+            0.000000000000000
+
+        Newtonian limit::
+
+            sage: BH.roche_volume(1000, 0)  # tol 1.0e-13
+            681633403.5759227
+
+        Comparison with  Eq. (10) of Dai & Blandford (2013)::
+
+            sage: _ - 0.683*1000^3  # tol 1.0e-13
+            -1.36659642407727e6
+
+        Roche volume around a rapidly rotating Kerr black hole::
+
+            sage: BH = KerrBH(0.9)
+            sage: rI = BH.isco_radius()
+            sage: BH.roche_volume(rI, 0)  # tol 1.0e-13
+            5.70065302837734
+
+        Comparison with  Eq. (26) of Dai & Blandford (2013)::
+
+            sage: _ - 0.456*rI^3  # tol 1.0e-13
+            0.000000000000000
+
+        Case `k_\omega=1`::
+
+            sage: BH.roche_volume(rI, 1)  # tol 1.0e-13
+            4.58068190295940
+
+        Comparison with  Eq. (26) of Dai & Blandford (2013)::
+
+            sage: _ - 0.456/(1+1/4.09)*rI^3  # tol 1.0e-13
+            0.000000000000000
+
+        Newtonian limit::
+
+            sage: BH.roche_volume(1000, 0)  # tol 1.0e-13
+            6.81881451514361e8
+
+        Comparison with  Eq. (10) of Dai & Blandford (2013)::
+
+            sage: _ - 0.683*1000^3  # tol 1.0e-13
+            -1.11854848563898e6
+
+        """
+        # Newtonian Roche volume
+        #   Eq. (10) of Dai & Blandford, MNRAS 434, 2948 (2013)
+        VN = 0.683/(1. + k_rot/2.78)*r0**3
+        # Roche volume at ISCO
+        #   Eq. (26) of Dai & Blandford, MNRAS 434, 2948 (2013)
+        VI = 0.456/(1. + k_rot/4.09)*r0**3
+        # Final result
+        #   Eq. (27) of Dai & Blandford, MNRAS 434, 2948 (2013)
+        asm = self._a / self._m
+        Fak = - 23.3 + 13.9/(k_rot + 2.8) \
+              + (23.8 - 14.8/(2.8 + k_rot))*(1. - asm)**0.02 \
+              + (0.9 - 0.4/(2.6 + k_rot))*(1. - asm)**(-0.16)
+        x = r0 * self._m / self.isco_radius()
+        return VN - (VN - VI)/(x**0.5 + Fak*(x - 1.))
