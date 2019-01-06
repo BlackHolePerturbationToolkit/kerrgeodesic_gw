@@ -1,5 +1,8 @@
 r"""
-Kerr black hole
+The Kerr black hole is implemented via the class :class:`KerrBH`, which
+provides the Lorentzian manifold functionalities associated with the Kerr
+metric, as well as functionalities regarding circular orbits (e.g. computation
+of the ISCO, Roche limit, etc.).
 
 REFERENCES:
 
@@ -27,10 +30,12 @@ from sage.manifolds.differentiable.pseudo_riemannian import PseudoRiemannianMani
 
 class KerrBH(PseudoRiemannianManifold):
     r"""
-    Spacetime representing the Kerr black hole.
+    Kerr black hole spacetime.
 
     The Kerr spacetime is generated as a 4-dimensional Lorentzian manifold,
     endowed with the Boyer-Lindquist coordinates (default chart).
+    Accordingly the class ``KerrBH`` inherits from the generic SageMath class
+    `PseudoRiemannianManifold <http://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/pseudo_riemannian.html>`_.
 
     INPUT:
 
@@ -60,7 +65,7 @@ class KerrBH(PseudoRiemannianManifold):
 
     The Boyer-Lindquist chart::
 
-        sage: BH.BoyerLindquist_coordinates()
+        sage: BH.boyer_lindquist_coordinates()
         Chart (M, (t, r, th, ph))
         sage: latex(_)
         \left(M,(t, r, {\theta}, {\phi})\right)
@@ -266,16 +271,16 @@ class KerrBH(PseudoRiemannianManifold):
 
     angular_momentum = spin
 
-    def BoyerLindquist_coordinates(self, symbols=None, names=None):
+    def boyer_lindquist_coordinates(self, symbols=None, names=None):
         r"""
-        Return the chart of Boyer-Lindquist coordinates
+        Return the chart of Boyer-Lindquist coordinates.
 
         INPUT:
 
         - ``symbols`` -- (default: ``None``) string defining the coordinate
           text symbols and LaTeX symbols, with the same conventions as the
           argument ``coordinates`` in
-          :class:`~sage.manifolds.differentiable.chart.RealDiffChart`; this is
+          `RealDiffChart <http://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/chart.html#sage.manifolds.differentiable.chart.RealDiffChart>`_; this is
           used only if the Boyer-Lindquist chart has not been already defined;
           if ``None`` the symbols are generated as `(t,r,\theta,\phi)`.
         - ``names`` -- (default: ``None``) unused argument, except if
@@ -286,48 +291,48 @@ class KerrBH(PseudoRiemannianManifold):
         OUTPUT:
 
         - the chart of Boyer-Lindquist coordinates, as an instance of
-          :class:`~sage.manifolds.differentiable.chart.RealDiffChart`
+          `RealDiffChart <http://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/chart.html#sage.manifolds.differentiable.chart.RealDiffChart>`_
 
         EXAMPLES::
 
             sage: from kerrgeodesic_gw import KerrBH
             sage: a, m = var('a m')
             sage: BH = KerrBH(a, m)
-            sage: BH.BoyerLindquist_coordinates()
+            sage: BH.boyer_lindquist_coordinates()
             Chart (M, (t, r, th, ph))
-            sage: latex(BH.BoyerLindquist_coordinates())
+            sage: latex(BH.boyer_lindquist_coordinates())
             \left(M,(t, r, {\theta}, {\phi})\right)
 
         The coordinate variables are returned by the square bracket operator::
 
-            sage: BH.BoyerLindquist_coordinates()[0]
+            sage: BH.boyer_lindquist_coordinates()[0]
             t
-            sage: BH.BoyerLindquist_coordinates()[1]
+            sage: BH.boyer_lindquist_coordinates()[1]
             r
-            sage: BH.BoyerLindquist_coordinates()[:]
+            sage: BH.boyer_lindquist_coordinates()[:]
             (t, r, th, ph)
 
         They can also be obtained via the operator ``<,>`` at the same
         time as the chart itself::
 
-            sage: BLchart.<t, r, th, ph> = BH.BoyerLindquist_coordinates()
+            sage: BLchart.<t, r, th, ph> = BH.boyer_lindquist_coordinates()
             sage: BLchart
             Chart (M, (t, r, th, ph))
             sage: type(ph)
             <type 'sage.symbolic.expression.Expression'>
 
-        Actually, ``BLchart.<t, r, th, ph> = BH.BoyerLindquist_coordinates()``
+        Actually, ``BLchart.<t, r, th, ph> = BH.boyer_lindquist_coordinates()``
         is a shortcut for::
 
-            sage: BLchart = BH.BoyerLindquist_coordinates()
+            sage: BLchart = BH.boyer_lindquist_coordinates()
             sage: t, r, th, ph = BLchart[:]
 
         The coordinate symbols can be customized::
 
             sage: BH = KerrBH(a)
-            sage: BH.BoyerLindquist_coordinates(symbols=r"T R Th:\Theta Ph:\Phi")
+            sage: BH.boyer_lindquist_coordinates(symbols=r"T R Th:\Theta Ph:\Phi")
             Chart (M, (T, R, Th, Ph))
-            sage: latex(BH.BoyerLindquist_coordinates())
+            sage: latex(BH.boyer_lindquist_coordinates())
             \left(M,(T, R, {\Theta}, {\Phi})\right)
 
         """
@@ -378,7 +383,7 @@ class KerrBH(PseudoRiemannianManifold):
         """
         if self._metric is None:
             # Initialization of the metric tensor in Boyer-Lindquist coordinates
-            cBL = self.BoyerLindquist_coordinates()
+            cBL = self.boyer_lindquist_coordinates()
             t, r, th, ph = cBL[:]
             g = super(KerrBH, self).metric() # the initialized metric object
             m = self._m
@@ -744,13 +749,14 @@ class KerrBH(PseudoRiemannianManifold):
         where `\omega` is the angular velocity of the star (assumed to be a
         rigid rotator) with respect to some inertial frame and `\Omega` is
         the orbital angular velocity (cf. :meth:`orbital_angular_velocity`).
-        The Roche volume is computed according to formulas provided by Dai
-        & Blandford, Mon. Not. Roy. Astron. Soc. **434**, 2948 (2013),
-        :doi:`10.1093/mnras/stt1209`.
+        The Roche volume is computed according to formulas based on the Kerr
+        metric and established by Dai & Blandford, Mon. Not. Roy. Astron. Soc.
+        **434**, 2948 (2013), :doi:`10.1093/mnras/stt1209`.
 
         INPUT:
 
-        - ``r0`` -- Boyer-Lindquist radial coordinate `r` of the circular orbit
+        - ``r0`` -- Boyer-Lindquist radial coordinate `r` of the circular orbit,
+          in units of the black hole mass
         - ``k_rot`` -- rotational parameter `k_\omega` defined above
 
         OUPUT:
@@ -841,3 +847,119 @@ class KerrBH(PseudoRiemannianManifold):
               + (0.9 - 0.4/(2.6 + k_rot))*(1. - asm)**(-0.16)
         x = r0 * self._m / self.isco_radius()
         return VN - (VN - VI)/(x**0.5 + Fak*(x - 1.))
+
+
+    def roche_limit_radius(self, rho, rho_unit='solar', mass_bh=None, k_rot=0,
+                           r_min=None, r_max=50):
+        r"""
+        Evaluate the orbital radius of the Roche limit for a star of given
+        density and rotation state.
+
+        The *Roche limit* is defined as the orbit at which the star fills its
+        Roche volume (cf. :meth:`roche_volume`).
+
+        INPUT:
+
+        - ``rho`` -- mean density of the star, in units of ``rho_unit``
+        - ``rho_unit`` -- (default: ``'solar'``) string specifying the unit in
+          which ``rho`` is provided; allowed values are
+
+          - ``'solar'``: density of the sun (`1.41\times 10^3 \; {\rm kg\, m}^{-3}`)
+          - ``'SI'``: SI unit (`{\rm kg\, m}^{-3}`)
+          - ``'M^{-2}'``: inverse square of the black hole mass `M`
+            (geometrized units)
+
+        - ``mass_bh`` -- (default: ``None``) black hole mass `M` in solar
+          masses; must be set if ``rho_unit`` = ``'solar'`` or ``'SI'``
+        - ``k_rot`` -- (default: ``0``) rotational parameter
+          `k_\omega := \omega/\Omega`, where `\omega` is the angular velocity
+          of the star (assumed to be a rigid rotator) with respect to some
+          inertial frame and `\Omega` is the orbital angular velocity (cf.
+          :meth:`roche_volume`)
+        - ``r_min`` -- (default: ``None``) lower bound for the search of the
+          Roche limit radius, in units of `M`; if none is provided, the value
+          of `r` at the prograde ISCO is used
+        - ``r_max`` -- (default: ``50``) upper bound for the search of the
+          Roche limit radius, in units of `M`
+
+        OUPUT:
+
+        - Boyer-Lindquist radial coordinate `r` of the circular orbit at
+          which the star fills its Roche volume, in units of the black hole
+          mass `M`
+
+        EXAMPLES:
+
+        Roche limit of a non-rotating solar type star around a Schwarzschild
+        black hole of mass equal to that of Sgr A* (`4.1\; 10^6\; M_\odot`)::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: BH = KerrBH(0)
+            sage: BH.roche_limit_radius(1, mass_bh=4.1e6)  # tol 1.0e-13
+            34.23628318664114
+
+        Instead of providing the density in solar units (the default), we can
+        provide it in SI units (`{\rm kg\, m}^{-3}`)::
+
+            sage: BH.roche_limit_radius(1.41e3, rho_unit='SI', mass_bh=4.1e6)  # tol 1.0e-13
+            34.23628318664114
+
+        or in geometrized units (`M^{-2}`), in which case it is not necessary
+        to specify the black hole mass::
+
+            sage: BH.roche_limit_radius(3.84e-5, rho_unit='M^{-2}')  # tol 1.0e-13
+            34.22977166547967
+
+        Case of a corotating star::
+
+            sage: BH.roche_limit_radius(1, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
+            37.72123132900303
+
+        Case of a brown dwarf::
+
+            sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6)  # tol 1.0e-13
+            9.041174231241808
+            sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
+            9.79156938403518
+
+        Case of a white dwarf::
+
+            sage: BH.roche_limit_radius(1.1e6, mass_bh=4.1e6, r_min=0.1)  # tol 1.0e-13
+            0.28480295433493313
+            sage: BH.roche_limit_radius(1.1e6, mass_bh=4.1e6, k_rot=1, r_min=0.1)  # tol 1.0e-13
+            0.3264701123320042
+
+        Roche limits around a rapidly rotating black hole::
+
+            sage: BH = KerrBH(0.999)
+            sage: BH.roche_limit_radius(1, mass_bh=4.1e6)  # tol 1.0e-13
+            34.250361275431175
+            sage: BH.roche_limit_radius(1, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
+            37.72322590054414
+            sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6)  # tol 1.0e-13
+            8.743504340697491
+            sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
+            9.575544111497662
+
+        """
+        from sage.numerical.optimize import find_root
+        from .astro_data import c, G, Msol
+        if rho_unit == 'M^{-2}':
+            rhoM = rho
+        else:
+            if not mass_bh:
+                raise ValueError("a value for mass_bh must be provided")
+            M2inv = (c**3/(mass_bh*Msol))**2/G**3 # M^{-2} in kg/m^3
+            if rho_unit == 'solar':
+                rho_sol = 1.41e3  # solar mean density in kg/m^3
+                rho = rho*rho_sol
+            elif rho_unit != 'SI':
+                raise ValueError("unknown value for rho_unit")
+            rhoM = rho / M2inv  # M^2 rho
+
+        def fzero(r):
+            return self.roche_volume(r, k_rot) - 1./rhoM
+
+        if r_min is None:
+            r_min = self.isco_radius()
+        return find_root(fzero, r_min, r_max)
