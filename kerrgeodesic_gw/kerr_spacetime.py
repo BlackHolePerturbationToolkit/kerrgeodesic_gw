@@ -719,7 +719,6 @@ class KerrBH(PseudoRiemannianManifold):
             sage: KerrBH(0, m).orbital_frequency(r)
             1/2*sqrt(m)/(pi*r^(3/2))
 
-
         Orbital angular velocity on the prograde ISCO of an extreme Kerr
         black hole (`a=m`)::
 
@@ -833,12 +832,12 @@ class KerrBH(PseudoRiemannianManifold):
             -1.11854848563898e6
 
         """
-        # Newtonian Roche volume
+        # Newtonian Roche volume / r0^3
         #   Eq. (10) of Dai & Blandford, MNRAS 434, 2948 (2013)
-        VN = 0.683/(1. + k_rot/2.78)*r0**3
-        # Roche volume at ISCO
+        VN = 0.683/(1. + k_rot/2.78)
+        # Roche volume at ISCO / r0^3
         #   Eq. (26) of Dai & Blandford, MNRAS 434, 2948 (2013)
-        VI = 0.456/(1. + k_rot/4.09)*r0**3
+        VI = 0.456/(1. + k_rot/4.09)
         # Final result
         #   Eq. (27) of Dai & Blandford, MNRAS 434, 2948 (2013)
         asm = self._a / self._m
@@ -846,7 +845,7 @@ class KerrBH(PseudoRiemannianManifold):
               + (23.8 - 14.8/(2.8 + k_rot))*(1. - asm)**0.02 \
               + (0.9 - 0.4/(2.6 + k_rot))*(1. - asm)**(-0.16)
         x = r0 * self._m / self.isco_radius()
-        return VN - (VN - VI)/(x**0.5 + Fak*(x - 1.))
+        return (VN + (VI - VN)/(x**0.5 + Fak*(x - 1.)))*r0**3
 
 
     def roche_limit_radius(self, rho, rho_unit='solar', mass_bh=None, k_rot=0,
