@@ -55,6 +55,15 @@ MSgrA = 4.1e6*Msol
 MSgrA_m = G*MSgrA/c**2
 # Sgr A* mass in seconds
 MSgrA_s = G*MSgrA/c**3
-
 # Distance to Sgr A* in SI units (m)
 dSgrA = 8.12e3*pc
+
+# M32 mass in SI units (kg)
+MM32 = 2.5e6*Msol
+# M32 mass in meters
+MM32_m = G*MM32/c**2
+# M32 mass in seconds
+MM32_s = G*MM32/c**3
+# Distance to M32 in SI units (m)
+dM32 = 7.9e5*pc
+
