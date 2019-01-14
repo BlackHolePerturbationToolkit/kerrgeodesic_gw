@@ -895,7 +895,7 @@ class KerrBH(PseudoRiemannianManifold):
             sage: from kerrgeodesic_gw import KerrBH
             sage: BH = KerrBH(0)
             sage: BH.roche_limit_radius(1, mass_bh=4.1e6)  # tol 1.0e-13
-            34.23628318664114
+            34.237640374879014
 
         Instead of providing the density in solar units (the default), we can
         provide it in SI units (`{\rm kg\, m}^{-3}`)::
@@ -912,46 +912,45 @@ class KerrBH(PseudoRiemannianManifold):
         Case of a corotating star::
 
             sage: BH.roche_limit_radius(1, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
-            37.72123132900303
+            37.72273453630254
 
         Case of a brown dwarf::
 
-            sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6)  # tol 1.0e-13
-            9.041174231241808
-            sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
-            9.79156938403518
+            sage: BH.roche_limit_radius(131., mass_bh=4.1e6)  # tol 1.0e-13
+            7.310533491138797
+            sage: BH.roche_limit_radius(131., mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
+            7.858624964105177
 
         Case of a white dwarf::
 
             sage: BH.roche_limit_radius(1.1e6, mass_bh=4.1e6, r_min=0.1)  # tol 1.0e-13
-            0.28480295433493313
+            0.28481414467302646
             sage: BH.roche_limit_radius(1.1e6, mass_bh=4.1e6, k_rot=1, r_min=0.1)  # tol 1.0e-13
-            0.3264701123320042
+            0.3264830116324442
 
         Roche limits around a rapidly rotating black hole::
 
             sage: BH = KerrBH(0.999)
             sage: BH.roche_limit_radius(1, mass_bh=4.1e6)  # tol 1.0e-13
-            34.250361275431175
+            34.25172708953104
             sage: BH.roche_limit_radius(1, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
-            37.72322590054414
+            37.72473460397109
             sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6)  # tol 1.0e-13
-            8.743504340697491
+            8.74384867481928
             sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
-            9.575544111497662
+            9.575923395816831
 
         """
         from sage.numerical.optimize import find_root
-        from .astro_data import c, G, Msol
+        from .astro_data import c, G, Sun_mass_kg, Sun_mean_density_SI
         if rho_unit == 'M^{-2}':
             rhoM = rho
         else:
             if not mass_bh:
                 raise ValueError("a value for mass_bh must be provided")
-            M2inv = (c**3/(mass_bh*Msol))**2/G**3 # M^{-2} in kg/m^3
+            M2inv = (c**3/(mass_bh*Sun_mass_kg))**2/G**3 # M^{-2} in kg/m^3
             if rho_unit == 'solar':
-                rho_sol = 1.41e3  # solar mean density in kg/m^3
-                rho = rho*rho_sol
+                rho = rho*Sun_mean_density_SI # rho in kg/m^3
             elif rho_unit != 'SI':
                 raise ValueError("unknown value for rho_unit")
             rhoM = rho / M2inv  # M^2 rho
