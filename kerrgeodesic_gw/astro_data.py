@@ -19,17 +19,17 @@ Fundamental constants (in SI units)::
 
 Solar mass in kg::
 
-    sage: astro_data.Sun_mass_kg
+    sage: astro_data.solar_mass_kg
     1.98848e+30
 
 Solar mass in meters (geometrized units)::
 
-    sage: astro_data.Sun_mass_m  # tol 1.0e-13
+    sage: astro_data.solar_mass_m  # tol 1.0e-13
     1476.6284425812723
 
 Solar mass in seconds (geometrized units)::
 
-    sage: astro_data.Sun_mass_s  # tol 1.0e-13
+    sage: astro_data.solar_mass_s  # tol 1.0e-13
     4.925502303934786e-06
 
 Mass of Sgr A* in solar masses::
@@ -82,46 +82,48 @@ yr = constants.year
 au = constants.au
 
 # Sun
-Sun_mass_kg = 1.98848e30 # Particle Data Group, PRD 98, 030001 (2018); http://pdg.lbl.gov/
-Sun_mass_m = G*Sun_mass_kg/c**2
-Sun_mass_s = Sun_mass_m/c
-Sun_eq_radius_m = 6.957e8  # IAU Resolution B3; arXiv:1510.07674
-Sun_mean_density_SI = Sun_mass_kg/(4*pi.n()/3*Sun_eq_radius_m**3)
+solar_mass_kg = 1.98848e30 # Particle Data Group, PRD 98, 030001 (2018); http://pdg.lbl.gov/
+solar_mass_m = G*solar_mass_kg/c**2
+solar_mass_s = solar_mass_m/c
+solar_eq_radius_m = 6.957e8  # IAU Resolution B3; arXiv:1510.07674
+solar_mean_density_SI = solar_mass_kg/(4*pi.n()/3*solar_eq_radius_m**3)
 # aliases:
-Msol = Sun_mass_kg
-Msol_m = Sun_mass_m
-Msol_s = Sun_mass_s
+Msol = solar_mass_kg
+Msol_m = solar_mass_m
+Msol_s = solar_mass_s
 
 # Earth
 Earth_mass_kg = 5.9724e24 # Particle Data Group, PRD 98, 030001 (2018); http://pdg.lbl.gov/
 Earth_mass_m = G*Earth_mass_kg/c**2
 Earth_mass_s = Earth_mass_m/c
-Earth_mass_sol = Earth_mass_kg/Sun_mass_kg
+Earth_mass_sol = Earth_mass_kg/solar_mass_kg
 Earth_eq_radius_m = 6.3781e6 # IAU Resolution B3; arXiv:1510.07674
 Earth_mean_density_SI = Earth_mass_kg/(4*pi.n()/3*Earth_eq_radius_m**3)
+Earth_mean_density_sol = Earth_mean_density_SI/solar_mean_density_SI
 
 # Jupiter
 Jupiter_mass_kg = 1.89819e27 # https://ssd.jpl.nasa.gov/?planet_phys_par
 Jupiter_mass_m = G*Jupiter_mass_kg/c**2
 Jupiter_mass_s = Jupiter_mass_m/c
-Jupiter_mass_sol = Jupiter_mass_kg/Sun_mass_kg
+Jupiter_mass_sol = Jupiter_mass_kg/solar_mass_kg
 Jupiter_eq_radius_m = 7.1492e7 # IAU Resolution B3; arXiv:1510.07674
 Jupiter_mean_radius_m = 6.9911e7 # https://en.wikipedia.org/wiki/Jupiter
 Jupiter_mean_density_SI = Jupiter_mass_kg/(4*pi.n()/3*Jupiter_mean_radius_m**3)
+Jupiter_mean_density_sol = Jupiter_mean_density_SI/solar_mean_density_SI
 
 # Brown dwarf of minimal radius
 #  Source: dashed line (t=5 Gyr) in Fig. 1 of Chabrier et al. (2009)
 #          https://doi.org/10.1063/1.3099078
 brown_dwarf1_mass_kg = 65*Jupiter_mass_kg
-brown_dwarf1_mass_sol = brown_dwarf1_mass_kg/Sun_mass_kg
+brown_dwarf1_mass_sol = brown_dwarf1_mass_kg/solar_mass_kg
 brown_dwarf1_radius_m = 10**(-0.11)*Jupiter_mean_radius_m
 brown_dwarf1_mean_density_SI = brown_dwarf1_mass_kg/(4*pi.n()/
                                                      3*brown_dwarf1_radius_m**3)
-brown_dwarf1_mean_density_sol = brown_dwarf1_mean_density_SI/Sun_mean_density_SI
+brown_dwarf1_mean_density_sol = brown_dwarf1_mean_density_SI/solar_mean_density_SI
 
 # Sagittarius A*
 SgrA_mass_sol = 4.1e6 # Table A.1, GRAVITY col., A&A 615, L15 (2018)
-SgrA_mass_kg = SgrA_mass_sol*Sun_mass_kg
+SgrA_mass_kg = SgrA_mass_sol*solar_mass_kg
 SgrA_mass_m = G*SgrA_mass_kg/c**2
 SgrA_mass_s = SgrA_mass_m/c
 SgrA_distance_pc = 8.12e3 # Table A.1, GRAVITY col., A&A 615, L15 (2018)
@@ -134,7 +136,7 @@ dSgrA = SgrA_distance_m
 
 # M32
 M32_mass_sol = 2.5e6 # Table 6 of Nguyen et al., ApJ 858, 118 (2018)
-M32_mass_kg = M32_mass_sol*Sun_mass_kg
+M32_mass_kg = M32_mass_sol*solar_mass_kg
 M32_mass_m = G*M32_mass_kg/c**2
 M32_mass_s = M32_mass_m/c
 M32_distance_pc = 7.9e5 # Table 4 of Nguyen et al., ApJ 858, 118 (2018)

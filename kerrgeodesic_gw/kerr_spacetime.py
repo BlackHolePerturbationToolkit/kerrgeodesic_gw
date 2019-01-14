@@ -942,15 +942,15 @@ class KerrBH(PseudoRiemannianManifold):
 
         """
         from sage.numerical.optimize import find_root
-        from .astro_data import c, G, Sun_mass_kg, Sun_mean_density_SI
+        from .astro_data import c, G, solar_mass_kg, solar_mean_density_SI
         if rho_unit == 'M^{-2}':
             rhoM = rho
         else:
             if not mass_bh:
                 raise ValueError("a value for mass_bh must be provided")
-            M2inv = (c**3/(mass_bh*Sun_mass_kg))**2/G**3 # M^{-2} in kg/m^3
+            M2inv = (c**3/(mass_bh*solar_mass_kg))**2/G**3 # M^{-2} in kg/m^3
             if rho_unit == 'solar':
-                rho = rho*Sun_mean_density_SI # rho in kg/m^3
+                rho = rho*solar_mean_density_SI # rho in kg/m^3
             elif rho_unit != 'SI':
                 raise ValueError("unknown value for rho_unit")
             rhoM = rho / M2inv  # M^2 rho
