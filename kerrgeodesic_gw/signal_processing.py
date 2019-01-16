@@ -15,6 +15,7 @@ import os
 from scipy.fftpack import fft, fftfreq, fftshift
 from scipy.integrate import quad
 from sage.calculus.interpolation import spline
+from sage.functions.trig import cos
 from sage.functions.other import sqrt
 from sage.rings.real_double import RDF
 from sage.symbolic.constants import pi
@@ -261,16 +262,16 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
         sage: psd = lisa_detector.power_spectral_density_RCLfit
         sage: fmin, fmax = 1e-5, 5e-3
         sage: mu_ov_r = astro_data.Msol_m / astro_data.dSgrA  # mu/r
-        sage: signal_to_noise(h, time_scale, psd, fmin, fmax,
-        ....:                 interpolation='spline', scale=mu_ov_r)  # tol 1.0e-13
+        sage: signal_to_noise(h, time_scale, psd, fmin, fmax,     # tol 1.0e-13
+        ....:                 interpolation='spline', scale=mu_ov_r)
         7582.5363375174875
 
     Signal-to-noise for a signal computed at the quadrupole approximation::
 
         sage: h = h_particle_signal(a, r0, theta, phi, 0., tmax, mode='+',
         ....:                       nb_points=4000, approximation='quadrupole')
-        sage: signal_to_noise(h, time_scale, psd, fmin, fmax,
-        ....:                 interpolation='spline', scale=mu_ov_r)  # tol 1.0e-13
+        sage: signal_to_noise(h, time_scale, psd, fmin, fmax,     # tol 1.0e-13
+        ....:                 interpolation='spline', scale=mu_ov_r)
         5380.74197174931
 
     """
@@ -299,7 +300,8 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
     return 2*sqrt(integ[0])*scale
 
 def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
-                             m_min=1, m_max=None, scale=1):
+                             m_min=1, m_max=None, scale=1,
+                             approximation=None):
     r"""
     Evaluate the signal-to-noise ratio of gravitational radiation emitted
     by a single orbiting particle observed in a detector of a given power
@@ -323,6 +325,13 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
       and to 5 for `r_0 > 20 M`
     - ``scale`` -- (default: ``1``) scale factor by which `h(t)` must be
       multiplied to get the actual signal; this should by `\mu/r`, where `\mu`
+    - ``approximation`` -- (default: ``None``) string describing the
+      computational method; allowed values are
+
+      - ``None``: exact computation
+      - ``'quadrupole'``: quadrupole approximation; see
+        :func:`.gw_particle.h_particle_quadrupole`
+
 
     OUTPUT:
 
@@ -341,17 +350,28 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
         sage: BH_time_scale = astro_data.MSgrA_s  # Sgr A* mass in seconds
         sage: psd = lisa_detector.power_spectral_density_RCLfit
         sage: mu_ov_r = astro_data.Msol_m / astro_data.dSgrA  # mu/r
-        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
-        ....:                          scale=mu_ov_r)  # tol 1.0e-13
+        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
+        ....:                          BH_time_scale, scale=mu_ov_r)
         7565.6612762972445
+
+    Using the quadrupole approximation::
+
+        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
+        ....:                          BH_time_scale, scale=mu_ov_r,
+        ....:                          approximation='quadrupole')
+        5230.403692883996
 
     """
     from .gw_particle import h_amplitude_particle_fourier
     from .zinf import _lmax
+    if approximation == 'quadrupole':
+        fm2 = RDF(1./(pi*r0**1.5)/BH_time_scale)
+        return RDF(2.*scale/r0*sqrt(t_obs/psd(fm2)
+                   *(1+6*cos(theta)**2+cos(theta)**4)))
     if m_max is None:
         m_max = _lmax(a, r0)
     # Orbital frequency in the same time units as S_n(f) (generally seconds):
-    f0 = RDF(1. /(2*pi*(r0**1.5 + a))/BH_time_scale)
+    f0 = RDF(1./(2*pi*(r0**1.5 + a))/BH_time_scale)
     rho2 = 0
     for m in range(m_min, m_max+1):
         hmp, hmc = h_amplitude_particle_fourier(m, a, r0, theta, l_max=m_max)
