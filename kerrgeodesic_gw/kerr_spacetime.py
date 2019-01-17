@@ -218,6 +218,12 @@ class KerrBH(PseudoRiemannianManifold):
                       legend_label=r"$r_{\rm ph}$ (retrograde)")
         sphinx_plot(graph)
 
+    Arbitrary precision computations are possible::
+
+        sage: a = RealField(200)(0.95) # 0.95 with 200 bits of precision
+        sage: KerrBH(a).isco_radius()  # tol 1e-50
+        1.9372378781396625744170794927972658947432427390836799716847
+
     """
     def __init__(self, a, m=1, manifold_name='M', manifold_latex_name=None,
                  metric_name='g', metric_latex_name=None):
@@ -688,7 +694,7 @@ class KerrBH(PseudoRiemannianManifold):
 
         The frequency `f` of a circular orbit of Boyer-Lindquist
         radial coordinate `r` around a Kerr black hole of parameters `(m, a)`
-        is `f := \Omega/(2\pi)`, where `\Omega` is given by Eq. :eq:`Omega`.
+        is `f = \Omega/(2\pi)`, where `\Omega` is given by Eq. :eq:`Omega`.
 
         INPUT:
 
@@ -726,13 +732,31 @@ class KerrBH(PseudoRiemannianManifold):
             sage: EKBH.orbital_frequency(EKBH.isco_radius())
             1/4/(pi*m)
 
+        For numerical values, the outcome depends on the type of the entry::
+
+            sage: KerrBH(0).orbital_frequency(6)
+            1/72*sqrt(6)/pi
+            sage: KerrBH(0).orbital_frequency(6.)  # tol 1.0e-13
+            0.0108291222393566
+            sage: KerrBH(0).orbital_frequency(RealField(200)(6))  # tol 1e-50
+            0.010829122239356612609803722920461899457548152312961017043180
+            sage: KerrBH(0.5).orbital_frequency(RealField(200)(6))  # tol 1.0e-13
+            0.0104728293495021
+            sage: KerrBH._clear_cache_()  # to remove the BH object created with a=0.5
+            sage: KerrBH(RealField(200)(0.5)).orbital_frequency(RealField(200)(6))  # tol 1.0e-50
+            0.010472829349502111962146754433990790738415624921109392616237
+
         """
         tpi = 2*pi
-        try:
-            par = r.parent()
-            tpi = par(tpi)
-        except AttributeError:
-            tpi = type(r)(tpi)
+        if isinstance(r, float):
+            tpi = float(tpi)
+        else:
+            try:
+                par = r.parent()
+                if not par.is_exact():  # case of RealField, RealDoubleField,...
+                    tpi = par(tpi)
+            except AttributeError:
+                pass
         return self.orbital_angular_velocity(r, retrograde=retrograde) / tpi
 
     def roche_volume(self, r0, k_rot):
