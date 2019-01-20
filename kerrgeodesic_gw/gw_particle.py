@@ -445,8 +445,8 @@ def h_amplitude_particle_fourier(m, a, r0, theta, l_max=10,
         (0.27875846152963557, 1.5860176188287866e-16)
         sage: h_amplitude_particle_fourier(2, a, 6., pi/4)  # tol 1.0e-13
         (0.47180033963220214, 0.45008696580919527)
-        sage: h_amplitude_particle_fourier(2, a, 6., 1e-12)  # tol 1.0e-13
-        (0.6724377101572424, 0.6724377101572424)
+        sage: h_amplitude_particle_fourier(2, a, 6., 0)  # tol 1.0e-13
+        (0.6724377101568336, 0.6724377101568336)
         sage: h_amplitude_particle_fourier(2, a, 6., pi/4, l_max=5)  # tol 1.0e-13
         (0.47179830286565255, 0.4500948389153302)
         sage: h_amplitude_particle_fourier(2, a, 6., pi/4, l_max=5,  # tol 1.0e-13
