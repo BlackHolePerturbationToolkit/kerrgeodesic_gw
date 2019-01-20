@@ -79,6 +79,11 @@ def _compute_sw_spherical_harm(s, l, m, theta, phi, condon_shortley=True,
     """
     if abs(s)>l:
         return ZZ(0)
+    if abs(theta) < 1.e-6:     # TODO: fix the treatment of small theta values
+        if theta < 0:          #       possibly with exact formula for theta=0
+            theta = -1.e-6     #
+        else:                  #
+            theta = 1.e-6      #
     cott2 = cos(theta/2)/sin(theta/2)
     res = 0
     for r in range(l-s+1):

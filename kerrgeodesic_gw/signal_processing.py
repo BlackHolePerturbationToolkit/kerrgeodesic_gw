@@ -325,6 +325,7 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
       and to 5 for `r_0 > 20 M`
     - ``scale`` -- (default: ``1``) scale factor by which `h(t)` must be
       multiplied to get the actual signal; this should by `\mu/r`, where `\mu`
+      is the particle mass and `r` the radial coordinate of the detector
     - ``approximation`` -- (default: ``None``) string describing the
       computational method; allowed values are
 
@@ -345,9 +346,9 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
         sage: from kerrgeodesic_gw import (signal_to_noise_particle,
         ....:                              lisa_detector, astro_data)
         sage: a, r0 = 0., 6.
-        sage: theta, phi = pi/2, 0
+        sage: theta = pi/2
         sage: t_obs = 24*3600  # 1 day in seconds
-        sage: BH_time_scale = astro_data.MSgrA_s  # Sgr A* mass in seconds
+        sage: BH_time_scale = astro_data.SgrA_mass_s  # Sgr A* mass in seconds
         sage: psd = lisa_detector.power_spectral_density_RCLfit
         sage: mu_ov_r = astro_data.Msol_m / astro_data.dSgrA  # mu/r
         sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
@@ -378,3 +379,105 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
         rho2 += (hmp**2 + hmc**2) / psd(m*f0)
     return sqrt(rho2*t_obs)*scale
 
+def max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,
+                          t_obs_yr=1, snr_threshold=10, r_min=None, r_max=200,
+                          m_min=1, m_max=None, approximation=None):
+    r"""
+    Compute the maximum orbital radius `r_{0,\rm max}` at which a particle
+    of given mass is detectable.
+
+    INPUT:
+
+    - ``a`` -- BH angular momentum parameter (in units of `M`, the BH mass)
+    - ``mu`` -- mass of the orbiting object, in solar masses
+    - ``theta`` -- Boyer-Lindquist colatitute `\theta` of the observer
+    - ``psd`` -- function with a single argument (`f`) representing the
+      detector's one-sided noise power spectral density `S_n(f)` (see e.g. :func:`.lisa_detector.power_spectral_density`)
+    - ``BH_time_scale`` -- value of `M` in the same time unit as `S_n(f)`; if
+      `S_n(f)` is provided in `\mathrm{Hz}^{-1}`, then ``BH_time_scale`` must
+      be `M` expressed in seconds.
+    - ``distance`` -- distance `r` to the detector, in parsecs
+    - ``t_obs_yr`` -- (default: 1) observation period, in years
+    - ``snr_threshold`` -- (default: 10) signal-to-noise value above which a
+      detection is claimed
+    - ``r_min`` -- (default: ``None``) lower bound of the search interval for
+      `r_{0,\rm max}` (in units of `M`); if ``None`` then the ISCO value is
+      used
+    - ``r_max`` -- (default: 200) upper bound of the search interval for
+      `r_{0,\rm max}` (in units of `M`)
+    - ``m_min`` -- (default: 1) lower bound in the summation over the Fourier
+      mode `m`
+    - ``m_max`` -- (default: ``None``) upper bound in the summation over the
+      Fourier mode `m`; if ``None``, ``m_max`` is set to 10 for `r_0 \leq 20 M`
+      and to 5 for `r_0 > 20 M`
+    - ``approximation`` -- (default: ``None``) string describing the
+      computational method; allowed values are
+
+      - ``None``: exact computation
+      - ``'quadrupole'``: quadrupole approximation; see
+        :func:`.gw_particle.h_particle_quadrupole`
+
+
+    OUTPUT:
+
+    - Boyer-Lindquist radius (in units of `M`) of the most remote orbit for
+      which the signal-to-noise ratio is larger than ``snr_threshold`` during
+      the observation time ``t_obs_yr``
+
+    EXAMPLES:
+
+    Maximum orbital radius for LISA detection of a 1 solar-mass object
+    orbiting Sgr A* observed by LISA, assuming a BH spin `a=0.9 M` and a
+    vanishing inclination angle::
+
+        sage: from kerrgeodesic_gw import (max_detectable_radius, lisa_detector,
+        ....:                              astro_data)
+        sage: a = 0.9
+        sage: mu = 1
+        sage: theta = 0
+        sage: psd = lisa_detector.power_spectral_density_RCLfit
+        sage: BH_time_scale = astro_data.SgrA_mass_s
+        sage: distance = astro_data.SgrA_distance_pc
+        sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance)  # tol 1.0e-13
+        46.983486000490934
+
+    Lowering the SNR threshold to 5::
+
+        sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,  # tol 1.0e-13
+        ....:                       snr_threshold=5)
+        53.734026574995205
+
+    Lowering the data acquisition time to 1 day::
+
+        sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,  # tol 1.0e-13
+        ....:                       t_obs_yr=1./365.25)
+        27.159049347284462
+
+    Assuming an inclination angle of `\pi/2`::
+
+        sage: theta = pi/2
+        sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance)  # tol 1.0e-13
+        39.8187305700897
+
+    """
+    from sage.numerical.optimize import find_root
+    from .astro_data import yr, pc, solar_mass_m
+    from .kerr_spacetime import KerrBH
+    t_obs = t_obs_yr*yr # observation time in seconds
+    distance_m = distance*pc # distance in meters
+    mu_ov_r = mu*solar_mass_m / distance_m
+    def fsnr(r0):
+        if r0 < 49.99:
+            return signal_to_noise_particle(a, r0, theta, psd, t_obs,
+                                            BH_time_scale, m_min=m_min,
+                                            m_max=m_max, scale=mu_ov_r,
+                                            approximation=approximation
+                                           ) - snr_threshold
+        else:
+             return signal_to_noise_particle(0, r0, theta, psd, t_obs,
+                                             BH_time_scale, scale=mu_ov_r,
+                                              approximation='quadrupole'
+                                            ) - snr_threshold
+    if r_min is None:
+        r_min = 1.0001*KerrBH(a).isco_radius()
+    return find_root(fsnr, r_min, r_max)

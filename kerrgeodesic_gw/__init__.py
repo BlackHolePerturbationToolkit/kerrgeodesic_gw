@@ -14,4 +14,5 @@ from .gw_blob import (h_blob, h_blob_signal, h_toy_model_semi_analytic,
                       blob_mass, surface_density_toy_model,
                       surface_density_gaussian)
 from .signal_processing import (fourier, read_signal, save_signal,
-                                signal_to_noise, signal_to_noise_particle)
+                                signal_to_noise, signal_to_noise_particle,
+                                max_detectable_radius)
