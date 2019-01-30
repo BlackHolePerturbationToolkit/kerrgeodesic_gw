@@ -121,6 +121,50 @@ brown_dwarf1_mean_density_SI = brown_dwarf1_mass_kg/(4*pi.n()/
                                                      3*brown_dwarf1_radius_m**3)
 brown_dwarf1_mean_density_sol = brown_dwarf1_mean_density_SI/solar_mean_density_SI
 
+# B8V star
+#  Source: Table 1 of Silaj et al., ApJ 795, 82 (2014)
+#          https://doi.org/10.1088/0004-637X/795/1/82
+#          (reproduced in https://en.wikipedia.org/wiki/B-type_main-sequence_star)
+B8Vstar_mass_sol = 3.8
+B8Vstar_mass_kg = B8Vstar_mass_sol*solar_mass_kg
+B8Vstar_radius_sol = 3.0
+B8Vstar_radius_m = B8Vstar_radius_sol*solar_eq_radius_m
+B8Vstar_mean_density_sol = B8Vstar_mass_sol/B8Vstar_radius_sol**3
+B8Vstar_mean_density_SI = B8Vstar_mean_density_sol*solar_mean_density_SI
+
+# A0V star
+#  Source: Table 1 of Adelman, Proc. IAU Symp. 224, 1 (2004)
+#          https://doi.org/10.1017/S1743921304004314
+A0Vstar_mass_sol = 2.40
+A0Vstar_mass_kg = A0Vstar_mass_sol*solar_mass_kg
+A0Vstar_radius_sol = 1.87
+A0Vstar_radius_m = A0Vstar_radius_sol*solar_eq_radius_m
+A0Vstar_mean_density_sol = A0Vstar_mass_sol/A0Vstar_radius_sol**3
+A0Vstar_mean_density_SI = A0Vstar_mean_density_sol*solar_mean_density_SI
+
+# M3V star
+#  Source: Table 1 of Kaltenegger & Traub, ApJ 698 519 (2009)
+#          https://doi.org/10.1088/0004-637X/698/1/519
+#          (reproduced in https://en.wikipedia.org/wiki/Red_dwarf)
+M3Vstar_mass_sol = 0.36
+M3Vstar_mass_kg = M3Vstar_mass_sol*solar_mass_kg
+M3Vstar_radius_sol = 0.39
+M3Vstar_radius_m = M3Vstar_radius_sol*solar_eq_radius_m
+M3Vstar_mean_density_sol = M3Vstar_mass_sol/M3Vstar_radius_sol**3
+M3Vstar_mean_density_SI = M3Vstar_mean_density_sol*solar_mean_density_SI
+
+# M4V star
+#  Source: mass: Table 1 of Kaltenegger & Traub, ApJ 698 519 (2009)
+#          https://doi.org/10.1088/0004-637X/698/1/519
+#          (reproduced in https://en.wikipedia.org/wiki/Red_dwarf)
+#          radius: Fig. 1 of Chabrier et al., A&A 472, L17 (2007)
+M4Vstar_mass_sol = 0.20
+M4Vstar_mass_kg = M4Vstar_mass_sol*solar_mass_kg
+M4Vstar_radius_sol = 0.22
+M4Vstar_radius_m = M4Vstar_radius_sol*solar_eq_radius_m
+M4Vstar_mean_density_sol = M4Vstar_mass_sol/M4Vstar_radius_sol**3
+M4Vstar_mean_density_SI = M4Vstar_mean_density_sol*solar_mean_density_SI
+
 # Sagittarius A*
 SgrA_mass_sol = 4.1e6 # Table A.1, GRAVITY col., A&A 615, L15 (2018)
 SgrA_mass_kg = SgrA_mass_sol*solar_mass_kg
