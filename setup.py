@@ -23,7 +23,7 @@ setup(
     version=readfile("VERSION").strip(), # the VERSION file is shared with the documentation
     description='Gravitational radiation from material orbiting a Kerr black hole',
     long_description=readfile("README.md"), # get the long description from the README
-    long_description_content_type='text/markdown'
+    long_description_content_type='text/markdown',
     url='https://gitlab.obspm.fr/gourgoul/kerrgeodesic_gw',
     author='Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton',
     author_email='eric.gourgoulhon@obspm.fr', # choose a main contact email
