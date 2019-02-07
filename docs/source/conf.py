@@ -19,11 +19,11 @@ from sage.env import SAGE_DOC_SRC, SAGE_DOC, SAGE_SRC
 
 # General information about the project.
 project = "kerrgeodesic_gw"
-copyright = "2018, Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton"
+copyright = "2019, Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton"
 package_name = "kerrgeodesic_gw"
 package_name_latex = r"kerrgeodesic\_gw"
 package_folder = "../../kerrgeodesic_gw"
-authors = "2018, Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton"
+authors = "2019, Eric Gourgoulhon, Alexandre Le Tiec, Frederic Vincent, Niels Warburton"
 authors_latex = r"Eric Gourgoulhon, Alexandre Le Tiec,\\ Frederic Vincent, Niels Warburton"
 
 try:

@@ -9,8 +9,8 @@ REFERENCES:
 - \S. Detweiler, Astrophys. J. **225**, 687 (1978)
 - \M. Shibata, Phys. Rev. D **50**, 6297 (1994)
 - \D. Kennefick, Phys. Rev. D **58**, 064012 (1998)
-- \S. A. Hughes, Phys. Rev. D **61**, 084004 (2000)
-- our paper
+- \S. A. Hughes, Phys. Rev. D **61**, 084004 (2000) [:doi:`10.1103/PhysRevD.61.084004`]
+- \E. Gourgoulhon, A. Le Tiec, F. Vincent, N. Warburton, in preparation
 
 """
 #******************************************************************************

@@ -3,7 +3,10 @@ kerrgeodesic_gw Reference Manual
 ================================
 
 This is the reference manual of the `SageMath <http://www.sagemath.org>`_
-package **kerrgeodesic_gw**.
+package
+`kerrgeodesic_gw <https://github.com/BlackHolePerturbationToolkit/kerrgeodesic_gw>`_.
+
+See this `page <https://github.com/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/README.md>`_ for the installation instructions.
 
 Contents
 ========
