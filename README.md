@@ -103,3 +103,4 @@ The pdf reference manual is then
 ### Online documentation
 
 - [Reference manual](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/index.html) ([PDF](https://cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/latex/kerrgeodesic_gw.pdf))
+- [Demo notebook](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/gw_single_particle.ipynb?viewer=share)
