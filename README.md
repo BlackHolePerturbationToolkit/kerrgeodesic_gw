@@ -8,7 +8,7 @@ A [SageMath](http://www.sagemath.org/) package to compute gravitational radiatio
 
 Download the source from the git repository:
 
-	git clone https://gitlab.obspm.fr/gourgoul/kerrgeodesic_gw.git
+	git clone https://github.com/BlackHolePerturbationToolkit/kerrgeodesic_gw.git
 
 This creates a directory `kerrgeodesic_gw`.
 
