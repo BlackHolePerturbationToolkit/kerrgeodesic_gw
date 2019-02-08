@@ -2,7 +2,7 @@
 
 A [SageMath](http://www.sagemath.org/) package to compute gravitational radiation from material orbiting a Kerr black hole
 
-This package makes use of SageMath differential geometry functionalities developed through the [SageManifolds](https://sagemanifolds.obspm.fr/) project and is part of the [Black Hole Peturbation Toolkit](http://bhptoolkit.org/).
+This package makes use of SageMath functionalities developed through the [SageManifolds](https://sagemanifolds.obspm.fr/) project and is part of the [Black Hole Peturbation Toolkit](http://bhptoolkit.org/).
 
 ## Installation
 
@@ -21,8 +21,14 @@ It suffices to run
 	sage -pip install kerrgeodesic_gw
 
 to have the package ready to use in SageMath.
-See however the *install from source* section below if you want to build a
+See however *install from source* below if you want to build a
 local version of the documentation or modify the source files (development).
+
+*NB:* on the [CoCalc](https://cocalc.com) cloud computing platform, you need
+to add the option `--user`, i.e. open a terminal and run
+
+	sage -pip install --user kerrgeodesic_gw
+
 
 Here is the [kerrgeodesic_gw page](https://pypi.org/project/kerrgeodesic-gw/) on PyPI (the Python Package Index).
 
