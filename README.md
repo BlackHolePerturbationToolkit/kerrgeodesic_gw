@@ -2,11 +2,17 @@
 
 A [SageMath](http://www.sagemath.org/) package to compute gravitational radiation from material orbiting a Kerr black hole
 
+This package makes use of SageMath differential geometry functionalities developed through the [SageManifolds](https://sagemanifolds.obspm.fr/) project and is part of the [Black Hole Peturbation Toolkit](http://bhptoolkit.org/).
+
 ## Installation
 
 ### Requirements
 
 This package requires the Python-based free mathematics software system [SageMath](http://www.sagemath.org/) (at least version 8.2).
+
+*NB:* the version of SageMath shipped with Ubuntu 18.04 is only 8.1; instead of
+the Ubuntu package `sagemath`, install then the most recent binary for Ubuntu 18.04
+from [SageMath download page](http://www.sagemath.org/download-linux.html).
 
 ### Simple installation from PyPI
 
@@ -16,7 +22,9 @@ It suffices to run
 
 to have the package ready to use in SageMath.
 See however the *install from source* section below if you want to build a
-local version of the documentation or modify the source files (development)
+local version of the documentation or modify the source files (development).
+
+Here is the [kerrgeodesic_gw page](https://pypi.org/project/kerrgeodesic-gw/) on PyPI (the Python Package Index).
 
 ### Install from source
 
@@ -102,5 +110,21 @@ The pdf reference manual is then
 
 ### Online documentation
 
-- [Reference manual](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/index.html) ([PDF](https://cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/latex/kerrgeodesic_gw.pdf))
+- [Reference manual](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/index.html)
+  ([PDF](https://cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/latex/kerrgeodesic_gw.pdf))
 - [Demo notebook](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/gw_single_particle.ipynb?viewer=share)
+- For the tensor calculus functionalities of the
+  [KerrBH](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/kerr_spacetime.html)
+  class provided by the package, see these examples:
+  [Kerr 1](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Worksheets/v1.3/SM_Kerr.ipynb),
+  [Kerr 2](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Worksheets/v1.3/SM_Kerr_Killing_tensor.ipynb),
+  [Kerr 3](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Worksheets/v1.3/SM_Simon-Mars_Kerr.ipynb),
+  and more generally [SageManifolds documentation](https://sagemanifolds.obspm.fr/documentation.html).
+
+
+## Authors
+
+- Eric Gourgoulhon
+- Alexandre Le Tiec
+- Frederic Vincent
+- Niels Warburton
