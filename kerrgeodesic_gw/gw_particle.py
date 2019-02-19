@@ -2,9 +2,9 @@ r"""
 Gravitational radiation by a particle on a circular orbit around a Kerr
 black hole
 
-The gravitational wave emitted by a particle of mass `\mu` in a circular orbit
-around a Kerr black hole of mass `M` and angular momentum parameter `a`
-is given by the formula:
+The gravitational wave emitted by a particle of mass `\mu` on a circular orbit
+in the equatorial plane of a Kerr black hole of mass `M` and angular momentum
+parameter `a` is given by the formula:
 
 .. MATH::
    :label: gw_single_part
@@ -473,8 +473,18 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
                            linestyle='-',  thickness=2, legend_label=None,
                            offset=0, xlabel=None, ylabel=None, title=None):
     r"""
-    Plot the spectrum of the gravitational radiation emitted by a particle in
-    circular orbit around a Kerr black hole.
+    Plot the Fourier spectrum of the gravitational radiation emitted by a
+    particle in equatorial circular orbit around a Kerr black hole.
+
+    The *Fourier spectrum* is defined by the following sequence indexed by `m`:
+
+    .. MATH::
+
+        H^{+,\times}_m(\theta) := \frac{r}{\mu}
+        \sqrt{(A_m^{+,\times}(\theta))^2 + (B_m^{+,\times}(\theta))^2}
+
+    where the functions `A_m^+`, `B_m^+`, `A_m^\times`, `B_m^\times` are
+    defined by :eq:`gw_single_part_Fourier`.
 
     INPUT:
 
@@ -503,7 +513,7 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
     - ``xlabel`` -- (default: ``None``) label of the x-axis; if none is
       provided, the label is set to `m`
     - ``ylabel`` -- (default: ``None``) label of the y-axis; if none is
-      provided, the label is set to `r h_m / \mu`
+      provided, the label is set to `H_m^{+,\times}`
     - ``title`` -- (default: ``None``) plot title; if ``None``, the title is
       generated from ``a``, ``r0`` and ``theta``
 
@@ -529,7 +539,7 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
     if not xlabel:
         xlabel = r"$m$"
     if not ylabel:
-        ylabel = r"$r h_m / \mu$"
+        ylabel = r"$H_m^{+,\times}$"
     if not title:
         if isinstance(theta, Expression):
             ltheta = latex(theta)
