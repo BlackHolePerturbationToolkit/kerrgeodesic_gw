@@ -1089,9 +1089,9 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
       ``('+', 'x')``
     - ``xlabel`` -- (default: ``r'$(t - r_*)/M$'``) label of the `x`-axis
     - ``ylabel`` -- (default: ``None``) label of the `y`-axis; if ``None``,
-      ``r'$r h_+/\mu$'`` is used for ``mode`` = ``'+'``,
-      ``r'$r h_\times/\mu$'`` for ``mode`` = ``'x'`` and
-      ``r'$r h/\mu$'`` for ``mode`` = ``('+', 'x')``
+      ``r'$(r/\mu)\, h_+$'`` is used for ``mode`` = ``'+'``,
+      ``r'$(r/\mu)\, h_\times$'`` for ``mode`` = ``'x'`` and
+      ``r'$(r/\mu)\, h_{+,\times}$'`` for ``mode`` = ``('+', 'x')``
     - ``title`` -- (default: ``None``) plot title; if ``None``, the title is
       generated from ``a``, ``r0`` and ``theta`` (see the example below)
 
@@ -1158,7 +1158,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 lstl = '-'
             lglab = None
             if not ylabel:
-                ylabel = r'$r h_+/\mu$'
+                ylabel = r'$(r/\mu)\, h_+$'
         else:
             if color:
                 col = color[0]
@@ -1170,7 +1170,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 lstl = '-'
             lglab = legend_label[0]
             if not ylabel:
-                ylabel = r'$r h/\mu$'
+                ylabel = r'$(r/\mu)\, h_{+,\times}$'
         graph += line(hsig, thickness=1.5, color=col, linestyle=lstl,
                       legend_label=lglab, axes_labels=[xlabel, ylabel],
                       gridlines=True, frame=True, axes=False, title=title)
@@ -1190,7 +1190,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 lstl = '-'
             lglab = None
             if not ylabel:
-                ylabel = r'$r h_\times/\mu$'
+                ylabel = r'$(r/\mu)\, h_\times$'
         else:
             if color:
                 col = color[1]
@@ -1202,7 +1202,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 lstl = '-'
             lglab = legend_label[1]
             if not ylabel:
-                ylabel = r'$r h/\mu$'
+                ylabel = r'$(r/\mu)\, h_{+,\times}$'
         graph += line(hsig, thickness=1.5, color=col, linestyle=lstl,
                       legend_label=lglab, axes_labels=[xlabel, ylabel],
                       gridlines=True, frame=True, axes=False, title=title)
