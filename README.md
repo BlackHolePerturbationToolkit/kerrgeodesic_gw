@@ -118,6 +118,7 @@ The pdf reference manual is then
 
 - [Reference manual](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/index.html)
   ([PDF](https://cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/latex/kerrgeodesic_gw.pdf))
+- Article describing the formulas implemented in the package: [arXiv:1903.02049](https://arxiv.org/abs/1903.02049)
 - [Demo notebook](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/gw_single_particle.ipynb?viewer=share)
 - For the tensor calculus functionalities of the
   [KerrBH](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/kerr_spacetime.html)
@@ -134,3 +135,5 @@ The pdf reference manual is then
 - Alexandre Le Tiec
 - Frederic Vincent
 - Niels Warburton
+
+**Reference:** E. Gourgoulhon, A. Le Tiec, F. H. Vincent & N. Warburton: *Gravitational waves from bodies orbiting the Galactic Center black hole and their detectability by LISA*, [arXiv:1903.02049](https://arxiv.org/abs/1903.02049)
