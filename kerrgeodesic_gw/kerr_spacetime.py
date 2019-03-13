@@ -357,7 +357,7 @@ class KerrBH(PseudoRiemannianManifold):
             coords = symbols.split()  # list of strings, one per coordinate
             # Adding the coordinate ranges:
             coordinates = (coords[0] + ' ' + coords[1] + ' ' + coords[2]
-                           + ':(0,pi) ' + coords[3] + ':(0,2*pi)')
+                           + ':(0,pi) ' + coords[3])
             self._BLcoord = self.chart(coordinates=coordinates)
         return self._BLcoord
 
