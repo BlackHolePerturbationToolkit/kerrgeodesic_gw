@@ -1,0 +1,3 @@
+kerrgeodesic_gw/*.py linguist-detectable
+Notebooks/*.ipynb linguist-vendored
+docs/source/*.rst linguist-documentation
