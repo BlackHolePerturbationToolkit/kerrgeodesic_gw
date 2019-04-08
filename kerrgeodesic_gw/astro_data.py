@@ -166,11 +166,11 @@ M4Vstar_mean_density_sol = M4Vstar_mass_sol/M4Vstar_radius_sol**3
 M4Vstar_mean_density_SI = M4Vstar_mean_density_sol*solar_mean_density_SI
 
 # Sagittarius A*
-SgrA_mass_sol = 4.1e6 # Table A.1, GRAVITY col., A&A 615, L15 (2018)
+SgrA_mass_sol = 4.1e6  # Table A.1, GRAVITY col., A&A 615, L15 (2018)
 SgrA_mass_kg = SgrA_mass_sol*solar_mass_kg
 SgrA_mass_m = G*SgrA_mass_kg/c**2
 SgrA_mass_s = SgrA_mass_m/c
-SgrA_distance_pc = 8.12e3 # Table A.1, GRAVITY col., A&A 615, L15 (2018)
+SgrA_distance_pc = 8.12e3  # Table A.1, GRAVITY col., A&A 615, L15 (2018)
 SgrA_distance_m = SgrA_distance_pc*pc
 # aliases:
 MSgrA = SgrA_mass_kg
@@ -179,9 +179,19 @@ MSgrA_s = SgrA_mass_s
 dSgrA = SgrA_distance_m
 
 # M32
-M32_mass_sol = 2.5e6 # Table 6 of Nguyen et al., ApJ 858, 118 (2018)
+M32_mass_sol = 2.5e6  # Table 6 of Nguyen et al., ApJ 858, 118 (2018)
 M32_mass_kg = M32_mass_sol*solar_mass_kg
 M32_mass_m = G*M32_mass_kg/c**2
 M32_mass_s = M32_mass_m/c
-M32_distance_pc = 7.9e5 # Table 4 of Nguyen et al., ApJ 858, 118 (2018)
+M32_distance_pc = 7.9e5  # Table 4 of Nguyen et al., ApJ 858, 118 (2018)
 M32_distance_m = M32_distance_pc*pc
+
+# M87
+M87_mass_sol = 6.2e9  # Gebhardt et al., ApJ 729, 119 (2010)
+M87_mass_kg = M87_mass_sol*solar_mass_kg
+M87_mass_m = G*M87_mass_kg/c**2
+M87_mass_s = M87_mass_m/c
+M87_distance_pc = 1.67e7  # Bird et al., A&A 524, A71 (2010)
+                          # Blakeslee et al., ApJ 694, 556 (2009)
+M87_distance_m = M87_distance_pc*pc
+
