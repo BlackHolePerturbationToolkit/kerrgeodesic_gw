@@ -23,6 +23,7 @@ Contents
    lisa_detector
    signal_processing
    astro_data
+   utilities
 
 Indices and Tables
 ==================
