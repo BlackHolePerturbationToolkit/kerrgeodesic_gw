@@ -471,7 +471,8 @@ def h_amplitude_particle_fourier(m, a, r0, theta, l_max=10,
 def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
                            algorithm_Zinf='spline', color='blue',
                            linestyle='-',  thickness=2, legend_label=None,
-                           offset=0, xlabel=None, ylabel=None, title=None):
+                           offset=0, xlabel=None, ylabel=None, title=None,
+                           gridlines=True):
     r"""
     Plot the Fourier spectrum of the gravitational radiation emitted by a
     particle in equatorial circular orbit around a Kerr black hole.
@@ -516,6 +517,8 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
       provided, the label is set to `H_m^{+,\times}`
     - ``title`` -- (default: ``None``) plot title; if ``None``, the title is
       generated from ``a``, ``r0`` and ``theta``
+    - ``gridlines`` -- (default: ``True``) indicates whether the gridlines are
+      to be plotted
 
     OUTPUT:
 
@@ -559,7 +562,7 @@ def plot_spectrum_particle(a, r0, theta, mode='+', m_max=10, l_max=10,
         graph += line([(m+offset, 0), (m+offset, hm)], color=color,
                       linestyle=linestyle, thickness=thickness,
                       legend_label=legend_label, axes_labels=(xlabel, ylabel),
-                      gridlines=True, frame=True, axes=False, xmin=0,
+                      gridlines=gridlines, frame=True, axes=False, xmin=0,
                       title=title)
     return graph
 
@@ -1039,7 +1042,8 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                     phi0=0, l_max=10, m_min=1, approximation=None,
                     mode=('+', 'x'), color=None, linestyle=None,
                     legend_label=(r'$h_+$', r'$h_\times$'),
-                    xlabel=r'$(t - r_*)/M$', ylabel=None, title=None):
+                    xlabel=r'$(t - r_*)/M$', ylabel=None, title=None,
+                    gridlines=True):
     r"""
     Plot the gravitational waveform emitted by a particle in circular orbit
     around a Kerr black hole.
@@ -1094,6 +1098,8 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
       ``r'$(r/\mu)\, h_{+,\times}$'`` for ``mode`` = ``('+', 'x')``
     - ``title`` -- (default: ``None``) plot title; if ``None``, the title is
       generated from ``a``, ``r0`` and ``theta`` (see the example below)
+    - ``gridlines`` -- (default: ``True``) indicates whether the gridlines are
+      to be plotted
 
     OUTPUT:
 
@@ -1117,7 +1123,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
     Plot of `h_+` only, with some non-default options::
 
         sage: plot_h_particle(0.9, 2.321, pi/4, 0., 0., 70., mode='+',
-        ....:                 color='green', xlabel=r'$u/M$',
+        ....:                 color='green', xlabel=r'$u/M$', gridlines=False,
         ....:                 title='GW from ISCO, $a=0.9M$')
         Graphics object consisting of 1 graphics primitive
 
@@ -1125,7 +1131,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
 
         from kerrgeodesic_gw import plot_h_particle
         g = plot_h_particle(0.9, 2.321, pi/4, 0., 0., 70., mode='+', \
-                            color='green', xlabel=r'$u/M$', \
+                            color='green', xlabel=r'$u/M$', gridlines=False, \
                             title='GW from ISCO, $a=0.9M$')
         sphinx_plot(g)
 
@@ -1173,7 +1179,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 ylabel = r'$(r/\mu)\, h_{+,\times}$'
         graph += line(hsig, thickness=1.5, color=col, linestyle=lstl,
                       legend_label=lglab, axes_labels=[xlabel, ylabel],
-                      gridlines=True, frame=True, axes=False, title=title)
+                      gridlines=gridlines, frame=True, axes=False, title=title)
     if mode == 'x' or mode == ('+', 'x'):
         hsig = h_particle_signal(a, r0, theta, phi, u_min, u_max,
                                  nb_points=plot_points, mode='x',
@@ -1205,7 +1211,7 @@ def plot_h_particle(a, r0, theta, phi, u_min, u_max, plot_points=200,
                 ylabel = r'$(r/\mu)\, h_{+,\times}$'
         graph += line(hsig, thickness=1.5, color=col, linestyle=lstl,
                       legend_label=lglab, axes_labels=[xlabel, ylabel],
-                      gridlines=True, frame=True, axes=False, title=title)
+                      gridlines=gridlines, frame=True, axes=False, title=title)
     return graph
 
 def radiated_power_particle(a, r0, l_max=None, m_min=1, approximation=None):
