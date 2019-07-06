@@ -10,7 +10,8 @@ REFERENCES:
 - \M. Shibata, Phys. Rev. D **50**, 6297 (1994)
 - \D. Kennefick, Phys. Rev. D **58**, 064012 (1998)
 - \S. A. Hughes, Phys. Rev. D **61**, 084004 (2000) [:doi:`10.1103/PhysRevD.61.084004`]
-- \E. Gourgoulhon, A. Le Tiec, F. Vincent, N. Warburton, :arXiv:`1903.02049`
+- \E. Gourgoulhon, A. Le Tiec, F. Vincent, N. Warburton, Astron. Astrophys.
+  **627**, A92 (2019) [:doi:`10.1051/0004-6361/201935406`]; :arXiv:`1903.02049`
 
 """
 #******************************************************************************

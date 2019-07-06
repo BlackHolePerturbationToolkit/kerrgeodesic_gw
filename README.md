@@ -118,7 +118,7 @@ The pdf reference manual is then
 
 - [Reference manual](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/index.html)
   ([PDF](https://cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/latex/kerrgeodesic_gw.pdf))
-- Article describing the formulas implemented in the package: [arXiv:1903.02049](https://arxiv.org/abs/1903.02049)
+- [Article describing the formulas implemented in the package](https://doi.org/10.1051/0004-6361/201935406) *(open access)*
 - Demo notebooks:
 
   - [Spin-weighted spheroidal harmonics](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/basic_kerrgeodesic_gw.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/basic_kerrgeodesic_gw.ipynb)
@@ -142,4 +142,4 @@ The pdf reference manual is then
 - Frederic Vincent
 - Niels Warburton
 
-**Reference:** E. Gourgoulhon, A. Le Tiec, F. H. Vincent & N. Warburton: *Gravitational waves from bodies orbiting the Galactic Center black hole and their detectability by LISA*, [arXiv:1903.02049](https://arxiv.org/abs/1903.02049)
+**Reference:** E. Gourgoulhon, A. Le Tiec, F. H. Vincent & N. Warburton: *Gravitational waves from bodies orbiting the Galactic center black hole and their detectability by LISA*, [A&A **627**, A92 (2019)](https://doi.org/10.1051/0004-6361/201935406) (preprint: [arXiv:1903.02049](https://arxiv.org/abs/1903.02049))
