@@ -327,12 +327,14 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
       multiplied to get the actual signal; this should by `\mu/r`, where `\mu`
       is the particle mass and `r` the radial coordinate of the detector
     - ``approximation`` -- (default: ``None``) string describing the
-      computational method; allowed values are
+      computational method for the signal; allowed values are
 
       - ``None``: exact computation
       - ``'quadrupole'``: quadrupole approximation; see
         :func:`.gw_particle.h_particle_quadrupole`
-
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
 
     OUTPUT:
 
@@ -362,6 +364,38 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
         ....:                          approximation='quadrupole')
         5230.403692883996
 
+    Using the 1.5-PN approximation (``m_max`` has to be at most 5)::
+
+        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
+        ....:                          BH_time_scale, scale=mu_ov_r,
+        ....:                          approximation='1.5PN', m_max=5)
+        7601.344521598601
+
+    For large values of `r_0`, the 1.5-PN approximation and the quadrupole one
+    converge::
+
+        sage: r0 = 100
+        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
+        ....:                          BH_time_scale, scale=mu_ov_r,
+        ....:                          approximation='quadrupole')
+        0.0030532227165507805
+        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
+        ....:                          BH_time_scale, scale=mu_ov_r,
+        ....:                          approximation='1.5PN')
+        0.0031442135473417616
+
+    ::
+
+        sage: r0 = 1000
+        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
+        ....:                          BH_time_scale, scale=mu_ov_r,
+        ....:                          approximation='quadrupole')
+        9.663790254603111e-09
+        sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
+        ....:                          BH_time_scale, scale=mu_ov_r,
+        ....:                          approximation='1.5PN')
+        9.687469292984858e-09
+
     """
     from .gw_particle import h_amplitude_particle_fourier
     from .zinf import _lmax
@@ -375,7 +409,8 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
     f0 = RDF(1./(2*pi*(r0**1.5 + a))/BH_time_scale)
     rho2 = 0
     for m in range(m_min, m_max+1):
-        hmp, hmc = h_amplitude_particle_fourier(m, a, r0, theta, l_max=m_max)
+        hmp, hmc = h_amplitude_particle_fourier(m, a, r0, theta, l_max=m_max,
+                                                algorithm_Zinf=approximation)
         rho2 += (hmp**2 + hmc**2) / psd(m*f0)
     return sqrt(rho2*t_obs)*scale
 
@@ -411,12 +446,14 @@ def max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,
       Fourier mode `m`; if ``None``, ``m_max`` is set to 10 for `r_0 \leq 20 M`
       and to 5 for `r_0 > 20 M`
     - ``approximation`` -- (default: ``None``) string describing the
-      computational method; allowed values are
+      computational method for the signal; allowed values are
 
       - ``None``: exact computation
       - ``'quadrupole'``: quadrupole approximation; see
         :func:`.gw_particle.h_particle_quadrupole`
-
+      - ``'1.5PN'`` (only for ``a=0``): 1.5-post-Newtonian expansion following
+        E. Poisson, Phys. Rev. D **47**, 1497 (1993)
+        [:doi:`10.1103/PhysRevD.47.1497`]
 
     OUTPUT:
 
@@ -445,7 +482,7 @@ def max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,
 
         sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,  # tol 1.0e-13
         ....:                       snr_threshold=5)
-        53.734026574995205
+        53.504027668563694
 
     Lowering the data acquisition time to 1 day::
 
@@ -458,6 +495,14 @@ def max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,
         sage: theta = pi/2
         sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance)  # tol 1.0e-13
         39.8187305700897
+
+    Using the 1.5-PN approximation (``a`` has to be zero and ``m_max`` has to
+    be at most 5)::
+
+        sage: a = 0
+        sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale,  # tol 1.0e-13
+        ....:                       distance, approximation='1.5PN', m_max=5)
+        39.743201341922195
 
     """
     from sage.numerical.optimize import find_root
@@ -476,7 +521,7 @@ def max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,
         else:
              return signal_to_noise_particle(0, r0, theta, psd, t_obs,
                                              BH_time_scale, scale=mu_ov_r,
-                                              approximation='quadrupole'
+                                              approximation='1.5PN'
                                             ) - snr_threshold
     if r_min is None:
         r_min = 1.0001*KerrBH(a).isco_radius()
