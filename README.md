@@ -1,18 +1,18 @@
 # kerrgeodesic_gw
 
-A [SageMath](http://www.sagemath.org/) package to compute gravitational radiation from material orbiting a Kerr black hole
+A [SageMath](https://www.sagemath.org/) package to compute gravitational radiation from material orbiting a Kerr black hole
 
-This package makes use of SageMath functionalities developed through the [SageManifolds](https://sagemanifolds.obspm.fr/) project and is part of the [Black Hole Peturbation Toolkit](http://bhptoolkit.org/).
+This package makes use of SageMath functionalities developed through the [SageManifolds](https://sagemanifolds.obspm.fr/) project and is part of the [Black Hole Perturbation Toolkit](https://bhptoolkit.org/).
 
 ## Installation
 
 ### Requirements
 
-This package requires the Python-based free mathematics software system [SageMath](http://www.sagemath.org/) (at least version 8.2).
+This package requires the Python-based free mathematics software system [SageMath](https://www.sagemath.org/) (at least version 8.2).
 
 *NB:* the version of SageMath shipped with Ubuntu 18.04 is only 8.1; instead of
 the Ubuntu package `sagemath`, install then the most recent binary for Ubuntu 18.04
-from [SageMath download page](http://www.sagemath.org/download-linux.html).
+from [SageMath download page](https://www.sagemath.org/download-linux.html).
 
 ### Simple installation from PyPI
 
@@ -93,7 +93,7 @@ Alternatively, you can run (from the same directory)
 
 ## Documentation
 
-The package documentation can be generated using SageMath's [Sphinx](http://www.sphinx-doc.org/) installation:
+The package documentation can be generated using SageMath's [Sphinx](https://www.sphinx-doc.org/) installation:
 
     cd docs
     sage -sh -c "make html"
