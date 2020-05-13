@@ -97,7 +97,7 @@ def fourier(signal):
     dt = t[1] - t[0]
     hf = dt*fftshift(fft(h))
     f = fftshift(fftfreq(len(signal), d=dt))
-    return zip(f, hf)
+    return list(zip(f, hf))
 
 def read_signal(filename, dirname=None):
     r"""
