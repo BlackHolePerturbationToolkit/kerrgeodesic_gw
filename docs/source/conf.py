@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import six
 import sys
 import os
 
@@ -59,24 +60,54 @@ extensions = [
 # through mathplotlib, so that it will be displayed in the HTML doc
 plot_html_show_source_link = False
 plot_pre_code = """
-def sphinx_plot(plot):
+def sphinx_plot(graphics, **kwds):
     import matplotlib.image as mpimg
-    from sage.misc.temporary_file import tmp_filename
     import matplotlib.pyplot as plt
+    from sage.misc.temporary_file import tmp_filename
+    from sage.plot.graphics import _parse_figsize
     if os.environ.get('SAGE_SKIP_PLOT_DIRECTIVE', 'no') != 'yes':
-        import matplotlib as mpl
-        mpl.rcParams['image.interpolation'] = 'bilinear'
-        mpl.rcParams['image.resample'] = False
-        mpl.rcParams['figure.figsize'] = [8.0, 6.0]
-        mpl.rcParams['figure.dpi'] = 80
-        mpl.rcParams['savefig.dpi'] = 100
-        fn = tmp_filename(ext=".png")
-        plot.plot().save(fn)
-        img = mpimg.imread(fn)
-        plt.imshow(img)
+        ## Option handling is taken from Graphics.save
+        options = dict()
+        if isinstance(graphics, sage.plot.graphics.Graphics):
+            options.update(sage.plot.graphics.Graphics.SHOW_OPTIONS)
+            options.update(graphics._extra_kwds)
+            options.update(kwds)
+        elif isinstance(graphics, sage.plot.multigraphics.MultiGraphics):
+            options.update(kwds)
+        else:
+            graphics = graphics.plot(**kwds)
+        dpi = options.pop('dpi', None)
+        transparent = options.pop('transparent', None)
+        fig_tight = options.pop('fig_tight', None)
+        figsize = options.pop('figsize', None)
+        if figsize is not None:
+            figsize = _parse_figsize(figsize)
+        plt.figure(figsize=figsize)
+        figure = plt.gcf()
+        if isinstance(graphics, (sage.plot.graphics.Graphics,
+                                 sage.plot.multigraphics.MultiGraphics)):
+            graphics.matplotlib(figure=figure, figsize=figsize, **options)
+            if isinstance(graphics, (sage.plot.graphics.Graphics,
+                                     sage.plot.multigraphics.GraphicsArray)):
+                # for Graphics and GraphicsArray, tight_layout adjusts the
+                # *subplot* parameters so ticks aren't cut off, etc.
+                figure.tight_layout()
+        else:
+            # 3d graphics via png
+            import matplotlib as mpl
+            mpl.rcParams['image.interpolation'] = 'bilinear'
+            mpl.rcParams['image.resample'] = False
+            mpl.rcParams['figure.figsize'] = [8.0, 6.0]
+            mpl.rcParams['figure.dpi'] = 80
+            mpl.rcParams['savefig.dpi'] = 100
+            fn = tmp_filename(ext=".png")
+            graphics.save(fn)
+            img = mpimg.imread(fn)
+            plt.imshow(img)
+            plt.axis("off")
         plt.margins(0)
-        plt.axis("off")
-        plt.tight_layout(pad=0)
+        if not isinstance(graphics, sage.plot.multigraphics.MultiGraphics):
+            plt.tight_layout(pad=0)
 
 from sage.all_cmdline import *
 """
@@ -264,7 +295,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class], toctree_only).
 latex_documents = [
   ('index', package_name + '.tex',
-   u'Reference manual of ' + unicode(package_name_latex), authors_latex,
+   u'Reference manual of ' + six.text_type(package_name_latex), authors_latex,
    'manual', True),
 ]
 
@@ -294,7 +325,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', package_name, unicode(package_name) + u" documentation",
+    ('index', package_name, six.text_type(package_name) + u" documentation",
      [authors], 1)
 ]
 
@@ -308,7 +339,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', package_name, unicode(package_name) + u" documentation",
+  ('index', package_name, six.text_type(package_name) + u" documentation",
    authors, package_name, project,
    'Miscellaneous'),
 ]
@@ -342,17 +373,19 @@ if (os.environ.get('SAGE_DOC_MATHJAX', 'no') != 'no'
     # this is broken for now
     # html_theme_options['mathjax_macros'] = sage_mathjax_macros()
 
-    from pkg_resources import Requirement, working_set
-    sagenb_path = working_set.find(Requirement.parse('sagenb')).location
-    mathjax_relative = os.path.join('sagenb','data','mathjax')
+    ## from pkg_resources import Requirement, working_set
+    ## sagenb_path = working_set.find(Requirement.parse('sagenb')).location
+    ## mathjax_relative = os.path.join('sagenb','data','mathjax')
 
     # It would be really nice if sphinx would copy the entire mathjax directory,
     # (so we could have a _static/mathjax directory), rather than the contents of the directory
 
-    mathjax_static = os.path.join(sagenb_path, mathjax_relative)
-    html_static_path.append(mathjax_static)
-    exclude_patterns=['**/'+os.path.join(mathjax_relative, i) for i in ('docs', 'README*', 'test',
-                                                                        'unpacked', 'LICENSE')]
+    ## mathjax_static = os.path.join(sagenb_path, mathjax_relative)
+    ## html_static_path.append(mathjax_static)
+    ## exclude_patterns=['**/'+os.path.join(mathjax_relative, i) for i in ('docs', 'README*', 'test','unpacked', 'LICENSE')]
+    from sage.env import SAGE_LOCAL, SAGE_SHARE
+    # html_static_path.append(SAGE_LOCAL + "/lib/mathjax")    # conda
+    html_static_path.append(SAGE_SHARE + "/mathjax")  # sage distribution
 else:
      extensions.append('sphinx.ext.pngmath')
 

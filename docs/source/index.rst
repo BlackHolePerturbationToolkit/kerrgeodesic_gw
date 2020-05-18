@@ -16,6 +16,7 @@ Contents
    :maxdepth: 3
 
    kerr_spacetime
+   kerr_geodesic
    spher_harm
    zinf
    gw_particle

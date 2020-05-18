@@ -13,7 +13,7 @@ REFERENCES:
 
 """
 #******************************************************************************
-#       Copyright (C) 2018 Eric Gourgoulhon <eric.gourgoulhon@obspm.fr>
+#       Copyright (C) 2018, 2020 Eric Gourgoulhon <eric.gourgoulhon@obspm.fr>
 #
 #  Distributed under the terms of the GNU General Public License (GPL)
 #  as published by the Free Software Foundation; either version 2 of
@@ -27,6 +27,8 @@ from sage.rings.rational_field import QQ
 from sage.symbolic.constants import pi
 from sage.misc.cachefunc import cached_method
 from sage.manifolds.differentiable.pseudo_riemannian import PseudoRiemannianManifold
+from sage.manifolds.differentiable.euclidean import EuclideanSpace
+from .kerr_geodesic import KerrGeodesic
 
 class KerrBH(PseudoRiemannianManifold):
     r"""
@@ -35,7 +37,7 @@ class KerrBH(PseudoRiemannianManifold):
     The Kerr spacetime is generated as a 4-dimensional Lorentzian manifold,
     endowed with the Boyer-Lindquist coordinates (default chart).
     Accordingly the class ``KerrBH`` inherits from the generic SageMath class
-    `PseudoRiemannianManifold <http://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/pseudo_riemannian.html>`_.
+    `PseudoRiemannianManifold <https://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/pseudo_riemannian.html>`_.
 
     INPUT:
 
@@ -59,7 +61,7 @@ class KerrBH(PseudoRiemannianManifold):
         sage: from kerrgeodesic_gw import KerrBH
         sage: a, m = var('a m')
         sage: BH = KerrBH(a, m); BH
-        4-dimensional Lorentzian manifold M
+        Kerr spacetime M
         sage: dim(BH)
         4
 
@@ -73,7 +75,7 @@ class KerrBH(PseudoRiemannianManifold):
     The Kerr metric::
 
         sage: g = BH.metric(); g
-        Lorentzian metric g on the 4-dimensional Lorentzian manifold M
+        Lorentzian metric g on the Kerr spacetime M
         sage: g.display()
         g = -(a^2*cos(th)^2 - 2*m*r + r^2)/(a^2*cos(th)^2 + r^2) dt*dt
          - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dt*dph
@@ -88,7 +90,7 @@ class KerrBH(PseudoRiemannianManifold):
     and `a=0.9`::
 
         sage: BH = KerrBH(0.9); BH
-        4-dimensional Lorentzian manifold M
+        Kerr spacetime M
         sage: g = BH.metric()
         sage: g.display()  # tol 1.0e-13
         g = -(r^2 + 0.81*cos(th)^2 - 2*r)/(r^2 + 0.81*cos(th)^2) dt*dt
@@ -131,8 +133,8 @@ class KerrBH(PseudoRiemannianManifold):
     are dealing with a solution of Einstein equation in vacuum)::
 
         sage: g.ricci()
-        Field of symmetric bilinear forms Ric(g) on the 4-dimensional
-         Lorentzian manifold M
+        Field of symmetric bilinear forms Ric(g) on the Schwarzschild
+         spacetime M
         sage: g.ricci().display()
         Ric(g) = 0
 
@@ -237,6 +239,27 @@ class KerrBH(PseudoRiemannianManifold):
                                           metric_latex_name=metric_latex_name)
         # Coordinate charts (not initialized yet)
         self._BLcoord = None # Boyer-Lindquist
+        # Map to Euclidean 4-space (not initialized yet)
+        self._map_to_E4 = None
+
+    def _repr_(self):
+        r"""
+        Return a string representation of ``self``.
+
+        TESTS::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: a = var('a')
+            sage: BH = KerrBH(a)
+            sage: BH
+            Kerr spacetime M
+            sage: KerrBH(0)
+            Schwarzschild spacetime M
+
+        """
+        if self._a == 0:
+            return "Schwarzschild spacetime " + self._name
+        return "Kerr spacetime " + self._name
 
     def mass(self):
         r"""
@@ -357,7 +380,8 @@ class KerrBH(PseudoRiemannianManifold):
             coords = symbols.split()  # list of strings, one per coordinate
             # Adding the coordinate ranges:
             coordinates = (coords[0] + ' ' + coords[1] + ' ' + coords[2]
-                           + ':(0,pi) ' + coords[3])
+                           + ' ' + coords[3])
+#                           + ':(0,pi) ' + coords[3])
             self._BLcoord = self.chart(coordinates=coordinates)
         return self._BLcoord
 
@@ -371,7 +395,7 @@ class KerrBH(PseudoRiemannianManifold):
             sage: a, m = var('a m')
             sage: BH = KerrBH(a, m)
             sage: BH.metric()
-            Lorentzian metric g on the 4-dimensional Lorentzian manifold M
+            Lorentzian metric g on the Kerr spacetime M
             sage: BH.metric().display()
             g = -(a^2*cos(th)^2 - 2*m*r + r^2)/(a^2*cos(th)^2 + r^2) dt*dt
              - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dt*dph
@@ -985,3 +1009,48 @@ class KerrBH(PseudoRiemannianManifold):
         if r_min is None:
             r_min = self.isco_radius()
         return find_root(fzero, r_min, r_max)
+
+    def geodesic(self, curve_param, initial_point,
+                 pt0=None, pr0=None, pth0=None, pph0=None,
+                 mu=None, E=None, L=None, Q=None, r_increase=True,
+                 th_increase=True, chart=None, name=None,
+                 latex_name=None, a_num=None, m_num=None, verbose=False):
+        r"""
+        Construct a geodesic on ``self``.
+        """
+        from sage.manifolds.differentiable.real_line import RealLine
+        from sage.manifolds.differentiable.manifold_homset import IntegratedGeodesicSet
+
+        if len(curve_param) != 3:
+            raise ValueError("the argument 'curve_param' must be of " +
+                             "the form (t, t_min, t_max)")
+        t = curve_param[0]
+        t_min = curve_param[1]
+        t_max = curve_param[2]
+        real_field = RealLine(names=(repr(t),))
+        interval = real_field.open_interval(t_min, t_max)
+        integrated_geodesic_set = IntegratedGeodesicSet(interval, self)
+        return KerrGeodesic(integrated_geodesic_set, t, initial_point,
+                            pt0=pt0, pr0=pr0, pth0=pth0, pph0=pph0, mu=mu, E=E,
+                            L=L, Q=Q, r_increase=r_increase,
+                            th_increase=th_increase, chart=chart, name=name,
+                            latex_name=latex_name, a_num=a_num, m_num=m_num,
+                            verbose=verbose)
+
+    def map_to_Euclidean(self):
+        r"""
+        Map from Kerr spacetime to the Euclidean 4-space, based on
+        Boyer-Lindquist coordinates
+        """
+        if self._map_to_E4 is None:
+            E4 = EuclideanSpace(4, coordinates='Cartesian', symbols='t x y z',
+                                start_index=0)
+            X4 = E4.cartesian_coordinates()
+            BL = self.boyer_lindquist_coordinates()
+            t, r, th, ph = BL[:]
+            self._map_to_E4 = self.diff_map(E4, {(BL, X4): [t,
+                                                            r*sin(th)*cos(ph),
+                                                            r*sin(th)*sin(ph),
+                                                            r*cos(th)]},
+                                            name='F')
+        return self._map_to_E4
