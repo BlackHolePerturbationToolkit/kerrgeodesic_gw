@@ -229,6 +229,9 @@ class KerrBH(PseudoRiemannianManifold):
     """
     def __init__(self, a, m=1, manifold_name='M', manifold_latex_name=None,
                  metric_name='g', metric_latex_name=None):
+        r"""
+        Initializes a Kerr spacetime.
+        """
         # Parameters
         self._m = m
         self._a = a

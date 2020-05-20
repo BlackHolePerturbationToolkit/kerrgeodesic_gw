@@ -103,8 +103,9 @@ class KerrGeodesic(IntegratedGeodesic):
     (ii) the four integral of motions `(\mu, E, L, Q)` or (iii) some of the
     components of `p_0` along with with some integrals of motion. We shall
     also specify some numerical value for the Kerr spin parameter `a`.
-    Here, we choose `\lambda\in[0, 300m]`, the option (ii) and `a=0.998 m`,
-    where `m` in the black hole mass::
+    Examples of (i) and (iii) are provided below. Here, we choose
+    `\lambda\in[0, 300m]`, the option (ii) and `a=0.998 m`, where `m` in the
+    black hole mass::
 
         sage: geod = M.geodesic((lamb, 0, 300), init_point, mu=1, E=0.883,
         ....:                   L=1.982, Q=0.467, a_num=0.998)
@@ -205,7 +206,7 @@ class KerrGeodesic(IntegratedGeodesic):
         sage: geod.codomain()
         Kerr spacetime M
 
-    It maps values of `\lambda` to points of spacetime::
+    It maps values of `\lambda` to spacetime points::
 
         sage: geod(0)
         Point on the Kerr spacetime M
@@ -242,7 +243,7 @@ class KerrGeodesic(IntegratedGeodesic):
         sage: g.at(init_point)(p0, p0).subs(a=0.998)  # tol 1.0e-13
         -1.00000000000000
 
-    The 4-momentum vector `p` at a any value of the affine parameter `\lambda`,
+    The 4-momentum vector `p` at any value of the affine parameter `\lambda`,
     e.g. `\lambda=200m`, is obtained by::
 
         sage: p = geod.tangent_vector_eval_at(200); p
@@ -297,12 +298,76 @@ class KerrGeodesic(IntegratedGeodesic):
             $L$       1.98209628664691    1.98200000000000    0.00009629     0.00004858
             $Q$      0.467042767529623    0.467000000000000   0.00004277     0.00009158
 
+
+    .. RUBRIC:: Various ways to initialize a geodesic
+
+    Instead of providing the integral of motions, as for ``geod`` above, one
+    can initialize a geodesic by providing the Boyer-Lindquist components
+    `(p^t_0, p^r_0, p^\theta_0, p^\phi_0)` of the initial 4-momentum vector
+    `p_0`. For instance::
+
+        sage: p0
+        Tangent vector p at Point P on the Kerr spacetime M
+        sage: p0[:]  # tol 1.0e-13
+        [1.29225788954106, 0.00438084990626460, 0.0189826106258554, 0.0646134478134985]
+        sage: geod2 = M.geodesic((lamb, 0, 300), init_point, pt0=p0[0], pr0=p0[1],
+        ....:                    pth0=p0[2], pph0=p0[3], a_num=0.998)
+        sage: geod2.initial_tangent_vector() == p0
+        True
+
+    As a check, we recover the same values of `(\mu, E, L, Q)` as those that
+    were used to initialize ``geod``::
+
+        sage: geod2.evaluate_mu(0)
+        1.00000000000000
+        sage: geod2.evaluate_E(0)
+        0.883000000000000
+        sage: geod2.evaluate_L(0)
+        1.98200000000000
+        sage: geod2.evaluate_Q(0)
+        0.467000000000000
+
+    We may also initialize a geodesic by providing the mass `\mu` and the
+    three spatial components `(p^r_0, p^\theta_0, p^\phi_0)` of the initial
+    4-momentum vector::
+
+        sage: geod3 = M.geodesic((lamb, 0, 300), init_point, mu=1, pr0=p0[1],
+        ....:                    pth0=p0[2], pph0=p0[3], a_num=0.998)
+
+    The component `p^t_0` is then automatically computed::
+
+        sage: geod3.initial_tangent_vector()[:]  # tol 1.0e-13
+        [1.29225788954106, 0.00438084990626460, 0.0189826106258554, 0.0646134478134985]
+
+    and we check the identity with the initial vector of ``geod``, up to
+    numerical errors::
+
+        sage: (geod3.initial_tangent_vector() - p0)[:]  # tol 1.0e-13
+        [2.22044604925031e-16, 0, 0, 0]
+
+    Another way to initialize a geodesic is to provide the conserved energy `E`,
+    the conserved angular momentum `L` and the two components
+    `(p^r_0, p^\theta_0)` of the initial 4-momentum vector::
+
+        sage: geod4 = M.geodesic((lamb, 0, 300), init_point, E=0.8830, L=1.982,
+        ....:                     pr0=p0[1], pth0=p0[2], a_num=0.998)
+        sage: geod4.initial_tangent_vector()[:]
+        [1.29225788954106, 0.00438084990626460, 0.0189826106258554, 0.0646134478134985]
+
+    Again, we get a geodesic equivalent to ``geod``::
+
+        sage: (geod4.initial_tangent_vector() - p0)[:]  # tol 1.0e-13
+        [0, 0, 0, 0]
+
     """
     def __init__(self, parent, affine_parameter,
                  initial_point, pt0=None, pr0=None, pth0=None, pph0=None,
                  mu=None, E=None, L=None, Q=None, r_increase=True,
                  th_increase=True, chart=None, name=None,
                  latex_name=None, a_num=None, m_num=None, verbose=False):
+        r"""
+        Initializes a geodesic in Kerr spacetime.
+        """
         self._spacetime = parent.codomain()
         self._mu = mu
         self._E = E
@@ -424,7 +489,22 @@ class KerrGeodesic(IntegratedGeodesic):
                                                     basis=basis, name='p')
     def initial_tangent_vector(self):
         r"""
-        Return the initial tangent vector.
+        Return the initial 4-momentum vector.
+
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: M = KerrBH(0)
+            sage: BLchart = M.boyer_lindquist_coordinates()
+            sage: init_point = M((0, 6, pi/2, 0), name='P')
+            sage: lamb = var('lamb', latex_name=r'\lambda')
+            sage: geod = M.geodesic((lamb, 0, 100), init_point, mu=0, E=1,
+            ....:                   L=3, Q=0)
+            sage: p0 = geod.initial_tangent_vector(); p0
+            Tangent vector p at Point P on the Schwarzschild spacetime M
+            sage: p0.display()
+            p = 3/2 d/dt + 1/6*sqrt(30) d/dr + 1/12 d/dph
+
         """
         return self._init_vector
 
@@ -445,6 +525,58 @@ class KerrGeodesic(IntegratedGeodesic):
                   parameters_values=None, verbose=False, **control_param):
         r"""
         Perform the numerical integration.
+
+        INPUT:
+
+        - ``step`` -- (default: ``None``) step `\delta\lambda` for the
+          integration, where `\lambda` is the affine parameter along the
+          geodesic; default value is a hundredth of the range of `\lambda`
+          declared when constructing the geodesic
+        - ``method`` -- (default: ``'odeint'``) numerical scheme to
+          use for the integration; available algorithms are:
+
+          * ``'odeint'`` - makes use of
+            `scipy.integrate.odeint <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html>`_
+            via Sage solver
+            :func:`~sage.calculus.desolvers.desolve_odeint`; ``odeint`` invokes
+            the LSODA algorithm of the
+            `ODEPACK suite <https://www.netlib.org/odepack/>`_, which
+            automatically selects between implicit Adams method (for non-stiff
+            problems) and a method based on backward differentiation formulas
+            (BDF) (for stiff problems).
+          * ``'rk4_maxima'`` - 4th order classical Runge-Kutta, which
+            makes use of Maxima's dynamics package via Sage solver
+            :func:`~sage.calculus.desolvers.desolve_system_rk4` (quite slow)
+          * ``'dopri5'`` - Dormand-Prince Runge-Kutta of order (4)5 provided by
+            `scipy.integrate.ode <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.html>`_
+          * ``'dop853'`` - Dormand-Prince Runge-Kutta of order 8(5,3) provided by
+            `scipy.integrate.ode <https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.html>`_
+
+          and those provided by ``GSL`` via Sage class
+          :class:`~sage.calculus.ode.ode_solver`:
+
+          * ``'rk2'`` - embedded Runge-Kutta (2,3)
+          * ``'rk4'`` - 4th order classical Runge-Kutta
+          * ``'rkf45'`` - Runge-Kutta-Felhberg (4,5)
+          * ``'rkck'`` - embedded Runge-Kutta-Cash-Karp (4,5)
+          * ``'rk8pd'`` - Runge-Kutta Prince-Dormand (8,9)
+          * ``'rk2imp'`` - implicit 2nd order Runge-Kutta at Gaussian points
+          * ``'rk4imp'`` - implicit 4th order Runge-Kutta at Gaussian points
+          * ``'gear1'`` - `M=1` implicit Gear
+          * ``'gear2'`` - `M=2` implicit Gear
+          * ``'bsimp'`` - implicit Bulirsch-Stoer (requires Jacobian)
+
+        - ``solution_key`` -- (default: ``None``) key which the
+          resulting numerical solution will be associated to; a default
+          value is given if none is provided
+        - ``parameters_values`` -- (default: ``None``) list of numerical
+          values of the parameters present in the system defining the
+          geodesic, to be substituted in the equations before integration
+        - ``verbose`` -- (default: ``False``) prints information about
+          the computation in progress
+        - ``**control_param`` -- extra control parameters to be passed to the
+          chosen solver
+
         """
         # Substituting a and m by their numerical values:
         if parameters_values is None:
