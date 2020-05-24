@@ -16,7 +16,8 @@ from sage.functions.other import sqrt
 from sage.symbolic.expression import Expression
 from sage.symbolic.relation import solve
 from sage.symbolic.ring import SR
-from sage.rings.real_mpfr import RealField, RR
+from sage.rings.complex_field import ComplexField
+from sage.rings.real_mpfr import RR
 from sage.plot.circle import circle
 from sage.plot.plot3d.shapes import Cylinder
 from sage.plot.plot3d.shapes2 import sphere
@@ -379,6 +380,7 @@ class KerrGeodesic(IntegratedGeodesic):
         self._m = m_num
         if self._m is None:
             self._m = self._spacetime.mass()
+        self._latest_solution = None  # to keep track of latest solution key
         self._init_vector = self._compute_init_vector(initial_point, pt0, pr0,
                                                       pth0, pph0, r_increase,
                                                       th_increase, verbose)
@@ -491,7 +493,15 @@ class KerrGeodesic(IntegratedGeodesic):
         r"""
         Return the initial 4-momentum vector.
 
-        EXAMPLES::
+        OUTPUT:
+
+        - instance of `TangentVector <https://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/tangent_vector.html>`_
+          representing the initial 4-momentum `p_0`
+
+        EXAMPLES:
+
+        Initial 4-momentum vector of a null geodesic in Schwarzschild
+        spacetime::
 
             sage: from kerrgeodesic_gw import KerrBH
             sage: M = KerrBH(0)
@@ -524,7 +534,7 @@ class KerrGeodesic(IntegratedGeodesic):
     def integrate(self, step=None, method='odeint', solution_key=None,
                   parameters_values=None, verbose=False, **control_param):
         r"""
-        Perform the numerical integration.
+        Solve numerically the geodesic equation.
 
         INPUT:
 
@@ -566,9 +576,8 @@ class KerrGeodesic(IntegratedGeodesic):
           * ``'gear2'`` - `M=2` implicit Gear
           * ``'bsimp'`` - implicit Bulirsch-Stoer (requires Jacobian)
 
-        - ``solution_key`` -- (default: ``None``) key which the
-          resulting numerical solution will be associated to; a default
-          value is given if none is provided
+        - ``solution_key`` -- (default: ``None``) string to tag the numerical
+          solution; if ``None``, the string ``method`` is used.
         - ``parameters_values`` -- (default: ``None``) list of numerical
           values of the parameters present in the system defining the
           geodesic, to be substituted in the equations before integration
@@ -577,39 +586,102 @@ class KerrGeodesic(IntegratedGeodesic):
         - ``**control_param`` -- extra control parameters to be passed to the
           chosen solver
 
+        EXAMPLES::
+
+            sage: from kerrgeodesic_gw import KerrBH
+            sage: M = KerrBH(0)
+            sage: BLchart = M.boyer_lindquist_coordinates()
+            sage: init_point = M((0, 10, pi/2, 0), name='P')
+            sage: lamb = var('lamb', latex_name=r'\lambda')
+            sage: geod = M.geodesic((lamb, 0, 1500), init_point, mu=1, E=0.973, L=4.2, Q=0)
+            sage: geod.integrate()
+
         """
         # Substituting a and m by their numerical values:
         if parameters_values is None:
             parameters_values = {}
         parameters_values.update(self._numerical_substitutions())
+        if solution_key is None:
+            solution_key = method
+        self._latest_solution = solution_key
         self.solve(step=step, method=method, solution_key=solution_key,
                    parameters_values=parameters_values, verbose=verbose,
                    **control_param)
-        self.interpolate(solution_key=solution_key, verbose=verbose)
+        # Since a single interpolation method is currently implemented (cubic
+        # spline), we use solution_key as interpolation_key:
+        self.interpolate(solution_key=solution_key,
+                         interpolation_key=solution_key, verbose=verbose)
 
-    def evaluate_mu(self, affine_parameter):
+    def evaluate_tangent_vector(self, affine_parameter, solution_key=None):
         r"""
-        Compute the mass parameter `\mu` at a given value of the affine
-        parameter `\lambda`
+        Return the tangent vector (4-momentum) at a given value of the
+        affine parameter.
+
+        INPUT:
+
+        - ``affine_parameter`` -- value of the affine parameter `\lambda`
+        - ``solution_key`` -- (default: ``None``) string denoting the numerical
+          solution to use for the evaluation; if ``None``, the latest solution
+          computed by :meth:`integrate` is used.
+
+        OUTPUT:
+
+        - instance of `TangentVector <https://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/tangent_vector.html>`_
+          representing the 4-momentum vector `p` at `\lambda`
+
         """
+        if solution_key is None:
+            solution_key = self._latest_solution
         if affine_parameter == self.domain().lower_bound():
             p = self._init_vector
         else:
-            p = self.tangent_vector_eval_at(affine_parameter)
+            p = self.tangent_vector_eval_at(affine_parameter,
+                                            interpolation_key=solution_key)
+        return p
+
+    def evaluate_mu(self, affine_parameter, solution_key=None):
+        r"""
+        Compute the mass parameter `\mu` at a given value of the affine
+        parameter `\lambda`.
+
+        INPUT:
+
+        - ``affine_parameter`` -- value of the affine parameter `\lambda`
+        - ``solution_key`` -- (default: ``None``) string denoting the numerical
+          solution to use for the evaluation; if ``None``, the latest solution
+          computed by :meth:`integrate` is used.
+
+        OUTPUT:
+
+        - value of `\mu`
+
+        """
+        p = self.evaluate_tangent_vector(affine_parameter,
+                                         solution_key=solution_key)
         point = p.parent().base_point()
         g = self._spacetime.metric().at(point)
         mu = sqrt(-g(p, p))
         return mu.substitute(self._numerical_substitutions())
 
-    def evaluate_E(self, affine_parameter):
+    def evaluate_E(self, affine_parameter, solution_key=None):
         r"""
         Compute the conserved energy `E` at a given value of the affine
         parameter `\lambda`.
+
+        INPUT:
+
+        - ``affine_parameter`` -- value of the affine parameter `\lambda`
+        - ``solution_key`` -- (default: ``None``) string denoting the numerical
+          solution to use for the evaluation; if ``None``, the latest solution
+          computed by :meth:`integrate` is used.
+
+        OUTPUT:
+
+        - value of `E`
+
         """
-        if affine_parameter == self.domain().lower_bound():
-            p = self._init_vector
-        else:
-            p = self.tangent_vector_eval_at(affine_parameter)
+        p = self.evaluate_tangent_vector(affine_parameter,
+                                         solution_key=solution_key)
         point = p.parent().base_point()
         BLchart = self._spacetime.boyer_lindquist_coordinates()
         r, th = BLchart(point)[1:3]
@@ -622,15 +694,25 @@ class KerrGeodesic(IntegratedGeodesic):
         E = (1 - b)*pt + b*a*sin(th)**2*pph
         return E.substitute(self._numerical_substitutions())
 
-    def evaluate_L(self, affine_parameter):
+    def evaluate_L(self, affine_parameter, solution_key=None):
         r"""
         Compute the conserved angular momentum about the rotation axis `L` at
         a given value of the affine parameter `\lambda`.
+
+        INPUT:
+
+        - ``affine_parameter`` -- value of the affine parameter `\lambda`
+        - ``solution_key`` -- (default: ``None``) string denoting the numerical
+          solution to use for the evaluation; if ``None``, the latest solution
+          computed by :meth:`integrate` is used.
+
+        OUTPUT:
+
+        - value of `L`
+
         """
-        if affine_parameter == self.domain().lower_bound():
-            p = self._init_vector
-        else:
-            p = self.tangent_vector_eval_at(affine_parameter)
+        p = self.evaluate_tangent_vector(affine_parameter,
+                                         solution_key=solution_key)
         point = p.parent().base_point()
         BLchart = self._spacetime.boyer_lindquist_coordinates()
         r, th = BLchart(point)[1:3]
@@ -645,39 +727,84 @@ class KerrGeodesic(IntegratedGeodesic):
         L = -bs*pt + (r2 + a2 + a*bs)*sin(th)**2*pph
         return L.substitute(self._numerical_substitutions())
 
-    def evaluate_Q(self, affine_parameter):
+    def evaluate_Q(self, affine_parameter, solution_key=None):
         r"""
         Compute the Carter constant `Q` at a given value of the affine
         parameter `\lambda`.
+
+        INPUT:
+
+        - ``affine_parameter`` -- value of the affine parameter `\lambda`
+        - ``solution_key`` -- (default: ``None``) string denoting the numerical
+          solution to use for the evaluation; if ``None``, the latest solution
+          computed by :meth:`integrate` is used.
+
+        OUTPUT:
+
+        - value of `Q`
+
         """
-        if affine_parameter == self.domain().lower_bound():
-            p = self._init_vector
-        else:
-            p = self.tangent_vector_eval_at(affine_parameter)
+        p = self.evaluate_tangent_vector(affine_parameter,
+                                         solution_key=solution_key)
         point = p.parent().base_point()
         BLchart = self._spacetime.boyer_lindquist_coordinates()
         r, th = BLchart(point)[1:3]
         a = self._a
         rho4 = (r**2 + (a*cos(th))**2)**2
         mu2 = self.evaluate_mu(affine_parameter)**2
-        E2 = self.evaluate_E(affine_parameter)**2
-        L2 = self.evaluate_L(affine_parameter)**2
+        E2 = self.evaluate_E(affine_parameter, solution_key=solution_key)**2
+        L2 = self.evaluate_L(affine_parameter, solution_key=solution_key)**2
         p_comp = p.components(basis=BLchart.frame().at(point))
         pth = p_comp[2]
         Q = rho4*pth**2 + cos(th)**2*(L2/sin(th)**2 + a**2*(mu2 - E2))
         return Q.substitute(self._numerical_substitutions())
 
-    def plot(self, coordinates='xyz', prange=None, interpolation_key=None,
+    def plot(self, coordinates='xyz', prange=None, solution_key=None,
              style='-', thickness=1, plot_points=1000, color='red',
              include_end_point=(True, True), end_point_offset=(0.001, 0.001),
              verbose=False, label_axes=None, plot_horizon=True,
-             horizon_color='grey', display_tangent=False, color_tangent='blue',
+             horizon_color='black', fill_BH_region=True, BH_region_color='grey',
+             display_tangent=False, color_tangent='blue',
              plot_points_tangent=10, width_tangent=1,
              scale=1, aspect_ratio='automatic', **kwds):
         r"""
         Plot the geodesic in terms of the coordinates `(t,x,y,z)` deduced from
         the Boyer-Lindquist coordinates `(t,r,\theta,\phi)` via the standard
         polar to Cartesian transformations.
+
+        INPUT:
+
+        - ``coordinates`` -- (default: ``'xyz'``) string indicating which of
+          the coordinates `(t,x,y,z)` to use for the plot
+        - ``prange`` -- (default: ``None``) range of the affine parameter
+          `\lambda` for the plot; if ``None``, the entire range declared during
+          the construction of the geodesic is considered
+        - ``solution_key`` -- (default: ``None``) string denoting the numerical
+          solution to use for the plot; if ``None``, the latest solution
+          computed by :meth:`integrate` is used.
+        - ``verbose`` -- (default: ``False``) determines whether information is
+          printed about the plotting in progress
+        - ``plot_horizon``  -- (default: ``True``) determines whether the
+          black hole event horizon is drawn
+        - ``horizon_color`` -- (default: ``'black'``) color of the event horizon
+        - ``fill_BH_region``  -- (default: ``True``) determines whether the
+          black hole region is colored (for 2D plots only)
+        - ``BH_region_color`` -- (default: ``'grey'``) color of the event horizon
+        - ``display_tangent`` -- (default: ``False``) determines whether
+          some tangent vectors should also be plotted
+        - ``color_tangent`` -- (default: ``blue``) color of the tangent
+          vectors when these are plotted
+        - ``plot_points_tangent`` -- (default: 10) number of tangent
+          vectors to display when these are plotted
+        - ``width_tangent`` -- (default: 1) sets the width of the arrows
+          representing the tangent vectors
+        - ``scale`` -- (default: 1) scale applied to the tangent vectors
+          before displaying them
+
+        .. SEEALSO::
+            `DifferentiableCurve.plot <https://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/curve.html#sage.manifolds.differentiable.curve.DifferentiableCurve.plot>`_
+            for the other input parameters
+
         """
         bad_format_msg = ("the argument 'coordinates' must be a string of "
                           "2 or 3 characters among {t,x,y,z} denoting the "
@@ -703,9 +830,11 @@ class KerrGeodesic(IntegratedGeodesic):
             else:
                 label_axes = False  # since three.js has its own mechanism to
                                     # label axes
+        if solution_key is None:
+            solution_key = self._latest_solution
         graph = self.plot_integrated(chart=X4, mapping=map_to_Euclidean,
                ambient_coords=ambient_coords, prange=prange,
-               interpolation_key=interpolation_key, style=style,
+               interpolation_key=solution_key, style=style,
                thickness=thickness, plot_points=plot_points, color=color,
                include_end_point=include_end_point,
                end_point_offset=end_point_offset, verbose=verbose,
@@ -730,34 +859,55 @@ class KerrGeodesic(IntegratedGeodesic):
                     graph += sphere(size=rH, color=horizon_color,
                                     aspect_ratio=aspect_ratio)
             if len(ambient_coords) == 2 and t not in ambient_coords:
-                graph += circle((0,0), rH, color=horizon_color, thickness=2)
+                if fill_BH_region:
+                    graph += circle((0,0), rH, edgecolor=horizon_color,
+                                    thickness=2, fill=True,
+                                    facecolor=BH_region_color, alpha=0.5)
+                else:
+                    graph += circle((0,0), rH, edgecolor=horizon_color,
+                                    thickness=2)
         return graph
 
-    def check_integrals_of_motion(self, affine_parameter):
+    def check_integrals_of_motion(self, affine_parameter, solution_key=None):
         r"""
         Check the constancy of the four integrals of motion
+
+        INPUT:
+
+        - ``affine_parameter`` -- value of the affine parameter `\lambda`
+        - ``solution_key`` -- (default: ``None``) string denoting the numerical
+          solution to use for evaluating the various integrals of motion;
+          if ``None``, the latest solution computed by :meth:`integrate` is
+          used.
+
+        OUTPUT:
+
+        - a `SageMath table <https://doc.sagemath.org/html/en/reference/misc/sage/misc/table.html>`_
+          with the absolute and relative differences with respect to the
+          initial values.
+
         """
-        RF = RealField(16)
+        CF = ComplexField(16)
         lambda_min = self.domain().lower_bound()
         res = [["quantity", "value", "initial value", "diff.", "relative diff."]]
-        mu = self.evaluate_mu(affine_parameter)
-        mu0 = self.evaluate_mu(lambda_min)
+        mu = self.evaluate_mu(affine_parameter, solution_key=solution_key)
+        mu0 = self.evaluate_mu(lambda_min, solution_key=solution_key)
         diff = mu - mu0
-        rel_diff = RF(diff / mu0) if mu0 != 0 else "-"
-        res.append([r"$\mu$", mu, mu0, RF(diff), rel_diff])
-        E = self.evaluate_E(affine_parameter)
-        E0 = self.evaluate_E(lambda_min)
+        rel_diff = CF(diff / mu0) if mu0 != 0 else "-"
+        res.append([r"$\mu$", mu, mu0, CF(diff), rel_diff])
+        E = self.evaluate_E(affine_parameter, solution_key=solution_key)
+        E0 = self.evaluate_E(lambda_min, solution_key=solution_key)
         diff = E - E0
-        rel_diff = RF(diff / E0) if E0 != 0 else "-"
-        res.append([r"$E$", E, E0, RF(diff), rel_diff])
-        L = self.evaluate_L(affine_parameter)
-        L0 = self.evaluate_L(lambda_min)
+        rel_diff = CF(diff / E0) if E0 != 0 else "-"
+        res.append([r"$E$", E, E0, CF(diff), rel_diff])
+        L = self.evaluate_L(affine_parameter, solution_key=solution_key)
+        L0 = self.evaluate_L(lambda_min, solution_key=solution_key)
         diff = L - L0
-        rel_diff = RF(diff / L0) if L0 != 0 else "-"
-        res.append([r"$L$", L, L0, RF(diff), rel_diff])
-        Q = self.evaluate_Q(affine_parameter)
-        Q0 = self.evaluate_Q(lambda_min)
+        rel_diff = CF(diff / L0) if L0 != 0 else "-"
+        res.append([r"$L$", L, L0, CF(diff), rel_diff])
+        Q = self.evaluate_Q(affine_parameter, solution_key=solution_key)
+        Q0 = self.evaluate_Q(lambda_min, solution_key=solution_key)
         diff = Q - Q0
-        rel_diff = RF(diff / Q0) if Q0 != 0 else "-"
-        res.append([r"$Q$", Q, Q0, RF(diff), rel_diff])
+        rel_diff = CF(diff / Q0) if Q0 != 0 else "-"
+        res.append([r"$Q$", Q, Q0, CF(diff), rel_diff])
         return table(res, align="center")
