@@ -586,15 +586,65 @@ class KerrGeodesic(IntegratedGeodesic):
         - ``**control_param`` -- extra control parameters to be passed to the
           chosen solver
 
-        EXAMPLES::
+        EXAMPLES:
+
+        Bound timelike geodesic in Schwarzschild spacetime::
 
             sage: from kerrgeodesic_gw import KerrBH
             sage: M = KerrBH(0)
             sage: BLchart = M.boyer_lindquist_coordinates()
             sage: init_point = M((0, 10, pi/2, 0), name='P')
             sage: lamb = var('lamb', latex_name=r'\lambda')
-            sage: geod = M.geodesic((lamb, 0, 1500), init_point, mu=1, E=0.973, L=4.2, Q=0)
+            sage: lmax = 1500.
+            sage: geod = M.geodesic((lamb, 0, lmax), init_point, mu=1, E=0.973,
+            ....:                   L=4.2, Q=0)
             sage: geod.integrate()
+            sage: geod.plot(coordinates='xy')
+            Graphics object consisting of 2 graphics primitives
+
+        .. PLOT::
+
+                from kerrgeodesic_gw import KerrBH
+                M = KerrBH(0)
+                BLchart = M.boyer_lindquist_coordinates()
+                init_point = M((0, 10, pi/2, 0), name='P')
+                lamb = var('lamb', latex_name=r'\lambda')
+                lmax = 1500.
+                geod = M.geodesic((lamb, 0, lmax), init_point, mu=1, E=0.973, L=4.2, Q=0)
+                geod.integrate()
+                sphinx_plot(geod.plot(coordinates='xy'))
+
+        With the default integration step, the accuracy is not very good::
+
+            sage: geod.check_integrals_of_motion(lmax)  # tol 1.0e-13
+              quantity           value             initial value       diff.     relative diff.
+               $\mu$      1.0003807796583015     1.00000000000000    0.0003808     0.0003808
+                $E$       0.9645485805311029     0.973000000000000   -0.008451     -0.008686
+                $L$        3.889790563436613     4.20000000000000     -0.3102       -0.07386
+                $Q$      5.673017834930457e-32           0           5.673e-32         -
+
+        Let us improve it by specifying a smaller integration step::
+
+            sage: geod.integrate(step=0.1)
+            sage: geod.check_integrals_of_motion(lmax)  # tol 1.0e-13
+              quantity           value             initial value        diff.      relative diff.
+               $\mu$      1.0000050939413836     1.00000000000000     5.094e-6        5.094e-6
+                $E$       0.9729448259998978     0.973000000000000   -0.00005517    -0.00005671
+                $L$        4.19797382932658      4.20000000000000     -0.002026      -0.0004824
+                $Q$      6.607560765298608e-32           0            6.608e-32          -
+
+        We may set the parameter ``solution_key`` to keep track of various
+        numerical solutions::
+
+            sage: geod.integrate(step=0.1, solution_key='step_0.1')
+            sage: geod.integrate(step=0.02, solution_key='step_0.02')
+
+        and use it in the various evaluation functions::
+
+            sage: geod.evaluate_mu(lmax, solution_key='step_0.1')  # tol 1.0e-13
+            1.0000050939413836
+            sage: geod.evaluate_mu(lmax, solution_key='step_0.02')  # tol 1.0e-13
+            1.0000010211859807
 
         """
         # Substituting a and m by their numerical values:
@@ -804,6 +854,12 @@ class KerrGeodesic(IntegratedGeodesic):
         .. SEEALSO::
             `DifferentiableCurve.plot <https://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/curve.html#sage.manifolds.differentiable.curve.DifferentiableCurve.plot>`_
             for the other input parameters
+
+        OUTPUT:
+
+        - either a 2D graphic oject (2 coordinates specified in the parameter
+          ``coordinates``) or a 3D graphic object (3 coordinates in
+          ``coordinates``)
 
         """
         bad_format_msg = ("the argument 'coordinates' must be a string of "
