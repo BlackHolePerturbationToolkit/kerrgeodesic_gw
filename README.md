@@ -129,8 +129,8 @@ The pdf reference manual is then
 - For the tensor calculus functionalities of the
   [KerrBH](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/kerr_spacetime.html)
   class provided by the package, see these examples:
-  [Kerr 1](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Worksheets/v1.3/SM_Kerr.ipynb),
-  [Kerr 2](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Worksheets/v1.3/SM_Kerr_Killing_tensor.ipynb),
+  [Kerr 1](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Notebooks/SM_Kerr.ipynb),
+  [Kerr 2](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Notebooks/SM_Kerr_Killing_tensor.ipynb),
   [Kerr 3](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Worksheets/v1.3/SM_Simon-Mars_Kerr.ipynb),
   and more generally [SageManifolds documentation](https://sagemanifolds.obspm.fr/documentation.html).
 

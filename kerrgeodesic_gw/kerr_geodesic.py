@@ -247,7 +247,7 @@ class KerrGeodesic(IntegratedGeodesic):
     The 4-momentum vector `p` at any value of the affine parameter `\lambda`,
     e.g. `\lambda=200m`, is obtained by::
 
-        sage: p = geod.tangent_vector_eval_at(200); p
+        sage: p = geod.evaluate_tangent_vector(200); p
         Tangent vector at Point on the Kerr spacetime M
         sage: p in M.tangent_space(geod(200))
         True
@@ -289,7 +289,7 @@ class KerrGeodesic(IntegratedGeodesic):
             $L$       1.98248083176764    1.98200000000000    0.0004808      0.0002426
             $Q$      0.467214121733873    0.467000000000000   0.0002141      0.0004585
 
-    Decreasing the integration step results in smaller errors::
+    Decreasing the integration step leads to smaller errors::
 
         sage: geod.integrate(step=0.001)
         sage: geod.check_integrals_of_motion(300)  # tol 1.0e-13
