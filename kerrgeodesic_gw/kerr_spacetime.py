@@ -1020,6 +1020,63 @@ class KerrBH(PseudoRiemannianManifold):
                  latex_name=None, a_num=None, m_num=None, verbose=False):
         r"""
         Construct a geodesic on ``self``.
+
+
+        INPUT:
+
+        - ``curve_param`` -- a tuple of the type
+          ``(lamb, lamb_min, lamb_max)``, where
+
+          * ``lamb`` is the symbolic variable denoting the affine parameter
+            `\lambda` of the geodesic
+          * ``lamb_min`` is the minimal (finite) value of `\lambda`
+          * ``lamb_max`` is the maximal (finite) value of `\lambda`
+
+        - ``initial_point`` -- point of Kerr spacetime from which the geodesic
+          is to be integrated
+        - ``pt0`` -- (default: ``None``) Boyer-Lindquist component `p^t` of the
+          initial 4-momentum vector
+        - ``pr0`` -- (default: ``None``) Boyer-Lindquist component `p^r` of the
+          initial 4-momentum
+          vector
+        - ``pth0`` -- (default: ``None``) Boyer-Lindquist component `p^\theta`
+          of the initial 4-momentum vector
+        - ``pph0`` -- (default: ``None``) Boyer-Lindquist component `p^\phi` of
+          the initial 4-momentum vector
+        - ``mu`` -- (default: ``None``) mass `\mu` of the particle
+        - ``E`` -- (default: ``None``) conserved energy `E` of the particle
+        - ``L`` -- (default: ``None``) conserved angular momemtum `L` of the
+          particle
+        - ``Q`` -- (default: ``None``) Carter constant `Q` of the particle
+        - ``r_increase`` -- (default: ``True``) boolean; if ``True``, the
+          initial value of `p^r=\mathrm{d}r/\mathrm{d}\lambda` determined from
+          the integral of motions is positive or zero, otherwise, `p^r` is
+          negative
+        - ``th_increase`` -- (default: ``True``) boolean; if ``True``, the
+          initial value of `p^\theta=\mathrm{d}\theta/\mathrm{d}\lambda`
+          determined from the integral of motions is positive or zero,
+          otherwise, `p^\theta` is negative
+        - ``chart`` -- (default: ``None``) chart on the spacetime manifold in
+          terms of which the geodesic equations are expressed; if ``None`` the
+          default chart (Boyer-Lindquist coordinates) is assumed
+        - ``name`` -- (default: ``None``) string; symbol given to the geodesic
+        - ``latex_name`` -- (default: ``None``) string; LaTeX symbol to denote
+          the geodesic; if none is provided, ``name`` will be used
+        - ``a_num`` -- (default: ``None``) numerical value of the Kerr spin
+          parameter `a` (required for a numerical integration)
+        - ``m_num`` -- (default: ``None``) numerical value of the Kerr mass
+          parameter `m` (required for a numerical integration)
+        - ``verbose`` -- (default: ``False``) boolean; determines whether some
+          information is printed during the construction of the geodesic
+
+        OUTPUT:
+
+        - an instance of :class:`~.kerr_geodesic.KerrGeodesic`
+
+        EXAMPLES:
+
+        See :class:`~.kerr_geodesic.KerrGeodesic`.
+
         """
         from sage.manifolds.differentiable.real_line import RealLine
         from sage.manifolds.differentiable.manifold_homset import IntegratedGeodesicSet
