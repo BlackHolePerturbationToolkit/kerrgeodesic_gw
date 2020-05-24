@@ -654,7 +654,9 @@ class KerrGeodesic(IntegratedGeodesic):
         if solution_key is None:
             solution_key = method
         self._latest_solution = solution_key
-        self.solve(step=step, method=method, solution_key=solution_key,
+        # For compatibility with Sage < 9.0:
+        method0 = method if method != 'odeint' else 'ode_int'
+        self.solve(step=step, method=method0, solution_key=solution_key,
                    parameters_values=parameters_values, verbose=verbose,
                    **control_param)
         # Since a single interpolation method is currently implemented (cubic
