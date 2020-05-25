@@ -38,8 +38,6 @@ class KerrGeodesic(IntegratedGeodesic):
     - ``parent`` --
       `IntegratedGeodesicSet <https://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/manifold_homset.html>`_, the set of curves `\mathrm{Hom_{geodesic}}(I, M)` to
       which the geodesic belongs
-    - ``affine_parameter`` -- symbolic variable to be used for the affine
-      parameter of the geodesic
     - ``initial_point`` -- point of Kerr spacetime from which the geodesic
       is to be integrated
     - ``pt0`` -- (default: ``None``) Boyer-Lindquist component `p^t` of the
@@ -91,12 +89,6 @@ class KerrGeodesic(IntegratedGeodesic):
 
         sage: init_point = M((0, 6, pi/2, 0), name='P')
 
-    and introduce the affine parameter `\lambda` along the geodesic as a
-    symbolic variable (we cannot name it ``lambda``, since this is reserved
-    keyword in Python)::
-
-        sage: lamb = var('lamb', latex_name=r'\lambda')
-
     A geodesic is constructed by providing the range of the affine
     parameter, the initial point and either (i) the Boyer-Lindquist components
     `(p^t_0, p^r_0, p^\theta_0, p^\phi_0)` of the initial 4-momentum vector
@@ -108,7 +100,7 @@ class KerrGeodesic(IntegratedGeodesic):
     `\lambda\in[0, 300m]`, the option (ii) and `a=0.998 m`, where `m` in the
     black hole mass::
 
-        sage: geod = M.geodesic((lamb, 0, 300), init_point, mu=1, E=0.883,
+        sage: geod = M.geodesic([0, 300], init_point, mu=1, E=0.883,
         ....:                   L=1.982, Q=0.467, a_num=0.998)
         sage: geod
         Geodesic of the Kerr spacetime M
@@ -131,8 +123,7 @@ class KerrGeodesic(IntegratedGeodesic):
         M = KerrBH(a)
         M.boyer_lindquist_coordinates()
         init_point = M((0, 6, pi/2, 0), name='p0')
-        lamb = var('lamb', latex_name=r'\lambda')
-        geod = M.geodesic((lamb, 0, 300), init_point, mu=1, E=0.883, \
+        geod = M.geodesic([0, 300], init_point, mu=1, E=0.883, \
                           L=1.982, Q=0.467, a_num=0.998)
         geod.integrate(step=0.005)
         graph = geod.plot(label_axes=True)  # True is required for jmol
@@ -152,8 +143,7 @@ class KerrGeodesic(IntegratedGeodesic):
         M = KerrBH(a)
         M.boyer_lindquist_coordinates()
         init_point = M((0, 6, pi/2, 0), name='p0')
-        lamb = var('lamb', latex_name=r'\lambda')
-        geod = M.geodesic((lamb, 0, 300), init_point, mu=1, E=0.883, \
+        geod = M.geodesic([0, 300], init_point, mu=1, E=0.883, \
                           L=1.982, Q=0.467, a_num=0.998)
         geod.integrate(step=0.005)
         graph = geod.plot(coordinates='txy', label_axes=True)
@@ -171,8 +161,7 @@ class KerrGeodesic(IntegratedGeodesic):
         M = KerrBH(a)
         M.boyer_lindquist_coordinates()
         init_point = M((0, 6, pi/2, 0), name='p0')
-        lamb = var('lamb', latex_name=r'\lambda')
-        geod = M.geodesic((lamb, 0, 300), init_point, mu=1, E=0.883, \
+        geod = M.geodesic([0, 300], init_point, mu=1, E=0.883, \
                           L=1.982, Q=0.467, a_num=0.998)
         geod.integrate(step=0.005)
         graph = geod.plot(coordinates='xy', plot_points=2000)
@@ -190,8 +179,7 @@ class KerrGeodesic(IntegratedGeodesic):
         M = KerrBH(a)
         M.boyer_lindquist_coordinates()
         init_point = M((0, 6, pi/2, 0), name='p0')
-        lamb = var('lamb', latex_name=r'\lambda')
-        geod = M.geodesic((lamb, 0, 300), init_point, mu=1, E=0.883, \
+        geod = M.geodesic([0, 300], init_point, mu=1, E=0.883, \
                           L=1.982, Q=0.467, a_num=0.998)
         geod.integrate(step=0.005)
         graph = geod.plot(coordinates='xz')
@@ -311,7 +299,7 @@ class KerrGeodesic(IntegratedGeodesic):
         Tangent vector p at Point P on the Kerr spacetime M
         sage: p0[:]  # tol 1.0e-13
         [1.29225788954106, 0.00438084990626460, 0.0189826106258554, 0.0646134478134985]
-        sage: geod2 = M.geodesic((lamb, 0, 300), init_point, pt0=p0[0], pr0=p0[1],
+        sage: geod2 = M.geodesic([0, 300], init_point, pt0=p0[0], pr0=p0[1],
         ....:                    pth0=p0[2], pph0=p0[3], a_num=0.998)
         sage: geod2.initial_tangent_vector() == p0
         True
@@ -332,7 +320,7 @@ class KerrGeodesic(IntegratedGeodesic):
     three spatial components `(p^r_0, p^\theta_0, p^\phi_0)` of the initial
     4-momentum vector::
 
-        sage: geod3 = M.geodesic((lamb, 0, 300), init_point, mu=1, pr0=p0[1],
+        sage: geod3 = M.geodesic([0, 300], init_point, mu=1, pr0=p0[1],
         ....:                    pth0=p0[2], pph0=p0[3], a_num=0.998)
 
     The component `p^t_0` is then automatically computed::
@@ -350,7 +338,7 @@ class KerrGeodesic(IntegratedGeodesic):
     the conserved angular momentum `L` and the two components
     `(p^r_0, p^\theta_0)` of the initial 4-momentum vector::
 
-        sage: geod4 = M.geodesic((lamb, 0, 300), init_point, E=0.8830, L=1.982,
+        sage: geod4 = M.geodesic([0, 300], init_point, E=0.8830, L=1.982,
         ....:                     pr0=p0[1], pth0=p0[2], a_num=0.998)
         sage: geod4.initial_tangent_vector()[:]
         [1.29225788954106, 0.00438084990626460, 0.0189826106258554, 0.0646134478134985]
@@ -361,7 +349,7 @@ class KerrGeodesic(IntegratedGeodesic):
         [0, 0, 0, 0]
 
     """
-    def __init__(self, parent, affine_parameter,
+    def __init__(self, parent,
                  initial_point, pt0=None, pr0=None, pth0=None, pph0=None,
                  mu=None, E=None, L=None, Q=None, r_increase=True,
                  th_increase=True, chart=None, name=None,
@@ -388,7 +376,8 @@ class KerrGeodesic(IntegratedGeodesic):
             print("Initial tangent vector: ")
             pretty_print(self._init_vector.display())
         metric = self._spacetime.metric()
-        IntegratedGeodesic.__init__(self, parent, metric, affine_parameter,
+        lamb = SR.var('lamb', latex_name=r'\lambda')
+        IntegratedGeodesic.__init__(self, parent, metric, lamb,
                                     self._init_vector, chart=chart,
                                     name=name, latex_name=latex_name,
                                     verbose=verbose)
@@ -507,8 +496,7 @@ class KerrGeodesic(IntegratedGeodesic):
             sage: M = KerrBH(0)
             sage: BLchart = M.boyer_lindquist_coordinates()
             sage: init_point = M((0, 6, pi/2, 0), name='P')
-            sage: lamb = var('lamb', latex_name=r'\lambda')
-            sage: geod = M.geodesic((lamb, 0, 100), init_point, mu=0, E=1,
+            sage: geod = M.geodesic([0, 100], init_point, mu=0, E=1,
             ....:                   L=3, Q=0)
             sage: p0 = geod.initial_tangent_vector(); p0
             Tangent vector p at Point P on the Schwarzschild spacetime M
@@ -594,9 +582,8 @@ class KerrGeodesic(IntegratedGeodesic):
             sage: M = KerrBH(0)
             sage: BLchart = M.boyer_lindquist_coordinates()
             sage: init_point = M((0, 10, pi/2, 0), name='P')
-            sage: lamb = var('lamb', latex_name=r'\lambda')
             sage: lmax = 1500.
-            sage: geod = M.geodesic((lamb, 0, lmax), init_point, mu=1, E=0.973,
+            sage: geod = M.geodesic([0, lmax], init_point, mu=1, E=0.973,
             ....:                   L=4.2, Q=0)
             sage: geod.integrate()
             sage: geod.plot(coordinates='xy')
@@ -608,9 +595,8 @@ class KerrGeodesic(IntegratedGeodesic):
                 M = KerrBH(0)
                 BLchart = M.boyer_lindquist_coordinates()
                 init_point = M((0, 10, pi/2, 0), name='P')
-                lamb = var('lamb', latex_name=r'\lambda')
                 lmax = 1500.
-                geod = M.geodesic((lamb, 0, lmax), init_point, mu=1, E=0.973, L=4.2, Q=0)
+                geod = M.geodesic([0, lmax], init_point, mu=1, E=0.973, L=4.2, Q=0)
                 geod.integrate()
                 sphinx_plot(geod.plot(coordinates='xy'))
 

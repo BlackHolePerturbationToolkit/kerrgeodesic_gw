@@ -122,7 +122,7 @@ The pdf reference manual is then
 - Demo notebooks:
 
   - [Spin-weighted spheroidal harmonics](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/basic_kerrgeodesic_gw.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/basic_kerrgeodesic_gw.ipynb)
-  - [Timelike geodesic in Kerr spacetime](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/geod_Kerr.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/geod_Kerr.ipynb)
+  - [Timelike and null geodesics in Kerr spacetime](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/Kerr_geodesics.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/Kerr_geodesics.ipynb)
   - [Gravitational waves from circular orbits around a Kerr black hole](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/grav_waves_circular.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/grav_waves_circular.ipynb)
   - [More on gravitational waves from circular orbits](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/gw_single_particle.ipynb?viewer=share)
 

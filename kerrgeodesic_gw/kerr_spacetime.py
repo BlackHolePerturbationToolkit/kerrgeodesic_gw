@@ -1013,7 +1013,7 @@ class KerrBH(PseudoRiemannianManifold):
             r_min = self.isco_radius()
         return find_root(fzero, r_min, r_max)
 
-    def geodesic(self, curve_param, initial_point,
+    def geodesic(self, parameter_range, initial_point,
                  pt0=None, pr0=None, pth0=None, pph0=None,
                  mu=None, E=None, L=None, Q=None, r_increase=True,
                  th_increase=True, chart=None, name=None,
@@ -1021,17 +1021,10 @@ class KerrBH(PseudoRiemannianManifold):
         r"""
         Construct a geodesic on ``self``.
 
-
         INPUT:
 
-        - ``curve_param`` -- a tuple of the type
-          ``(lamb, lamb_min, lamb_max)``, where
-
-          * ``lamb`` is the symbolic variable denoting the affine parameter
-            `\lambda` of the geodesic
-          * ``lamb_min`` is the minimal (finite) value of `\lambda`
-          * ``lamb_max`` is the maximal (finite) value of `\lambda`
-
+        - ``parameter_range`` -- range of the affine parameter `\lambda`, as a
+          pair ``(lambda_min, lambda_max)``
         - ``initial_point`` -- point of Kerr spacetime from which the geodesic
           is to be integrated
         - ``pt0`` -- (default: ``None``) Boyer-Lindquist component `p^t` of the
@@ -1080,17 +1073,15 @@ class KerrBH(PseudoRiemannianManifold):
         """
         from sage.manifolds.differentiable.real_line import RealLine
         from sage.manifolds.differentiable.manifold_homset import IntegratedGeodesicSet
-
-        if len(curve_param) != 3:
-            raise ValueError("the argument 'curve_param' must be of " +
-                             "the form (t, t_min, t_max)")
-        t = curve_param[0]
-        t_min = curve_param[1]
-        t_max = curve_param[2]
-        real_field = RealLine(names=(repr(t),))
-        interval = real_field.open_interval(t_min, t_max)
+        if len(parameter_range) != 2:
+            raise ValueError("the argument 'parameter_range' must be of "
+                             "the form (lambda_min, lambda_max)")
+        lamb_min = parameter_range[0]
+        lamb_max = parameter_range[1]
+        real_field = RealLine(names=('lamb',))
+        interval = real_field.open_interval(lamb_min, lamb_max)
         integrated_geodesic_set = IntegratedGeodesicSet(interval, self)
-        return KerrGeodesic(integrated_geodesic_set, t, initial_point,
+        return KerrGeodesic(integrated_geodesic_set, initial_point,
                             pt0=pt0, pr0=pr0, pth0=pth0, pph0=pph0, mu=mu, E=E,
                             L=L, Q=Q, r_increase=r_increase,
                             th_increase=th_increase, chart=chart, name=name,
