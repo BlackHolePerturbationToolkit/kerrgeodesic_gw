@@ -24,7 +24,10 @@ to have the package ready to use in SageMath.
 See however *install from source* below if you want to build a
 local version of the documentation or modify the source files (development).
 
-*NB:* on the [CoCalc](https://cocalc.com) cloud computing platform, you need
+*NB1 (Ubuntu users):* if you have installed SageMath as the system package `sagemath` (e.g. via `apt-get install`), the installation is system wide and does not allow to use `-pip install` at the user level. Install instead SageMath from the most recent binary tar ball for Ubuntu
+from [SageMath download page](https://www.sagemath.org/download-linux.html).
+
+*NB2:* on the [CoCalc](https://cocalc.com) cloud computing platform, you need
 to add the option `--user`, i.e. open a terminal and run
 
     sage -pip install --user kerrgeodesic_gw
