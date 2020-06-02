@@ -865,15 +865,14 @@ class KerrGeodesic(IntegratedGeodesic):
             raise ValueError(bad_format_msg)
         if ambient_coords[0] == t:
             ambient_coords = ambient_coords[1:] + [t]
-        kwds['axes_labels'] = [repr(c) for c in ambient_coords] # unfortunately this option
-                                                                # is not forwarded to
-                                                                # three.js in Sage <= 9.1
+        axes_labels = kwds.get('axes_labels')
         if label_axes is None:  # the default
             if len(ambient_coords) == 2:
                 label_axes = True
             else:
                 label_axes = False  # since three.js has its own mechanism to
                                     # label axes
+                axes_labels = [repr(c) for c in ambient_coords]
         if solution_key is None:
             solution_key = self._latest_solution
         graph = self.plot_integrated(chart=X4, mapping=map_to_Euclidean,
@@ -910,6 +909,8 @@ class KerrGeodesic(IntegratedGeodesic):
                 else:
                     graph += circle((0,0), rH, edgecolor=horizon_color,
                                     thickness=2)
+        if axes_labels:
+            graph._extra_kwds['axes_labels'] = axes_labels
         return graph
 
     def check_integrals_of_motion(self, affine_parameter, solution_key=None):
