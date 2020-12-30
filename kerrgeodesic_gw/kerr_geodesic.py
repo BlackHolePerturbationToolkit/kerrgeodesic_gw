@@ -204,7 +204,7 @@ class KerrGeodesic(IntegratedGeodesic):
         sage: BLchart(geod(0))       # equivalent to above   # tol 1.0e-13
         (0.0, 6.0, 1.5707963267948966, 0.0)
         sage: geod(300).coordinates()   # tol 1.0e-13
-        (553.4637298235969, 3.7035524920469878, 1.6613833561392117, 84.62814586190511)
+        (553.4637300974945, 3.7035523865714906, 1.6613833515146383, 84.62814601752315)
 
     The initial 4-momentum vector `p_0` is returned by the method
     :meth:`initial_tangent_vector()`::
@@ -240,8 +240,8 @@ class KerrGeodesic(IntegratedGeodesic):
         sage: p in M.tangent_space(geod(200))
         True
         sage: p.display()  # tol 1.0e-13
-        1.3165926052039156 d/dt - 0.07370434461768362 d/dr
-         - 0.010911954123803514 d/dth + 0.07600209953046694 d/dph
+        1.316592599538385 d/dt - 0.07370434212575372 d/dr
+         - 0.010911954251379917 d/dth + 0.0760020976922675 d/dph
 
     The particle mass `\mu` computed at a given value of  `\lambda` is returned
     by the method :meth:`evaluate_mu`::
@@ -253,7 +253,7 @@ class KerrGeodesic(IntegratedGeodesic):
     to the numerical accuracy::
 
         sage: geod.evaluate_mu(300)  # tol 1.0e-13
-        1.0000117991483337
+        1.000011799029519
 
     Similarly, the conserved energy `E`, conserved angular momentum `L` and
     Carter constant `Q` are computed at any value of `\lambda` by respectively
@@ -272,20 +272,20 @@ class KerrGeodesic(IntegratedGeodesic):
 
         sage: geod.check_integrals_of_motion(300)  # tol 1.0e-13
           quantity         value            initial value       diff.      relative diff.
-           $\mu$     1.0000117991483337   1.00000000000000    0.00001180     0.00001180
-            $E$      0.883067996752519    0.883000000000000   0.00006800     0.00007701
-            $L$       1.98248083176764    1.98200000000000    0.0004808      0.0002426
-            $Q$      0.467214121733873    0.467000000000000   0.0002141      0.0004585
+           $\mu^2$   1.000023598198255   1.00000000000000    0.00002360     0.00002360
+            $E$      0.883067997592201   0.883000000000000   0.00006800     0.00007701
+            $L$      1.98248083165642    1.98200000000000    0.0004808      0.0002426
+            $Q$      0.467214120536574   0.467000000000000   0.0002141      0.0004585
 
     Decreasing the integration step leads to smaller errors::
 
         sage: geod.integrate(step=0.001)
         sage: geod.check_integrals_of_motion(300)  # tol 1.0e-13
           quantity         value            initial value       diff.      relative diff.
-           $\mu$     1.0000023592012068   1.00000000000000     2.359e-6       2.359e-6
-            $E$      0.883013605582177    0.883000000000000   0.00001361     0.00001541
-            $L$       1.98209628664691    1.98200000000000    0.00009629     0.00004858
-            $Q$      0.467042767529623    0.467000000000000   0.00004277     0.00009158
+          $\mu^2$    1.000004717486823   1.00000000000000     4.717e-6       4.717e-6
+            $E$      0.883013605071059   0.883000000000000   0.00001360     0.00001541
+            $L$      1.98209627732502    1.98200000000000    0.00009628     0.00004858
+            $Q$      0.467042767853191   0.467000000000000   0.00004277     0.00009158
 
 
     .. RUBRIC:: Various ways to initialize a geodesic
@@ -604,7 +604,7 @@ class KerrGeodesic(IntegratedGeodesic):
 
             sage: geod.check_integrals_of_motion(lmax)  # tol 1.0e-13
               quantity           value             initial value       diff.     relative diff.
-               $\mu$      1.0003807796583015     1.00000000000000    0.0003808     0.0003808
+              $\mu^2$     1.0007617043097512     1.00000000000000    0.0007617     0.0007617
                 $E$       0.9645485805311029     0.973000000000000   -0.008451     -0.008686
                 $L$        3.889790563436613     4.20000000000000     -0.3102       -0.07386
                 $Q$      5.673017834930457e-32           0           5.673e-32         -
@@ -614,7 +614,7 @@ class KerrGeodesic(IntegratedGeodesic):
             sage: geod.integrate(step=0.1)
             sage: geod.check_integrals_of_motion(lmax)  # tol 1.0e-13
               quantity           value             initial value        diff.      relative diff.
-               $\mu$      1.0000050939413836     1.00000000000000     5.094e-6        5.094e-6
+              $\mu^2$     1.0000101879087153     1.00000000000000    0.00001019      0.00001019
                 $E$       0.9729448259998978     0.973000000000000   -0.00005517    -0.00005671
                 $L$        4.19797382932658      4.20000000000000     -0.002026      -0.0004824
                 $Q$      6.607560765298608e-32           0            6.608e-32          -
@@ -694,12 +694,32 @@ class KerrGeodesic(IntegratedGeodesic):
         - value of `\mu`
 
         """
+        return sqrt(self.evaluate_mu2(affine_parameter,
+                                      solution_key=solution_key))
+
+    def evaluate_mu2(self, affine_parameter, solution_key=None):
+        r"""
+        Compute the square of the mass parameter `\mu^2` at a given value of
+        the affine parameter `\lambda`.
+
+        INPUT:
+
+        - ``affine_parameter`` -- value of the affine parameter `\lambda`
+        - ``solution_key`` -- (default: ``None``) string denoting the numerical
+          solution to use for the evaluation; if ``None``, the latest solution
+          computed by :meth:`integrate` is used.
+
+        OUTPUT:
+
+        - value of `\mu^2`
+
+        """
         p = self.evaluate_tangent_vector(affine_parameter,
                                          solution_key=solution_key)
         point = p.parent().base_point()
         g = self._spacetime.metric().at(point)
-        mu = sqrt(-g(p, p))
-        return mu.substitute(self._numerical_substitutions())
+        mu2 = -g(p, p)
+        return mu2.substitute(self._numerical_substitutions())
 
     def evaluate_E(self, affine_parameter, solution_key=None):
         r"""
@@ -789,7 +809,7 @@ class KerrGeodesic(IntegratedGeodesic):
         r, th = BLchart(point)[1:3]
         a = self._a
         rho4 = (r**2 + (a*cos(th))**2)**2
-        mu2 = self.evaluate_mu(affine_parameter)**2
+        mu2 = self.evaluate_mu2(affine_parameter)
         E2 = self.evaluate_E(affine_parameter, solution_key=solution_key)**2
         L2 = self.evaluate_L(affine_parameter, solution_key=solution_key)**2
         p_comp = p.components(basis=BLchart.frame().at(point))
@@ -935,11 +955,11 @@ class KerrGeodesic(IntegratedGeodesic):
         CF = ComplexField(16)
         lambda_min = self.domain().lower_bound()
         res = [["quantity", "value", "initial value", "diff.", "relative diff."]]
-        mu = self.evaluate_mu(affine_parameter, solution_key=solution_key)
-        mu0 = self.evaluate_mu(lambda_min, solution_key=solution_key)
-        diff = mu - mu0
-        rel_diff = CF(diff / mu0) if mu0 != 0 else "-"
-        res.append([r"$\mu$", mu, mu0, CF(diff), rel_diff])
+        mu2 = self.evaluate_mu2(affine_parameter, solution_key=solution_key)
+        mu20 = self.evaluate_mu2(lambda_min, solution_key=solution_key)
+        diff = mu2 - mu20
+        rel_diff = CF(diff / mu20) if mu20 != 0 else "-"
+        res.append([r"$\mu^2$", mu2, mu20, CF(diff), rel_diff])
         E = self.evaluate_E(affine_parameter, solution_key=solution_key)
         E0 = self.evaluate_E(lambda_min, solution_key=solution_key)
         diff = E - E0
