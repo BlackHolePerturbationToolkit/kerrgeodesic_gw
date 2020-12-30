@@ -264,7 +264,7 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
         sage: mu_ov_r = astro_data.Msol_m / astro_data.dSgrA  # mu/r
         sage: signal_to_noise(h, time_scale, psd, fmin, fmax,     # tol 1.0e-13
         ....:                 interpolation='spline', scale=mu_ov_r)
-        7582.5363375174875
+        7583.104124621172
 
     Signal-to-noise for a signal computed at the quadrupole approximation::
 
@@ -272,7 +272,7 @@ def signal_to_noise(signal, time_scale, psd, fmin, fmax, scale=1,
         ....:                       nb_points=4000, approximation='quadrupole')
         sage: signal_to_noise(h, time_scale, psd, fmin, fmax,     # tol 1.0e-13
         ....:                 interpolation='spline', scale=mu_ov_r)
-        5380.74197174931
+        5383.264004811493
 
     """
     sig = [(t*time_scale, h) for (t, h) in signal]
@@ -355,21 +355,21 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
         sage: mu_ov_r = astro_data.Msol_m / astro_data.dSgrA  # mu/r
         sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
         ....:                          BH_time_scale, scale=mu_ov_r)
-        7565.6612762972445
+        7565.450402023329
 
     Using the quadrupole approximation::
 
         sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
         ....:                          BH_time_scale, scale=mu_ov_r,
         ....:                          approximation='quadrupole')
-        5230.403692883996
+        5230.216539094391
 
     Using the 1.5-PN approximation (``m_max`` has to be at most 5)::
 
         sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
         ....:                          BH_time_scale, scale=mu_ov_r,
         ....:                          approximation='1.5PN', m_max=5)
-        7601.344521598601
+        7601.135299165022
 
     For large values of `r_0`, the 1.5-PN approximation and the quadrupole one
     converge::
@@ -378,11 +378,11 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
         sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
         ....:                          BH_time_scale, scale=mu_ov_r,
         ....:                          approximation='quadrupole')
-        0.0030532227165507805
+        0.003053021617751869
         sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
         ....:                          BH_time_scale, scale=mu_ov_r,
         ....:                          approximation='1.5PN')
-        0.0031442135473417616
+        0.003144006483338098
 
     ::
 
@@ -390,11 +390,11 @@ def signal_to_noise_particle(a, r0, theta, psd, t_obs, BH_time_scale,
         sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
         ....:                          BH_time_scale, scale=mu_ov_r,
         ....:                          approximation='quadrupole')
-        9.663790254603111e-09
+        9.663153184393872e-09
         sage: signal_to_noise_particle(a, r0, theta, psd, t_obs,  # tol 1.0e-13
         ....:                          BH_time_scale, scale=mu_ov_r,
         ....:                          approximation='1.5PN')
-        9.687469292984858e-09
+        9.686830661779979e-09
 
     """
     from .gw_particle import h_amplitude_particle_fourier
@@ -476,25 +476,25 @@ def max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,
         sage: BH_time_scale = astro_data.SgrA_mass_s
         sage: distance = astro_data.SgrA_distance_pc
         sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance)  # tol 1.0e-13
-        46.983486000490934
+        46.98292057022975
 
     Lowering the SNR threshold to 5::
 
         sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,  # tol 1.0e-13
         ....:                       snr_threshold=5)
-        53.504027668563694
+        53.503386416644645
 
     Lowering the data acquisition time to 1 day::
 
         sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,  # tol 1.0e-13
         ....:                       t_obs_yr=1./365.25)
-        27.159049347284462
+        27.158725683511463
 
     Assuming an inclination angle of `\pi/2`::
 
         sage: theta = pi/2
         sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance)  # tol 1.0e-13
-        39.8187305700897
+        39.81826500968452
 
     Using the 1.5-PN approximation (``a`` has to be zero and ``m_max`` has to
     be at most 5)::
@@ -502,7 +502,7 @@ def max_detectable_radius(a, mu, theta, psd, BH_time_scale, distance,
         sage: a = 0
         sage: max_detectable_radius(a, mu, theta, psd, BH_time_scale,  # tol 1.0e-13
         ....:                       distance, approximation='1.5PN', m_max=5)
-        39.743201341922195
+        39.74273792957649
 
     """
     from sage.numerical.optimize import find_root

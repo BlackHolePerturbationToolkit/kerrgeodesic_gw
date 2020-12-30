@@ -946,13 +946,13 @@ class KerrBH(PseudoRiemannianManifold):
             sage: from kerrgeodesic_gw import KerrBH
             sage: BH = KerrBH(0)
             sage: BH.roche_limit_radius(1, mass_bh=4.1e6)  # tol 1.0e-13
-            34.237640374879014
+            34.23653024850463
 
         Instead of providing the density in solar units (the default), we can
         provide it in SI units (`{\rm kg\, m}^{-3}`)::
 
             sage: BH.roche_limit_radius(1.41e3, rho_unit='SI', mass_bh=4.1e6)  # tol 1.0e-13
-            34.23628318664114
+            34.23517310503541
 
         or in geometrized units (`M^{-2}`), in which case it is not necessary
         to specify the black hole mass::
@@ -963,33 +963,33 @@ class KerrBH(PseudoRiemannianManifold):
         Case of a corotating star::
 
             sage: BH.roche_limit_radius(1, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
-            37.72273453630254
+            37.72150497210367
 
         Case of a brown dwarf::
 
             sage: BH.roche_limit_radius(131., mass_bh=4.1e6)  # tol 1.0e-13
-            7.310533491138797
+            7.3103232747243165
             sage: BH.roche_limit_radius(131., mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
-            7.858624964105177
+            7.858389409707688
 
         Case of a white dwarf::
 
             sage: BH.roche_limit_radius(1.1e6, mass_bh=4.1e6, r_min=0.1)  # tol 1.0e-13
-            0.28481414467302646
+            0.2848049914201514
             sage: BH.roche_limit_radius(1.1e6, mass_bh=4.1e6, k_rot=1, r_min=0.1)  # tol 1.0e-13
-            0.3264830116324442
+            0.3264724605157346
 
         Roche limits around a rapidly rotating black hole::
 
             sage: BH = KerrBH(0.999)
             sage: BH.roche_limit_radius(1, mass_bh=4.1e6)  # tol 1.0e-13
-            34.25172708953104
+            34.250609907563984
             sage: BH.roche_limit_radius(1, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
-            37.72473460397109
+            37.72350054417335
             sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6)  # tol 1.0e-13
-            8.74384867481928
+            8.74356702311824
             sage: BH.roche_limit_radius(64.2, mass_bh=4.1e6, k_rot=1)  # tol 1.0e-13
-            9.575923395816831
+            9.575613156232857
 
         """
         from sage.numerical.optimize import find_root

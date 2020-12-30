@@ -13,7 +13,7 @@ Fundamental constants (in SI units)::
 
     sage: from kerrgeodesic_gw import astro_data
     sage: astro_data.G
-    6.67408e-11
+    6.6743e-11
     sage: astro_data.c
     299792458.0
 
@@ -25,12 +25,12 @@ Solar mass in kg::
 Solar mass in meters (geometrized units)::
 
     sage: astro_data.solar_mass_m  # tol 1.0e-13
-    1476.6284425812723
+    1476.6771171937082
 
 Solar mass in seconds (geometrized units)::
 
     sage: astro_data.solar_mass_s  # tol 1.0e-13
-    4.925502303934786e-06
+    4.925664664965348e-06
 
 Mass of Sgr A* in solar masses::
 
@@ -45,19 +45,19 @@ Mass of Sgr A* in kg::
 Mass of Sgr A* in meters (geometrized units)::
 
     sage: astro_data.SgrA_mass_m  # tol 1.0e-13
-    6054176614.583217
+    6054376180.4942045
 
 Mass of Sgr A* in seconds (geometrized units)::
 
     sage: astro_data.SgrA_mass_s  # tol 1.0e-13
-    20.19455944613262
+    20.19522512635793
 
 Distance to Sgr A* in parsecs and meters, respectively::
 
     sage: astro_data.SgrA_distance_pc
     8120.0
     sage: astro_data.SgrA_distance_m  # tol 1.0e-13
-    2.5055701960202522e+20
+    2.5055701961709902e+20
 
 """
 #******************************************************************************
