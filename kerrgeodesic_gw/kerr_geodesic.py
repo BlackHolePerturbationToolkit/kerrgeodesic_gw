@@ -912,8 +912,11 @@ class KerrGeodesic(IntegratedGeodesic):
             if len(ambient_coords) == 3:
                 if t in ambient_coords:
                     BLchart = self._spacetime.boyer_lindquist_coordinates()
-                    lambda_min = self.domain().lower_bound()
-                    lambda_max = self.domain().upper_bound()
+                    if prange:
+                        lambda_min, lambda_max = prange
+                    else:
+                        lambda_min = self.domain().lower_bound()
+                        lambda_max = self.domain().upper_bound()
                     tmin = BLchart(self(lambda_min))[0]
                     tmax = BLchart(self(lambda_max))[0]
                     graph += Cylinder(rH, tmax - tmin, color=horizon_color,
