@@ -27,7 +27,7 @@ from sage.rings.rational_field import QQ
 from sage.symbolic.constants import pi
 from sage.misc.cachefunc import cached_method
 from sage.manifolds.differentiable.pseudo_riemannian import PseudoRiemannianManifold
-from sage.manifolds.differentiable.euclidean import EuclideanSpace
+from sage.manifolds.differentiable.examples.euclidean import EuclideanSpace
 from .kerr_geodesic import KerrGeodesic
 
 class KerrBH(PseudoRiemannianManifold):
