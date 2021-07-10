@@ -8,10 +8,10 @@ This package makes use of SageMath functionalities developed through the [SageMa
 
 ### Requirements
 
-This package requires the Python-based free mathematics software system [SageMath](https://www.sagemath.org/) (at least version 8.2).
+This package requires the Python-based free mathematics software system [SageMath](https://www.sagemath.org/) (at least version 9.3).
 
-*NB:* the version of SageMath shipped with Ubuntu 18.04 is only 8.1; instead of
-the Ubuntu package `sagemath`, install then the most recent binary for Ubuntu 18.04
+*NB:* the version of SageMath shipped with Ubuntu 20.04 is only 9.0; instead of
+the Ubuntu package `sagemath`, install then the most recent binary for Ubuntu 20.04
 from [SageMath download page](https://www.sagemath.org/download-linux.html).
 
 ### Simple installation from PyPI

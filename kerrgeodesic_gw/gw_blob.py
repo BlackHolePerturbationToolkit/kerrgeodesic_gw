@@ -91,7 +91,7 @@ def h_blob(u, theta, phi, a, surf_dens, param_surf_dens, integ_range,
         sage: integ_range = [6.3, 6.7, -0.04, 0.04]
         sage: h_blob(0., pi/2, 0., a, surface_density_toy_model,  # tol 1.0e-13
         ....:        param_surf_dens, integ_range)
-        (0.03688373245628765, 9.872900530109585e-10)
+        (0.03688373245628765, 9.872900827148663e-10)
         sage: h_blob(0., pi/2, 0., a, surface_density_toy_model,  # tol 1.0e-13
         ....:        param_surf_dens, integ_range, l_max=5)
         (0.037532424224875585, 1.3788099591183387e-09)
@@ -100,7 +100,7 @@ def h_blob(u, theta, phi, a, surf_dens, param_surf_dens, integ_range,
 
         sage: h_blob(0., pi/4, 0., a, surface_density_toy_model,  # tol 1.0e-13
         ....:        param_surf_dens, integ_range, mode='x')
-        (0.06203815455135455, 1.972915343495317e-09)
+        (0.06203815455135455, 1.972915290337975e-09)
         sage: h_blob(0., pi/4, 0., a, surface_density_toy_model,  # tol 1.0e-13
         ....:        param_surf_dens, integ_range, mode='x', l_max=5)
         (0.06121422594295032, 1.924590678064715e-09)
@@ -318,7 +318,7 @@ def h_toy_model_semi_analytic(u, theta, phi, a, r0, phi0, lam, Dphi, l_max=10):
     import numpy
     from sage.rings.real_double import RDF
     from sage.rings.complex_double import CDF
-    from sage.symbolic.all import i as I
+    from sage.symbolic.constants import I
     from .spin_weighted_spherical_harm import spin_weighted_spherical_harmonic
     from .spin_weighted_spheroidal_harm import spin_weighted_spheroidal_harmonic
     from .zinf import Zinf

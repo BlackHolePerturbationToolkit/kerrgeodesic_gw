@@ -30,8 +30,7 @@ from sage.functions.other import sqrt
 from sage.functions.log import ln
 from sage.rings.real_double import RDF
 from sage.rings.complex_double import CDF
-from sage.symbolic.constants import pi
-from sage.symbolic.all import i as I
+from sage.symbolic.constants import pi, I
 
 _cached_splines = {}
 

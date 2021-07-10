@@ -17,8 +17,7 @@ from sage.rings.real_mpfr import RealField_class
 from sage.functions.other import binomial, factorial, sqrt
 from sage.functions.log import exp
 from sage.functions.trig import cos, sin
-from sage.symbolic.constants import pi
-from sage.symbolic.all import i as I
+from sage.symbolic.constants import pi, I
 from sage.symbolic.expression import Expression
 
 _cached_functions = {}

@@ -16,7 +16,7 @@ from sage.functions.other import sqrt
 from sage.symbolic.expression import Expression
 from sage.symbolic.relation import solve
 from sage.symbolic.ring import SR
-from sage.rings.complex_field import ComplexField
+from sage.rings.complex_mpfr import ComplexField
 from sage.rings.real_mpfr import RR
 from sage.plot.circle import circle
 from sage.plot.plot3d.shapes import Cylinder

@@ -1071,7 +1071,8 @@ class KerrBH(PseudoRiemannianManifold):
         See :class:`~.kerr_geodesic.KerrGeodesic`.
 
         """
-        from sage.manifolds.differentiable.real_line import RealLine
+
+        from sage.manifolds.differentiable.examples.real_line import RealLine
         from sage.manifolds.differentiable.manifold_homset import IntegratedGeodesicSet
         if len(parameter_range) != 2:
             raise ValueError("the argument 'parameter_range' must be of "
