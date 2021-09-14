@@ -121,7 +121,7 @@ The pdf reference manual is then
 ### Online documentation
 
 - [Reference manual](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/index.html)
-  ([PDF](https://cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/latex/kerrgeodesic_gw.pdf))
+  ([PDF](https://cocalc.com/share/raw/69ba86bdcd1228be93df6b33bba9563cbb943ac6/kerrgeodesic_gw/docs/build/latex/kerrgeodesic_gw.pdf))
 - [Article describing the formulas implemented in the package](https://doi.org/10.1051/0004-6361/201935406) *(open access)*
 - Demo notebooks:
 
