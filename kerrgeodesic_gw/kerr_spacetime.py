@@ -77,12 +77,12 @@ class KerrBH(PseudoRiemannianManifold):
         sage: g = BH.metric(); g
         Lorentzian metric g on the Kerr spacetime M
         sage: g.display()
-        g = -(a^2*cos(th)^2 - 2*m*r + r^2)/(a^2*cos(th)^2 + r^2) dt*dt
-         - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dt*dph
-         + (a^2*cos(th)^2 + r^2)/(a^2 - 2*m*r + r^2) dr*dr
-         + (a^2*cos(th)^2 + r^2) dth*dth
-         - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dph*dt
-         + (2*a^2*m*r*sin(th)^4 + (a^2*r^2 + r^4 + (a^4 + a^2*r^2)*cos(th)^2)*sin(th)^2)/(a^2*cos(th)^2 + r^2) dph*dph
+        g = -(a^2*cos(th)^2 - 2*m*r + r^2)/(a^2*cos(th)^2 + r^2) dt⊗dt
+         - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dt⊗dph
+         + (a^2*cos(th)^2 + r^2)/(a^2 - 2*m*r + r^2) dr⊗dr
+         + (a^2*cos(th)^2 + r^2) dth⊗dth
+         - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dph⊗dt
+         + (2*a^2*m*r*sin(th)^4 + (a^2*r^2 + r^4 + (a^4 + a^2*r^2)*cos(th)^2)*sin(th)^2)/(a^2*cos(th)^2 + r^2) dph⊗dph
         sage: g[0,3]
         -2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2)
 
@@ -93,13 +93,13 @@ class KerrBH(PseudoRiemannianManifold):
         Kerr spacetime M
         sage: g = BH.metric()
         sage: g.display()  # tol 1.0e-13
-        g = -(r^2 + 0.81*cos(th)^2 - 2*r)/(r^2 + 0.81*cos(th)^2) dt*dt
-          - 1.8*r*sin(th)^2/(r^2 + 0.81*cos(th)^2) dt*dph
-          + (1.0*r^2 + 0.81*cos(th)^2)/(1.0*r^2 - 2.0*r + 0.81) dr*dr
-          + (r^2 + 0.81*cos(th)^2) dth*dth
-         - 1.8*r*sin(th)^2/(r^2 + 0.81*cos(th)^2) dph*dt
+        g = -(r^2 + 0.81*cos(th)^2 - 2*r)/(r^2 + 0.81*cos(th)^2) dt⊗dt
+         - 1.8*r*sin(th)^2/(r^2 + 0.81*cos(th)^2) dt⊗dph
+         + (1.0*r^2 + 0.81*cos(th)^2)/(1.0*r^2 - 2.0*r + 0.81) dr⊗dr
+         + (r^2 + 0.81*cos(th)^2) dth⊗dth
+         - 1.8*r*sin(th)^2/(r^2 + 0.81*cos(th)^2) dph⊗dt
          + (1.62*r*sin(th)^4 + (1.0*r^4 + (0.81*r^2 + 0.6561)*cos(th)^2
-            + 0.81*r^2)*sin(th)^2)/(1.0*r^2 + 0.81*cos(th)^2) dph*dph
+            + 0.81*r^2)*sin(th)^2)/(1.0*r^2 + 0.81*cos(th)^2) dph⊗dph
         sage: g[0,3]
         -1.8*r*sin(th)^2/(r^2 + 0.81*cos(th)^2)
 
@@ -109,7 +109,7 @@ class KerrBH(PseudoRiemannianManifold):
         sage: BH = KerrBH(0, m)
         sage: g = BH.metric()
         sage: g.display()
-        g = (2*m - r)/r dt*dt - r/(2*m - r) dr*dr + r^2 dth*dth + r^2*sin(th)^2 dph*dph
+        g = (2*m - r)/r dt⊗dt - r/(2*m - r) dr⊗dr + r^2 dth⊗dth + r^2*sin(th)^2 dph⊗dph
 
     The object returned by :meth:`metric` belongs to the SageMath class
     `PseudoRiemannianMetric <http://doc.sagemath.org/html/en/reference/manifolds/sage/manifolds/differentiable/metric.html>`_,
@@ -400,18 +400,18 @@ class KerrBH(PseudoRiemannianManifold):
             sage: BH.metric()
             Lorentzian metric g on the Kerr spacetime M
             sage: BH.metric().display()
-            g = -(a^2*cos(th)^2 - 2*m*r + r^2)/(a^2*cos(th)^2 + r^2) dt*dt
-             - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dt*dph
-             + (a^2*cos(th)^2 + r^2)/(a^2 - 2*m*r + r^2) dr*dr
-             + (a^2*cos(th)^2 + r^2) dth*dth
-             - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dph*dt
-             + (2*a^2*m*r*sin(th)^4 + (a^2*r^2 + r^4 + (a^4 + a^2*r^2)*cos(th)^2)*sin(th)^2)/(a^2*cos(th)^2 + r^2) dph*dph
+            g = -(a^2*cos(th)^2 - 2*m*r + r^2)/(a^2*cos(th)^2 + r^2) dt⊗dt
+             - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dt⊗dph
+             + (a^2*cos(th)^2 + r^2)/(a^2 - 2*m*r + r^2) dr⊗dr
+             + (a^2*cos(th)^2 + r^2) dth⊗dth
+             - 2*a*m*r*sin(th)^2/(a^2*cos(th)^2 + r^2) dph⊗dt
+             + (2*a^2*m*r*sin(th)^4 + (a^2*r^2 + r^4 + (a^4 + a^2*r^2)*cos(th)^2)*sin(th)^2)/(a^2*cos(th)^2 + r^2) dph⊗dph
 
         The Schwarzschild metric::
 
             sage: KerrBH(0, m).metric().display()
-            g = (2*m - r)/r dt*dt - r/(2*m - r) dr*dr + r^2 dth*dth
-             + r^2*sin(th)^2 dph*dph
+            g = (2*m - r)/r dt⊗dt - r/(2*m - r) dr⊗dr + r^2 dth⊗dth
+             + r^2*sin(th)^2 dph⊗dph
 
         """
         if self._metric is None:
