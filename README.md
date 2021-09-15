@@ -120,18 +120,18 @@ The pdf reference manual is then
 
 ### Online documentation
 
-- [Reference manual](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/index.html)
-  ([PDF](https://cocalc.com/share/raw/69ba86bdcd1228be93df6b33bba9563cbb943ac6/kerrgeodesic_gw/docs/build/latex/kerrgeodesic_gw.pdf))
+- [Reference manual](https://sagemanifolds.obspm.fr/kerrgeodesic_gw/reference/)
+  ([PDF](https://sagemanifolds.obspm.fr/kerrgeodesic_gw/kerrgeodesic_gw.pdf))
 - [Article describing the formulas implemented in the package](https://doi.org/10.1051/0004-6361/201935406) *(open access)*
 - Demo notebooks:
 
   - [Spin-weighted spheroidal harmonics](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/basic_kerrgeodesic_gw.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/basic_kerrgeodesic_gw.ipynb)
   - [Timelike and null geodesics in Kerr spacetime](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/Kerr_geodesics.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/Kerr_geodesics.ipynb)
   - [Gravitational waves from circular orbits around a Kerr black hole](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/grav_waves_circular.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/grav_waves_circular.ipynb)
-  - [More on gravitational waves from circular orbits](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/gw_single_particle.ipynb?viewer=share)
+  - [More on gravitational waves from circular orbits](https://nbviewer.jupyter.org/github/BlackHolePerturbationToolkit/kerrgeodesic_gw/blob/master/Notebooks/gw_single_particle.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlackHolePerturbationToolkit/kerrgeodesic_gw/master?filepath=Notebooks/gw_single_particle.ipynb)
 
 - For the tensor calculus functionalities of the
-  [KerrBH](https://share.cocalc.com/share/2b3f8da9-6d53-4261-b5a5-ff27b5450abb/kerrgeodesic_gw/docs/build/html/kerr_spacetime.html)
+  [KerrBH](https://sagemanifolds.obspm.fr/kerrgeodesic_gw/reference/kerr_spacetime.html)
   class provided by the package, see these examples:
   [Kerr 1](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Notebooks/SM_Kerr.ipynb),
   [Kerr 2](https://nbviewer.jupyter.org/github/sagemanifolds/SageManifolds/blob/master/Notebooks/SM_Kerr_Killing_tensor.ipynb),
