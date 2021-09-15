@@ -7,3 +7,4 @@
 - v0.3.2 (30 Dec 2020): update to SageMath 9.2 (SciPy 1.5.2) + new method `KerrGeodesic.evaluate_mu2`
 - v0.4   (11 Jul 2021): update to SageMath 9.3
 - v0.4.1 (14 Sep 2021): update to SageMath 9.4 (SciPy 1.6.3)
+- v0.4.2 (15 Sep 2021): new location for the online reference manual
