@@ -179,7 +179,7 @@ def spin_weighted_spherical_harmonic(s, l, m, theta, phi,
         sage: spin_weighted_spherical_harmonic(-2, 2, 1, float(3.0), float(4.0))  # tol 1.0e-13
         (-0.0002911423884400524-0.00033709085352998027j)
         sage: parent(_)
-        <type 'complex'>
+        <class 'complex'>
 
     Computation with arbitrary precision are possible (here 100 bits)::
 
@@ -210,7 +210,7 @@ def spin_weighted_spherical_harmonic(s, l, m, theta, phi,
         sage: spin_weighted_spherical_harmonic(-2, 2, 1, pi/3, pi/4, numerical=float)  # tol 1.0e-13
         (0.28970565151739225+0.2897056515173922j)
         sage: parent(_)
-        <type 'complex'>
+        <class 'complex'>
 
     One can go beyond double precision, for instance using 100 bits of
     precision::
