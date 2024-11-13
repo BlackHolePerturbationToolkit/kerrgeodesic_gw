@@ -351,7 +351,7 @@ class KerrBH(PseudoRiemannianManifold):
             sage: BLchart
             Chart (M, (t, r, th, ph))
             sage: type(ph)
-            <type 'sage.symbolic.expression.Expression'>
+            <class 'sage.symbolic.expression.Expression'>
 
         Actually, ``BLchart.<t, r, th, ph> = BH.boyer_lindquist_coordinates()``
         is a shortcut for::
