@@ -46,4 +46,5 @@ setup(
     package_data={'kerrgeodesic_gw': ['data/*.dat']},
     cmdclass={'test': SageTest}, # adding a special setup command for tests
     install_requires=['sphinx'],
+    extras_require={'passagemath': ['passagemath-symbolics[plot,test]']},
 )
