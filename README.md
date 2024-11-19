@@ -86,7 +86,9 @@ Download the source from the git repository:
 
     git clone https://github.com/BlackHolePerturbationToolkit/kerrgeodesic_gw.git
 
-This creates a directory `kerrgeodesic_gw`.
+This creates a directory `kerrgeodesic_gw`. Change to that directory:
+
+    cd kerrgeodesic_gw
 
 Create and activate a virtual environment:
 
