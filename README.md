@@ -80,6 +80,40 @@ Once the package is installed, you can use it in SageMath, like for instance:
     1/4*(sqrt(5)*cos(theta) + sqrt(5))*e^(I*phi)*sin(theta)/sqrt(pi)
 
 
+## Usage in a virtual Python environment (no SageMath installation required)
+
+Download the source from the git repository:
+
+    git clone https://github.com/BlackHolePerturbationToolkit/kerrgeodesic_gw.git
+
+This creates a directory `kerrgeodesic_gw`.
+
+Create and activate a virtual environment:
+
+    python3 -m venv venv_kerrgeodesic_gw
+    . venv_kerrgeodesic_gw/bin/activate
+
+Install the package in the virtual environment:
+
+    pip install -e .[passagemath]
+
+This automatically installs the modularized parts of the Sage library that are
+needed by the package.
+
+Start Python:
+
+    python3
+
+Import and use the package:
+
+    >>> from sage.all__sagemath_symbolics import *
+    >>> from sage.all__sagemath_plot import *
+    >>> from kerrgeodesic_gw import spin_weighted_spherical_harmonic
+    >>> theta, phi = var('theta phi')
+    >>> spin_weighted_spherical_harmonic(-2, 2, 1, theta, phi)
+    1/4*(sqrt(5)*cos(theta) + sqrt(5))*e^(I*phi)*sin(theta)/sqrt(pi)
+
+
 ## Tests
 
 This package is configured for tests written in the documentation strings of the source files, also known as *doctests*.
